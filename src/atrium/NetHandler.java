@@ -8,7 +8,6 @@ import java.util.List;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import data.Data;
 import data.DataTypes;
@@ -34,67 +33,7 @@ public class NetHandler {
 			registerClasses(server.getKryo());
 
 			Utilities.log(this, "Registering server listeners");
-			server.addListener(new Listener() {
-				//New incoming connection
-				public void connected(Connection connection) {
-					try {
-						Peer newPeer = new Peer(connection, 1);
-						newPeer.getConnection().sendTCP(new Request(RequestTypes.MUTEX, null));
-						newPeer.getConnection().sendTCP(new Request(RequestTypes.PEERLIST, null));
-						newPeer.getLatch().await();
-						addPeer(newPeer);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-
-				//New incoming packet post-connection
-				public void received(Connection connection, Object object) {
-					if(object instanceof Request) {
-						Request request = (Request) object;
-						String type = request.getType();
-
-						switch(type) {
-							case RequestTypes.MUTEX:
-								Utilities.log(this, "Received request for mutex");
-								connection.sendTCP(new Data(DataTypes.MUTEX, Core.mutex));
-								break;
-						
-							case RequestTypes.PEERLIST:
-								Utilities.log(this, "Received request for peerlist");
-								//TODO: more refined peerList filtering
-								connection.sendTCP(new Data(DataTypes.PEERLIST, peers));
-								break;
-								
-							default: 
-								Utilities.log(this, "Got request type " + type + " with payload of " + request.getPayload().toString());
-								break;
-						}
-					}
-
-					if(object instanceof Data) {
-						Data data = (Data) object;
-						String type = data.getType();
-
-						switch(type) {
-							case DataTypes.MUTEX:
-								Utilities.log(this, "Received mutex data");
-								Peer.findPeer(connection).setMutex((String) data.getPayload());
-								break;
-								
-							case DataTypes.PEERLIST:
-								Utilities.log(this,  "Received peerlist data");
-								//TODO: implement peerlist processing
-								Utilities.log(this, "Peerlist: " + (String) data.getPayload());
-								break;
-								
-							default: 
-								Utilities.log(this, "Got data type " + type + " with payload of " + data.getPayload().toString());
-								break;
-						}
-					}
-				}
-			});
+			server.addListener(new DualListener(this));
 
 			Utilities.log(this, "Starting server component");
 			server.bind(Core.tcp, Core.udp);
@@ -111,16 +50,7 @@ public class NetHandler {
 			Utilities.log(this, "Registering client listeners");
 
 			//Use listeners, not arbitrary code
-			client.addListener(new Listener() {
-				public void connected(Connection connection) {
-					//TODO: fix this to allow for two-way communication
-					addPeer(new Peer(connection, 0));
-				}
-
-				public void received(Connection connection, Object object) {
-
-				}
-			});
+			client.addListener(new DualListener(this));
 
 			Utilities.log(this, "Starting client component");
 			client.start();
@@ -188,7 +118,7 @@ public class NetHandler {
 	 * Adds a peer only if it isn't of self or other peers' mutex
 	 * @param peer
 	 */
-	private void addPeer(Peer peer) {
+	public void addPeer(Peer peer) {
 		if(peer.getMutex().equals(Core.mutex)) {
 			return;
 		}
