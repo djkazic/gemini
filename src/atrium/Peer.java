@@ -6,13 +6,13 @@ import com.esotericsoftware.kryonet.Connection;
 
 public class Peer {
 	
-	private CountDownLatch allFieldsDone;
+	private CountDownLatch cryptoDone;
 	private Connection connection;
 	private String mutex;
 	private int inOut;  //= 1 for incoming
 	
 	public Peer(Connection connection, int inOut) {
-		allFieldsDone = new CountDownLatch(1);
+		cryptoDone = new CountDownLatch(1);
 		this.connection = connection;
 		this.inOut = inOut;
 	}
@@ -29,8 +29,8 @@ public class Peer {
 		return inOut;
 	}
 	
-	public CountDownLatch getLatch() {
-		return allFieldsDone;
+	public CountDownLatch getCryptoLatch() {
+		return cryptoDone;
 	}
 	
 	public void setMutex(String mutex) {
