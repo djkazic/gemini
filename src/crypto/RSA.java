@@ -5,16 +5,25 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
 
+import atrium.Core;
+
 public class RSA {
 	
 	private KeyPairGenerator kpg;
 	private KeyPair myPair;
+	
+	public RSA() throws NoSuchAlgorithmException {
+		kpg = KeyPairGenerator.getInstance("RSA");
+		myPair = kpg.generateKeyPair();
+		Core.pubKey = myPair.getPublic();
+	}
 	
 	/**
 	 * Encrypts a string using a generated key, and generates a key pair if not there
@@ -40,14 +49,15 @@ public class RSA {
 		return new SealedObject(str, cipher);
 	}
 	
-	public String decrypt(SealedObject in, KeyPair extPair) throws NoSuchAlgorithmException, 
-	                                                               NoSuchPaddingException, 
-	                                                               InvalidKeyException, 
-	                                                               ClassNotFoundException, 
-	                                                               IllegalBlockSizeException, 
-	                                                               BadPaddingException, IOException {
+	public String decrypt(SealedObject in, PublicKey extKey) throws NoSuchAlgorithmException, 
+	                                                                NoSuchPaddingException, 
+	                                                                InvalidKeyException, 
+	                                                                ClassNotFoundException, 
+	                                                                IllegalBlockSizeException, 
+	                                                                BadPaddingException, 
+	                                                                IOException {
 		Cipher dec = Cipher.getInstance("RSA");
-		dec.init(Cipher.DECRYPT_MODE, extPair.getPrivate());
+		dec.init(Cipher.DECRYPT_MODE, extKey);
 		return (String) in.getObject(dec);
 	}
 }

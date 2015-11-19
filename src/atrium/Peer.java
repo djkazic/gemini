@@ -1,5 +1,6 @@
 package atrium;
 
+import java.security.PublicKey;
 import java.util.concurrent.CountDownLatch;
 
 import com.esotericsoftware.kryonet.Connection;
@@ -8,6 +9,7 @@ public class Peer {
 	
 	private CountDownLatch cryptoDone;
 	private Connection connection;
+	private PublicKey pubkey;
 	private String mutex;
 	private int inOut;  //= 1 for incoming
 	
@@ -21,6 +23,10 @@ public class Peer {
 		return connection;
 	}
 	
+	public PublicKey getPubkey() {
+		return pubkey;
+	}
+	
 	public String getMutex() {
 		return mutex;
 	}
@@ -31,6 +37,10 @@ public class Peer {
 	
 	public CountDownLatch getCryptoLatch() {
 		return cryptoDone;
+	}
+	
+	public void setPubkey(PublicKey pubkey) {
+		this.pubkey = pubkey;
 	}
 	
 	public void setMutex(String mutex) {
