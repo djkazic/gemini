@@ -7,12 +7,9 @@ import java.util.Enumeration;
 import java.util.List;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import data.Data;
-import data.DataTypes;
 import requests.Request;
-import requests.RequestTypes;
 
 public class NetHandler {
 
@@ -33,7 +30,7 @@ public class NetHandler {
 			registerClasses(server.getKryo());
 
 			Utilities.log(this, "Registering server listeners");
-			server.addListener(new DualListener(this));
+			server.addListener(new DualListener(this, 1));
 
 			Utilities.log(this, "Starting server component");
 			server.bind(Core.tcp, Core.udp);
@@ -50,7 +47,7 @@ public class NetHandler {
 			Utilities.log(this, "Registering client listeners");
 
 			//Use listeners, not arbitrary code
-			client.addListener(new DualListener(this));
+			client.addListener(new DualListener(this, 0));
 
 			Utilities.log(this, "Starting client component");
 			client.start();
