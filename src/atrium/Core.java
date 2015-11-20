@@ -1,14 +1,13 @@
 package atrium;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import com.esotericsoftware.minlog.Log;
 import crypto.RSA;
 
 public class Core {
 	
 	public static RSA rsa;
-	public static PublicKey pubKey;
+	public static String pubKey;
 	public static NetHandler netHandler;
 	
 	public static int tcp = 35500;
@@ -18,7 +17,7 @@ public class Core {
 	public static void main(String[] args) throws NoSuchAlgorithmException {	
 		//TODO: remove for production
 		//Set logging
-		Log.set(Log.LEVEL_NONE);
+		Log.set(Log.LEVEL_INFO);
 		
 		//Set mutex
 		mutex = Utilities.getMutex();
