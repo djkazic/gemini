@@ -88,8 +88,9 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received pubkey data: ");
 					String pubkeyData = (String) data.getPayload();
 					Utilities.log(this, "\t" + pubkeyData);
-					foundPeer.setPubkey(pubkeyData);
-					foundPeer.getCryptoLatch().countDown();
+					if(foundPeer.setPubkey(pubkeyData)) {
+						foundPeer.getPubkeyLatch().countDown();
+					}
 					break;
 			
 				case DataTypes.MUTEX:
@@ -97,7 +98,9 @@ public class DualListener extends Listener {
 					String encryptedMutex = (String) data.getPayload();
 					try {
 						String mutexData = Core.rsa.decrypt(encryptedMutex);
-						foundPeer.mutexCheck(mutexData);
+						if(foundPeer.mutexCheck(mutexData)) {
+							foundPeer.getCryptoLatch().countDown();
+						}
 					} catch (Exception ex) {
 						Utilities.log(this, "Failed to set mutex");
 						ex.printStackTrace();

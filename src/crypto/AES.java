@@ -12,7 +12,7 @@ public class AES {
 	private SecretKeySpec key;
 	
 	public AES(String mutex) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-		byte[] keyBytes = (mutex).getBytes("ISO-8859-1");
+		byte[] keyBytes = mutex.getBytes("ISO-8859-1");
 		MessageDigest sha = MessageDigest.getInstance("SHA-1");
 		keyBytes = sha.digest(keyBytes);
 		keyBytes = Arrays.copyOf(keyBytes, 16);
