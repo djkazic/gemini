@@ -134,4 +134,10 @@ public class NetHandler {
 			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
+	
+	public static void requestBlock(String block) {
+		for(Peer peer : peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, Core.aes.encrypt(block)));
+		}
+	}
 }

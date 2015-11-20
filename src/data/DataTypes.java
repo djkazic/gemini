@@ -6,5 +6,6 @@ public class DataTypes {
 	public static final String MUTEX    = "DATA_MUTEX";
 	public static final String PEERLIST = "DATA_PEERLIST";
 	public static final String SEARCH   = "DATA_SEARCH";
+	public static final String BLOCK    = "DATA_BLOCK";
 	
 }

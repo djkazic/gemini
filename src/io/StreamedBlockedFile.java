@@ -1,8 +1,6 @@
 package io;
 
-import java.io.File;
 import java.util.ArrayList;
-
 import crypto.AES;
 
 /**

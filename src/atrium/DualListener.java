@@ -86,6 +86,13 @@ public class DualListener extends Listener {
 					//TODO: register StreamedBlockedFile
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
+					
+				case RequestTypes.BLOCK:
+					Utilities.log(this, "Received request for block");
+					String encryptedBlock = (String) request.getPayload();
+					String decryptedBlock = foundPeer.getAES().decrypt(encryptedBlock);
+					//TODO: search for block
+					break;
 			}
 		} else if(object instanceof Data) {
 			Data data = (Data) object;
