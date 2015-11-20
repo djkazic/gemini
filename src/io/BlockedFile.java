@@ -123,11 +123,11 @@ public class BlockedFile {
 		return null;
 	}
 	
-	public StreamedBlockedFile toStreamedBlockedFile(AES aes) {
+	public StreamedBlockedFile toStreamedBlockedFile() {
 		ArrayList<String> encryptedList = new ArrayList<String> ();
 		for(int i=0; i < blockList.size(); i++) {
-			encryptedList.set(i, aes.encrypt(blockList.get(i)));
+			encryptedList.set(i, Core.aes.encrypt(blockList.get(i)));
 		}
-		return new StreamedBlockedFile(aes.encrypt(pointer.getName()), encryptedList);
+		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), encryptedList);
 	}
 }

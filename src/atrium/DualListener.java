@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Listener;
 import data.Data;
 import data.DataTypes;
 import io.BlockedFile;
+import io.StreamedBlockedFile;
 import requests.Request;
 import requests.RequestTypes;
 
@@ -59,7 +60,7 @@ public class DualListener extends Listener {
 					Utilities.log(this, "\tSent mutex back");
 					break;
 					
-				//TODO: Requests below are symmetrically encrypted
+				//Requests below are symmetrically encrypted
 	
 				case RequestTypes.PEERLIST:
 					Utilities.log(this, "Received request for peerlist");
@@ -82,7 +83,13 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received request for search");
 					String encryptedQuery = (String) request.getPayload();
 					String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
-					//TODO: for all known BlockedFiles, check if relevant
+					//For all known BlockedFiles, check if relevant
+					ArrayList<StreamedBlockedFile> streams = new ArrayList<StreamedBlockedFile> ();
+					for(BlockedFile bf : Core.blockDex) {
+						if(bf.matchSearch(decrypted)) {
+							streams.add(bf.toStreamedBlockedFile());
+						}
+					}
 					//TODO: register StreamedBlockedFile
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
