@@ -83,7 +83,8 @@ public class DualListener extends Listener {
 					String encryptedQuery = (String) request.getPayload();
 					String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
 					//TODO: for all known BlockedFiles, check if relevant
-					//Search results are ArrayList<SimpleBlockedFiles> which have encrypted name + onboard encrypted blockList
+					//TODO: register StreamedBlockedFile
+					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 			}
 		} else if(object instanceof Data) {

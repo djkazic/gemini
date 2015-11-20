@@ -159,7 +159,7 @@ public class FileUtils {
 
 	public void unifyBlocks(BlockedFile bf) throws Exception {
 		int numberParts = bf.getBlockList().size();
-		String outputPath = bf.getFolder();
+		String outputPath = bf.getPath();
 		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputPath));
 		File[] blocks = new File(bf.getBlocksFolder()).listFiles();
 		if(blocks.length != numberParts) {
@@ -192,11 +192,11 @@ public class FileUtils {
 			Utilities.log(this, "Unable to clear data for " + bf.getPointer().getName());
 		}
 		//Set complete flag
-		bf.setFinished(true);
+		bf.setComplete(true);
 	}
 	
 	public static void openBlockedFile(BlockedFile bf) {
-		if(bf.isFinished()) {
+		if(bf.isComplete()) {
 			Desktop thisDesktop = Desktop.getDesktop();
 			try {
 				thisDesktop.open(bf.getPointer());

@@ -16,19 +16,23 @@ public class BlockedFile {
 	private String checksum;
 	private ArrayList<String> blockList;
 	private ArrayList<String> blackList;
-	private boolean finished;
+	private boolean complete;
 	private String progress;
 
 	/**
-	 * Constructor for brand new BlockedFile (likely first time seeing in the directory)
+	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
 	 * @param pointer
 	 */
-	public BlockedFile(File pointer) {
+	public BlockedFile(File pointer, boolean finished) {
 		this.pointer = pointer;
-		checksum = FileUtils.generateChecksum(pointer);
-		blockList = FileUtils.enumerateBlocks(pointer);
+		if(finished) {
+			checksum = FileUtils.generateChecksum(pointer);
+			blockList = FileUtils.enumerateBlocks(pointer);
+		} else {
+			blockList = new ArrayList<String> ();
+		}
 		blackList = new ArrayList<String> ();
-		finished = false;
+		this.complete = finished;
 		progress = "";
 		Core.blockDex.add(this);
 	}
@@ -39,11 +43,11 @@ public class BlockedFile {
 	 * @param blockList
 	 */
 	public BlockedFile(String pointer, ArrayList<String> blockList) {
-		this.pointer = new File(pointer);
+		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
 		checksum = FileUtils.generateChecksum(this.pointer);
 		this.blockList = blockList;
 		blackList = new ArrayList<String> ();
-		finished = false;
+		complete = false;
 		progress = "";
 		Core.blockDex.add(this);
 	}
@@ -59,7 +63,7 @@ public class BlockedFile {
 		return pointer;
 	}
 
-	public String getFolder() {
+	public String getPath() {
 		return FileUtils.getWorkspaceDir() + "/" + pointer.getName();
 	}
 
@@ -79,12 +83,12 @@ public class BlockedFile {
 		return blackList;
 	}
 
-	public boolean isFinished() {
-		return finished;
+	public boolean isComplete() {
+		return complete;
 	}
 
-	public void setFinished(boolean bool) {
-		finished = bool;
+	public void setComplete(boolean bool) {
+		complete = bool;
 	}
 
 	public String getProgress() {
@@ -96,7 +100,7 @@ public class BlockedFile {
 	}
 	
 	public String getDateModified() {
-		if(finished) {
+		if(complete) {
 			Date date = new Date (pointer.lastModified());
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			return formatter.format(date);
