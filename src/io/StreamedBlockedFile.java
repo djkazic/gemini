@@ -15,9 +15,9 @@ public class StreamedBlockedFile {
 	private String pointerName;
 	private ArrayList<String> blockList;
 	
-	public StreamedBlockedFile(File pointer, ArrayList<String> blockList) {
-		pointerName = pointer.getName();
-		this.blockList = blockList;
+	public StreamedBlockedFile(String encryptedPointerName, ArrayList<String> encryptedBlockList) {
+		pointerName = encryptedPointerName;
+		this.blockList = encryptedBlockList;
 	}
 	
 	public BlockedFile toBlockedFile(AES aes) {

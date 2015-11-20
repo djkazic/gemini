@@ -8,6 +8,7 @@ import java.util.Date;
 import atrium.Core;
 import atrium.FileUtils;
 import atrium.Utilities;
+import crypto.AES;
 
 public class BlockedFile {
 
@@ -101,5 +102,13 @@ public class BlockedFile {
 			return formatter.format(date);
 		} 
 		return null;
+	}
+	
+	public StreamedBlockedFile toStreamedBlockedFile(AES aes) {
+		ArrayList<String> encryptedList = new ArrayList<String> ();
+		for(int i=0; i < blockList.size(); i++) {
+			encryptedList.set(i, aes.encrypt(blockList.get(i)));
+		}
+		return new StreamedBlockedFile(aes.encrypt(pointer.getName()), encryptedList);
 	}
 }
