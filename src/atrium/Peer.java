@@ -5,9 +5,8 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
-
 import com.esotericsoftware.kryonet.Connection;
-
+import crypto.AES;
 import data.Data;
 import data.DataTypes;
 import requests.Request;
@@ -19,6 +18,7 @@ public class Peer {
 	private CountDownLatch cryptoDone;
 	private Connection connection;
 	private PublicKey pubkey;
+	private AES aes;
 	private String mutex;
 	private int inOut;  //= 1 for incoming
 
@@ -46,6 +46,7 @@ public class Peer {
 						connection.sendTCP(new Request(RequestTypes.PUBKEY, null));
 						Utilities.log(this, "Awaiting peer's pubkey");
 						cryptoDone.await();
+						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's mutex");
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
 						Utilities.log(this, "Requesting peer's peerlist");
@@ -54,6 +55,7 @@ public class Peer {
 						//When we send back a peerList, it's time to start sending requests
 						//Keeping cryptoDone as a sequential check
 						cryptoDone.await();
+						aes = new AES(mutex);
 						deferredRequesting.await();
 						Utilities.log(this, "Requesting peer's mutex");
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
@@ -91,6 +93,10 @@ public class Peer {
 
 	public int getInOut() {
 		return inOut;
+	}
+	
+	public AES getAES() {
+		return aes;
 	}
 
 	public CountDownLatch getDeferredLatch() {

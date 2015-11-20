@@ -66,8 +66,9 @@ public class DualListener extends Listener {
 					ArrayList<String> refinedPeerList = new ArrayList<String> ();
 					for(Peer peer : NetHandler.peers) {
 						//if(peer.externallyVisible())
-						refinedPeerList.add(peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
-											+ peer.getConnection().getRemoteAddressTCP().getPort());
+						String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
+										+ peer.getConnection().getRemoteAddressTCP().getPort();
+						refinedPeerList.add(Core.aes.encrypt(peerData));
 					}
 					connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
 					Utilities.log(this, "\tSent peerlist back");
@@ -116,7 +117,9 @@ public class DualListener extends Listener {
 						for(int i=0; i < potentialList.size(); i++) {
 							Object o = potentialList.get(i);
 							if(o instanceof String) {
-								finishedList.add((String) o);
+								String encrypted = (String) o;
+								String decrypted = foundPeer.getAES().decrypt(encrypted);
+								finishedList.add(decrypted);
 							}
 						}
 						Utilities.log(this, "\tPeerlist: " + finishedList);
