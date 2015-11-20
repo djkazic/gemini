@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import data.Data;
 import data.DataTypes;
+import io.BlockedFile;
 import requests.Request;
 import requests.RequestTypes;
 
@@ -76,6 +77,14 @@ public class DualListener extends Listener {
 						foundPeer.getDeferredLatch().countDown();
 					}
 					break;
+					
+				case RequestTypes.SEARCH:
+					Utilities.log(this, "Received request for search");
+					String encryptedQuery = (String) request.getPayload();
+					String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
+					//TODO: for all known BlockedFiles, check if relevant
+					//Search results are ArrayList<SimpleBlockedFiles> which have encrypted name + onboard encrypted blockList
+					break;
 			}
 		} else if(object instanceof Data) {
 			Data data = (Data) object;
@@ -127,6 +136,13 @@ public class DualListener extends Listener {
 						Utilities.log(this, "\tPeerlist: " + finishedList);
 					}
 					break;
+					
+				case DataTypes.SEARCH:
+					Utilities.log(this,  "Received search reply data");
+					Object searchPayload = data.getPayload();
+					if(searchPayload instanceof ArrayList<?>) {
+						//Search results are ArrayList<SimpleBlockedFiles> which have encrypted name + onboard encrypted blockList
+					}
 			}
 		}
 	}

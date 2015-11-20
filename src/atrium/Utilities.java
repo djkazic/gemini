@@ -11,6 +11,10 @@ public class Utilities {
 		System.out.println("<LOG> [" + someClass.getClass().getName() + "]: " + msg);
 	}
 	
+	public static void log(String someClass, String msg) {
+		System.out.println("<LOG> [" + someClass + "]: " + msg);
+	}
+	
 	public static String getMutex() {
 		try {
 			String firstInterfaceFound = null;        

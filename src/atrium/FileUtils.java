@@ -1,10 +1,12 @@
 package atrium;
 
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -16,9 +18,10 @@ import io.BlockedFile;
 public class FileUtils {
 
 	public static void initDirs() {
+		Utilities.log("atrium.FileUtils", "Initializing file worker");
 		File findir = new File(getWorkspaceDir());
 		if(!findir.exists()) {
-			System.out.println("Could not find directory, creating");
+			Utilities.log("atrium.FileUtils", "Could not find directory, creating");
 			boolean attempt = false;
 			try {
 				findir.mkdir();
@@ -27,12 +30,12 @@ public class FileUtils {
 				se.printStackTrace();
 			}
 			if(attempt) {
-				System.out.println("Successfully created directory");
+				Utilities.log("atrium.FileUtils", "Successfully created directory");
 			}
 		}
 		File configDir = new File(getWorkspaceDir() + "/" + ".config");
 		if(!configDir.exists()) {
-			System.out.println("Could not find config directory, creating");
+			Utilities.log("atrium.FileUtils", "Could not find config directory, creating");
 			boolean attempt = false;
 			try {
 				configDir.mkdir();
@@ -41,12 +44,12 @@ public class FileUtils {
 				se.printStackTrace();
 			}
 			if(attempt) {
-				System.out.println("Successfully created config directory");
+				Utilities.log("atrium.FileUtils", "Successfully created config directory");
 			}
 		}
 		File appDataGen = new File(getAppDataDir());
 		if(!appDataGen.exists()) {
-			System.out.println("Could not find appData directory, creating");
+			Utilities.log("atrium.FileUtils", "Could not find appData directory, creating");
 			boolean attempt = false;
 			try {
 				appDataGen.mkdir();
@@ -55,7 +58,7 @@ public class FileUtils {
 				e.printStackTrace();
 			}
 			if(attempt) {
-				System.out.println("Successfully created appData directory");
+				Utilities.log("atrium.FileUtils", "Successfully created appData directory");
 			}
 		}
 	}
@@ -190,5 +193,34 @@ public class FileUtils {
 		}
 		//Set complete flag
 		bf.setFinished(true);
+	}
+	
+	public static void openBlockedFile(BlockedFile bf) {
+		if(bf.isFinished()) {
+			Desktop thisDesktop = Desktop.getDesktop();
+			try {
+				thisDesktop.open(bf.getPointer());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static BlockedFile getBlockedFile(String filename) {
+		for(BlockedFile block : Core.blockDex) {
+			if(block.getPointer().getName().equals(filename)) {
+				return block;
+			}
+		}
+		return null;
+	}
+	
+	public static BlockedFile getBlockedFile(ArrayList<String> blockList) {
+		for(BlockedFile block : Core.blockDex) {
+			if(block.getBlockList().containsAll(blockList) && blockList.containsAll(block.getBlockList())) {
+				return block;
+			}
+		}
+		return null;
 	}
 }

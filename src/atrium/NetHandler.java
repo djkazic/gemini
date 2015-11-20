@@ -11,6 +11,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 import data.Data;
 import requests.Request;
+import requests.RequestTypes;
 
 public class NetHandler {
 
@@ -125,6 +126,12 @@ public class NetHandler {
 			Utilities.log(this, "Terminated peer discovery");
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public static void doSearch(String keyword) {
+		for(Peer peer : peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
 }
