@@ -296,7 +296,8 @@ public class MainWindow extends JFrame {
 								if(!alreadyDoneInPane) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%"});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
-									bf.download();
+									//TODO: BF downloads
+									//bf.download();
 								}
 								resetTable();
 							}
@@ -380,7 +381,7 @@ public class MainWindow extends JFrame {
 		if(!Core.headless) {
 			clearTable(libraryModel);
 			for(BlockedFile bf : Core.blockDex) {
-				if(bf.isFinished()) {
+				if(bf.isComplete()) {
 					String fileEstimateStr = "";
 					long fileEstimateKb = bf.getPointer().length() / 1000;
 					if(fileEstimateKb > 1000) {
