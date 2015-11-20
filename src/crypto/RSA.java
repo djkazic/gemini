@@ -5,16 +5,25 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import javax.crypto.BadPaddingException;
+import java.security.PublicKey;
+import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SealedObject;
+
+import atrium.Core;
 
 public class RSA {
 	
 	private KeyPairGenerator kpg;
-	private KeyPair myPair;
+	public KeyPair myPair;
+	
+	public RSA() throws NoSuchAlgorithmException {
+		kpg = KeyPairGenerator.getInstance("RSA");
+		myPair = kpg.generateKeyPair();
+		byte[] pubKeyBytes = myPair.getPublic().getEncoded();
+		Core.pubKey = new String(Base64.getEncoder().encode(pubKeyBytes));
+	}
 	
 	/**
 	 * Encrypts a string using a generated key, and generates a key pair if not there
@@ -26,28 +35,26 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
 	 */
-	public SealedObject encrypt(String str) throws InvalidKeyException, 
-												   IllegalBlockSizeException, 
-												   IOException, 
-												   NoSuchAlgorithmException, 
-												   NoSuchPaddingException {
-		if(myPair == null) {
-			kpg = KeyPairGenerator.getInstance("RSA");
-			myPair = kpg.generateKeyPair();
+	public String encrypt(String str, PublicKey pk) {
+		try {
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.ENCRYPT_MODE, pk);
+			return new String(cipher.doFinal(str.getBytes()), "ISO-8859-1");
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.ENCRYPT_MODE, myPair.getPublic());
-		return new SealedObject(str, cipher);
+		return null;
 	}
 	
-	public String decrypt(SealedObject in, KeyPair extPair) throws NoSuchAlgorithmException, 
-	                                                               NoSuchPaddingException, 
-	                                                               InvalidKeyException, 
-	                                                               ClassNotFoundException, 
-	                                                               IllegalBlockSizeException, 
-	                                                               BadPaddingException, IOException {
-		Cipher dec = Cipher.getInstance("RSA");
-		dec.init(Cipher.DECRYPT_MODE, extPair.getPrivate());
-		return (String) in.getObject(dec);
+	public String decrypt(String in) {
+		try {
+			Cipher decipher = Cipher.getInstance("RSA");
+			decipher.init(Cipher.DECRYPT_MODE, myPair.getPrivate());
+			String output = new String(decipher.doFinal(in.getBytes("ISO-8859-1")));
+			return output;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
 	}
 }

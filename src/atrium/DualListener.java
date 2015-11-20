@@ -1,8 +1,8 @@
 package atrium;
 
+import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-
 import data.Data;
 import data.DataTypes;
 import requests.Request;
@@ -10,23 +10,26 @@ import requests.RequestTypes;
 
 public class DualListener extends Listener {
 	
-	private NetHandler net;
+	private int inOut;
 	
-	public DualListener(NetHandler nh) {
+	public DualListener(int inOut) {
 		super();
-		net = nh;
+		this.inOut = inOut;
 	}
 
-	//New incoming connection
+	//New connection, either incoming or outgoing
 	public void connected(Connection connection) {
+		if(inOut == 1) {
+			Utilities.log(this, "New incoming peer");
+		} else {
+			Utilities.log(this, "New outgoing peer");
+		}
 		try {
-			Peer newPeer = new Peer(connection, 1);
-			newPeer.getConnection().sendTCP(new Request(RequestTypes.PUBKEY, null));
-			newPeer.getCryptoLatch().await();
-			newPeer.getConnection().sendTCP(new Request(RequestTypes.MUTEX, null));
-			newPeer.getConnection().sendTCP(new Request(RequestTypes.PEERLIST, null));
-			//Wait for all fields done for two way
-			net.addPeer(newPeer);
+			if(inOut == 1) {
+				new Peer(connection, inOut);
+			} else {
+				new Peer(connection, inOut);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -34,48 +37,95 @@ public class DualListener extends Listener {
 
 	//New incoming packet post-connection
 	public void received(Connection connection, Object object) {
+		Peer foundPeer = Peer.findPeer(connection);
+		
 		if(object instanceof Request) {
 			Request request = (Request) object;
 			String type = request.getType();
 
 			switch(type) {
-			case RequestTypes.MUTEX:
-				Utilities.log(this, "Received request for mutex");
-				connection.sendTCP(new Data(DataTypes.MUTEX, Core.mutex));
-				break;
-
-			case RequestTypes.PEERLIST:
-				Utilities.log(this, "Received request for peerlist");
-				//TODO: more refined peerList filtering
-				connection.sendTCP(new Data(DataTypes.PEERLIST, NetHandler.peers));
-				break;
-
-			default: 
-				Utilities.log(this, "Got request type " + type + " with payload of " + request.getPayload().toString());
-				break;
+				//Requests below are non-encrypted
+			
+				case RequestTypes.PUBKEY:
+					Utilities.log(this, "Received request for pubkey");
+					connection.sendTCP(new Data(DataTypes.PUBKEY, Core.pubKey));
+					Utilities.log(this, "\tSent pubkey back");
+					break;
+			
+				case RequestTypes.MUTEX:
+					Utilities.log(this, "Received request for mutex");
+					connection.sendTCP(new Data(DataTypes.MUTEX, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
+					Utilities.log(this, "\tSent mutex back");
+					break;
+					
+				//TODO: Requests below are symmetrically encrypted
+	
+				case RequestTypes.PEERLIST:
+					Utilities.log(this, "Received request for peerlist");
+					//TODO: more refined peerList filtering
+					ArrayList<String> refinedPeerList = new ArrayList<String> ();
+					for(Peer peer : NetHandler.peers) {
+						//if(peer.externallyVisible())
+						refinedPeerList.add(peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
+											+ peer.getConnection().getRemoteAddressTCP().getPort());
+					}
+					connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
+					Utilities.log(this, "\tSent peerlist back");
+					if(foundPeer.getInOut() == 0) {
+						foundPeer.getDeferredLatch().countDown();
+					}
+					break;
 			}
-		}
-
-		if(object instanceof Data) {
+		} else if(object instanceof Data) {
 			Data data = (Data) object;
 			String type = data.getType();
 
 			switch(type) {
-			case DataTypes.MUTEX:
-				Utilities.log(this, "Received mutex data");
-				Peer.findPeer(connection).setMutex((String) data.getPayload());
-				break;
-
-			case DataTypes.PEERLIST:
-				Utilities.log(this,  "Received peerlist data");
-				//TODO: implement peerlist processing
-				Utilities.log(this, "Peerlist: " + (String) data.getPayload());
-				break;
-
-			default: 
-				Utilities.log(this, "Got data type " + type + " with payload of " + data.getPayload().toString());
-				break;
+				//Data below are encryption keys, mutex is encrypted via RSA
+			
+				case DataTypes.PUBKEY:
+					Utilities.log(this, "Received pubkey data: ");
+					String pubkeyData = (String) data.getPayload();
+					Utilities.log(this, "\t" + pubkeyData);
+					foundPeer.setPubkey(pubkeyData);
+					foundPeer.getCryptoLatch().countDown();
+					break;
+			
+				case DataTypes.MUTEX:
+					Utilities.log(this, "Received mutex data");
+					String encryptedMutex = (String) data.getPayload();
+					try {
+						String mutexData = Core.rsa.decrypt(encryptedMutex);
+						foundPeer.mutexCheck(mutexData);
+					} catch (Exception ex) {
+						Utilities.log(this, "Failed to set mutex");
+						ex.printStackTrace();
+					}
+					break;
+	
+				//All data past this point is encrypted via symmetric encryption
+				//TODO: symmetric encryption for peerlist and on
+					
+				case DataTypes.PEERLIST:
+					Utilities.log(this,  "Received peerlist data");
+					//TODO: implement peerlist processing
+					Object payload = data.getPayload();
+					if(payload instanceof ArrayList<?>) {
+						ArrayList<String> finishedList = new ArrayList<String> ();
+						ArrayList<?> potentialList = (ArrayList<?>) payload;
+						for(int i=0; i < potentialList.size(); i++) {
+							Object o = potentialList.get(i);
+							if(o instanceof String) {
+								finishedList.add((String) o);
+							}
+						}
+						Utilities.log(this, "\tPeerlist: " + finishedList);
+					}
+					break;
 			}
+		} else {
+			Utilities.log(this, "Unknown object recevied:");
+			Utilities.log(this, object.toString());
 		}
 	}
 
