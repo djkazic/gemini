@@ -5,9 +5,8 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
-
 import com.esotericsoftware.kryonet.Connection;
-
+import crypto.AES;
 import data.Data;
 import data.DataTypes;
 import requests.Request;
@@ -16,14 +15,17 @@ import requests.RequestTypes;
 public class Peer {
 
 	private CountDownLatch deferredRequesting;
+	private CountDownLatch pubkeyDone;
 	private CountDownLatch cryptoDone;
 	private Connection connection;
 	private PublicKey pubkey;
+	private AES aes;
 	private String mutex;
 	private int inOut;  //= 1 for incoming
 
 	public Peer(Connection connection, int inOut) {
 		deferredRequesting = new CountDownLatch(1);
+		pubkeyDone = new CountDownLatch(1);
 		cryptoDone = new CountDownLatch(1);
 		this.connection = connection;
 		this.inOut = inOut;
@@ -45,18 +47,22 @@ public class Peer {
 						Utilities.log(this, "Requesting peer's pubkey");
 						connection.sendTCP(new Request(RequestTypes.PUBKEY, null));
 						Utilities.log(this, "Awaiting peer's pubkey");
-						cryptoDone.await();
+						pubkeyDone.await();
 						Utilities.log(this, "Requesting peer's mutex");
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
+						cryptoDone.await();
+						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist");
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
 					} else {
 						//When we send back a peerList, it's time to start sending requests
-						//Keeping cryptoDone as a sequential check
-						cryptoDone.await();
+						//Keeping pubkeyDone as a sequential check
+						pubkeyDone.await();
 						deferredRequesting.await();
 						Utilities.log(this, "Requesting peer's mutex");
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
+						cryptoDone.await();
+						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist");
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
 					}
@@ -92,25 +98,35 @@ public class Peer {
 	public int getInOut() {
 		return inOut;
 	}
+	
+	public AES getAES() {
+		return aes;
+	}
 
 	public CountDownLatch getDeferredLatch() {
 		return deferredRequesting;
+	}
+	
+	public CountDownLatch getPubkeyLatch() {
+		return pubkeyDone;
 	}
 	
 	public CountDownLatch getCryptoLatch() {
 		return cryptoDone;
 	}
 
-	public void setPubkey(String pubkey) {
+	public boolean setPubkey(String pubkey) {
 		try {
 			byte[] pubKeyBytes = pubkey.getBytes();
 			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(pubKeyBytes));
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			PublicKey pk = kf.generatePublic(keySpec);
 			this.pubkey = pk;
+			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		return false;
 	}
 
 	public void setMutex(String mutex) {
@@ -126,9 +142,10 @@ public class Peer {
 		return null;
 	}
 	
-	public void mutexCheck(String mutexData) {
+	public boolean mutexCheck(String mutexData) {
 		if(mutexData.equals(Core.mutex)) {
 			disconnect();
+			return false;
 		} else {
 			boolean passed = true;
 			for(Peer peer : NetHandler.peers) {
@@ -139,8 +156,10 @@ public class Peer {
 			}
 			if(passed) {
 				setMutex(mutexData);
+				return true;
 			} else {
 				disconnect();
+				return false;
 			}	
 		}
 	}

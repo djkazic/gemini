@@ -66,8 +66,9 @@ public class DualListener extends Listener {
 					ArrayList<String> refinedPeerList = new ArrayList<String> ();
 					for(Peer peer : NetHandler.peers) {
 						//if(peer.externallyVisible())
-						refinedPeerList.add(peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
-											+ peer.getConnection().getRemoteAddressTCP().getPort());
+						String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
+										+ peer.getConnection().getRemoteAddressTCP().getPort();
+						refinedPeerList.add(Core.aes.encrypt(peerData));
 					}
 					connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
 					Utilities.log(this, "\tSent peerlist back");
@@ -86,9 +87,9 @@ public class DualListener extends Listener {
 				case DataTypes.PUBKEY:
 					Utilities.log(this, "Received pubkey data: ");
 					String pubkeyData = (String) data.getPayload();
-					Utilities.log(this, "\t" + pubkeyData);
-					foundPeer.setPubkey(pubkeyData);
-					foundPeer.getCryptoLatch().countDown();
+					if(foundPeer.setPubkey(pubkeyData)) {
+						foundPeer.getPubkeyLatch().countDown();
+					}
 					break;
 			
 				case DataTypes.MUTEX:
@@ -96,7 +97,9 @@ public class DualListener extends Listener {
 					String encryptedMutex = (String) data.getPayload();
 					try {
 						String mutexData = Core.rsa.decrypt(encryptedMutex);
-						foundPeer.mutexCheck(mutexData);
+						if(foundPeer.mutexCheck(mutexData)) {
+							foundPeer.getCryptoLatch().countDown();
+						}
 					} catch (Exception ex) {
 						Utilities.log(this, "Failed to set mutex");
 						ex.printStackTrace();
@@ -116,17 +119,15 @@ public class DualListener extends Listener {
 						for(int i=0; i < potentialList.size(); i++) {
 							Object o = potentialList.get(i);
 							if(o instanceof String) {
-								finishedList.add((String) o);
+								String encrypted = (String) o;
+								String decrypted = foundPeer.getAES().decrypt(encrypted);
+								finishedList.add(decrypted);
 							}
 						}
 						Utilities.log(this, "\tPeerlist: " + finishedList);
 					}
 					break;
 			}
-		} else {
-			Utilities.log(this, "Unknown object recevied:");
-			Utilities.log(this, object.toString());
 		}
 	}
-
 }
