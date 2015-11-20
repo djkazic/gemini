@@ -3,7 +3,6 @@ package atrium;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import com.esotericsoftware.minlog.Log;
-
 import crypto.AES;
 import crypto.RSA;
 

@@ -114,8 +114,12 @@ public class NetHandler {
 			//TODO: make this not just an IP, but also port
 			//TODO: port randomization
 			for(InetAddress ia : foundHosts) {
-				Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
-				client.connect(5000, ia, Core.tcp, Core.udp);
+				try {
+					Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
+					client.connect(5000, ia, Core.tcp, Core.udp);
+				} catch (Exception ex) {
+					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed");
+				}
 			}
 
 			Utilities.log(this, "Terminated peer discovery");

@@ -87,7 +87,6 @@ public class DualListener extends Listener {
 				case DataTypes.PUBKEY:
 					Utilities.log(this, "Received pubkey data: ");
 					String pubkeyData = (String) data.getPayload();
-					Utilities.log(this, "\t" + pubkeyData);
 					if(foundPeer.setPubkey(pubkeyData)) {
 						foundPeer.getPubkeyLatch().countDown();
 					}
@@ -129,10 +128,6 @@ public class DualListener extends Listener {
 					}
 					break;
 			}
-		} else {
-			Utilities.log(this, "Unknown object recevied:");
-			Utilities.log(this, object.toString());
 		}
 	}
-
 }
