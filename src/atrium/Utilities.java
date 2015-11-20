@@ -52,4 +52,8 @@ public class Utilities {
 		}
 		return output;
 	}
+	
+	public static boolean isWindows() {
+		return (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0);
+	}
 }

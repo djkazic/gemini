@@ -13,6 +13,7 @@ public class Core {
 	public static String pubKey;
 	public static NetHandler netHandler;
 	
+	public static int blockSize = 384000;
 	public static int tcp = 35500;
 	public static int udp = 35501;
 	public static String mutex;
