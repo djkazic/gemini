@@ -156,8 +156,17 @@ public class DualListener extends Listener {
 					Utilities.log(this,  "Received search reply data");
 					Object searchPayload = data.getPayload();
 					if(searchPayload instanceof ArrayList<?>) {
-						//Search results are ArrayList<SimpleBlockedFiles> which have encrypted name + onboard encrypted blockList
+						ArrayList<BlockedFile> bfa = new ArrayList<BlockedFile> ();
+						ArrayList<?> potentialStreams = (ArrayList<?>) searchPayload;
+						for(int i=0; i < potentialStreams.size(); i++) {
+							Object o = potentialStreams.get(i);
+							if(o instanceof StreamedBlockedFile) {
+								StreamedBlockedFile sbl = (StreamedBlockedFile) o;
+								bfa.add(sbl.toBlockedFile(foundPeer.getAES()));
+							}
+						}
 					}
+					break;
 			}
 		}
 	}
