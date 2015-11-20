@@ -14,16 +14,6 @@ public class BlockedFile {
 	private boolean finished;
 	private String progress;
 	
-	public static void main(String[] args) {
-		try {
-			System.out.println("Creating blocked file...");
-			BlockedFile bf = new BlockedFile(new File("Why.exe"));
-			System.out.println(bf.checksum);
-			System.out.println(bf.blockList.size());
-			System.out.println(bf.blockList);
-		} catch (Exception ex) {}
-	}
-	
 	/**
 	 * Constructor for brand new BlockedFile (likely first time seeing in the directory)
 	 * @param pointer
