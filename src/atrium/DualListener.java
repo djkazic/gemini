@@ -90,7 +90,8 @@ public class DualListener extends Listener {
 							streams.add(bf.toStreamedBlockedFile());
 						}
 					}
-					//TODO: register StreamedBlockedFile
+					connection.sendTCP(new Data(DataTypes.SEARCH, streams));
+					Utilities.log(this, "\tSent search results back");
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
@@ -156,16 +157,30 @@ public class DualListener extends Listener {
 					Utilities.log(this,  "Received search reply data");
 					Object searchPayload = data.getPayload();
 					if(searchPayload instanceof ArrayList<?>) {
-						ArrayList<BlockedFile> bfa = new ArrayList<BlockedFile> ();
 						ArrayList<?> potentialStreams = (ArrayList<?>) searchPayload;
 						for(int i=0; i < potentialStreams.size(); i++) {
 							Object o = potentialStreams.get(i);
 							if(o instanceof StreamedBlockedFile) {
 								StreamedBlockedFile sbl = (StreamedBlockedFile) o;
-								bfa.add(sbl.toBlockedFile(foundPeer.getAES()));
+								BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
+								
+								//Store name and blockList in preparation for Download thread fetching from GUI
+								String name = intermediate.getPointer().getName();
+								ArrayList<String> blockList = intermediate.getBlockList();
+								Core.index.put(name, blockList);
+								
+								String sizeEstimate = "";
+								int estimateKb = (int) ((Core.blockSize * blockList.size()) / 1000);
+								if(estimateKb > 1000) {
+									int estimateMb = (int) (estimateKb / 1000D);
+									sizeEstimate += estimateMb + "MB";
+								} else {
+									sizeEstimate += estimateKb + "KB";
+								}
+								
+								Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate});
 							}
 						}
-						Utilities.log(this, "\tSize of reply: " + bfa.size());
 					}
 					break;
 			}

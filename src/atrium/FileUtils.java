@@ -69,9 +69,9 @@ public class FileUtils {
 		FileSystemView fw = fr.getFileSystemView();
 		directory = fw.getDefaultDirectory().toString();
 		if(Utilities.isWindows()) {
-			directory += "/XNet";
+			directory += "/Radiator";
 		} else { 
-			directory += "/Documents/XNet";
+			directory += "/Documents/Radiator";
 		}
 		return directory;
 	}
@@ -104,6 +104,16 @@ public class FileUtils {
 		return null;
 	}
 
+	public static void genBlockIndex() {
+		File baseFolder = new File(getWorkspaceDir());
+		File[] list = baseFolder.listFiles();
+		for(int i=0; i < list.length; i++) {
+			if(list[i].isFile()) {
+				new BlockedFile(list[i], true);
+			}
+		}
+	}
+	
 	public static String generateChecksum(File file) {
 		try {
 			InputStream fis = new FileInputStream(file);
