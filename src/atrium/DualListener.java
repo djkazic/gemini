@@ -1,11 +1,13 @@
 package atrium;
 
+import java.io.File;
 import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import data.Data;
 import data.DataTypes;
 import io.BlockedFile;
+import io.StreamedBlock;
 import io.StreamedBlockedFile;
 import requests.Request;
 import requests.RequestTypes;
@@ -96,10 +98,39 @@ public class DualListener extends Listener {
 					break;
 					
 				case RequestTypes.BLOCK:
-					Utilities.log(this, "Received request for block");
-					String encryptedBlock = (String) request.getPayload();
-					String decryptedBlock = foundPeer.getAES().decrypt(encryptedBlock);
+					Utilities.log(this, "Received request for block:");
+					String[] encryptedBlock = (String[]) request.getPayload();
+					String blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
+					String blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+					
 					//TODO: search for block
+					BlockedFile foundBlock;
+					if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
+						int blockPosition;
+						if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+							
+							File searchRes = null;
+							if(foundBlock.isComplete()) {
+								//Attempt complete search
+								searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
+							} else {
+								//Attempt incomplete search
+								searchRes = FileUtils.findBlockAppData(blockOrigin, blockName);
+							}
+							
+							if(searchRes != null) {
+								Utilities.log(this, "\tSending back block: " + searchRes.getName());
+								connection.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+							} else {
+								Utilities.log(this, "\tFailure: could not find block " + blockName);
+							}
+						} else {
+							Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
+												+ foundBlock.getBlockList());
+						}
+					} else {
+						Utilities.log(this, "\tFailure: don't have origin BlockedFile");
+					}
 					break;
 			}
 		} else if(object instanceof Data) {
@@ -182,6 +213,14 @@ public class DualListener extends Listener {
 							}
 						}
 					}
+					break;
+					
+				case DataTypes.BLOCK:
+					Utilities.log(this, "Received block data");
+					StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
+					String origin = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
+					Utilities.log(this, "\tBlock origin: " + origin);
+					streamedBlock.insertSelf(foundPeer.getAES());
 					break;
 			}
 		}

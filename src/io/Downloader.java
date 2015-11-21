@@ -1,5 +1,6 @@
 package io;
 
+import atrium.FileUtils;
 import atrium.NetHandler;
 import atrium.Utilities;
 
@@ -16,9 +17,11 @@ public class Downloader implements Runnable {
 		try {
 			String currentBlock;
 			while((currentBlock = blockedFile.getNextBlock()) != null) {
-				NetHandler.requestBlock(currentBlock);
-				Thread.sleep(1);
+				Utilities.log(this, "Requesting block " + currentBlock);
+				NetHandler.requestBlock(blockedFile.getPointer().getName(), currentBlock);
+				Thread.sleep(1000);
 			}
+			FileUtils.unifyBlocks(blockedFile);
 		} catch (Exception ex) {
 			Utilities.log(this, "Downloader exception:");
 			ex.printStackTrace();

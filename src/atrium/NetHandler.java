@@ -1,5 +1,6 @@
 package atrium;
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -10,6 +11,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 import data.Data;
+import io.StreamedBlock;
 import io.StreamedBlockedFile;
 import requests.Request;
 import requests.RequestTypes;
@@ -29,7 +31,7 @@ public class NetHandler {
 
 	public void registerServerListeners() {
 		try {
-			server = new Server();
+			server = new Server(480000, 480000);
 			registerClasses(server.getKryo());
 
 			Utilities.log(this, "Registering server listeners");
@@ -44,7 +46,7 @@ public class NetHandler {
 
 	public void registerClientListeners() {
 		try {
-			client = new Client();
+			client = new Client(480000, 480000);
 			registerClasses(client.getKryo());
 
 			Utilities.log(this, "Registering client listeners");
@@ -64,8 +66,9 @@ public class NetHandler {
 
 	private void registerClasses(Kryo kryo) {
 		//Shared fields import
-		kryo.register(byte[].class);
+		kryo.register(String[].class);
 		kryo.register(ArrayList.class);
+		kryo.register(byte[].class);
 		
 		//Specifics import
 		kryo.register(Data.class);
@@ -74,6 +77,7 @@ public class NetHandler {
 		kryo.register(Client.class);
 		kryo.register(Inet4Address.class);
 		kryo.register(StreamedBlockedFile.class);
+		kryo.register(StreamedBlock.class);
 	}
 	
 	private void peerDiscovery() {
@@ -141,9 +145,9 @@ public class NetHandler {
 		}
 	}
 	
-	public static void requestBlock(String block) {
+	public static void requestBlock(String origin, String block) {
 		for(Peer peer : peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, Core.aes.encrypt(block)));
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
 		}
 	}
 }
