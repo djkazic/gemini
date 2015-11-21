@@ -79,15 +79,16 @@ public class FileUtils {
 	public static String getAppDataDir() {
 		String scratchDirectory;
 		if(Utilities.isWindows()) {
-			scratchDirectory = System.getenv("AppData") + "/XNet";
+			scratchDirectory = System.getenv("AppData") + "/Radiator";
 		} else {
 			scratchDirectory = getWorkspaceDir() + "/.cache";
 		}
 		return scratchDirectory;
 	}
 
-	public static File findBlock(String baseForFile, String block) {
-		File directory = new File(FileUtils.getAppDataDir() + "/" + baseForFile);
+	public static File findBlockAppData(String origin, String block) {
+		String base64Name = Utilities.base64(origin);
+		File directory = new File(FileUtils.getAppDataDir() + "/" + base64Name);
 		if(!directory.exists()) {
 			return null;
 		}
@@ -100,6 +101,39 @@ public class FileUtils {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		return null;
+	}
+	
+	public static File findBlockRAF(BlockedFile bf, int blockIndex) {
+		try {
+			File temp = File.createTempFile("temp-block-" + bf.getPointer().getName(), ".tmp");
+			temp.deleteOnExit();
+			FileOutputStream fos = new FileOutputStream(temp);
+			InputStream fis = new FileInputStream(bf.getPointer());
+			byte[] buffer = new byte[Core.blockSize];
+
+			int blockPos = 0;
+			int numRead;
+			do {
+				blockPos++;
+				numRead = fis.read(buffer);
+				if(numRead > 0) {
+					fos.write(buffer, 0, numRead);
+				} else {
+					break;
+				}
+			} while(numRead != -1 && blockPos < blockIndex);
+			fis.close();
+			fos.close();
+			
+			if(blockPos > 0) {
+				return temp;
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 		return null;
 	}
@@ -144,6 +178,8 @@ public class FileUtils {
 			ArrayList<String> blockList = new ArrayList<String> ();
 			InputStream fis = new FileInputStream(file);
 			byte[] buffer = new byte[Core.blockSize];
+			
+			System.out.println(file.length());
 
 			MessageDigest complete = MessageDigest.getInstance("SHA1");
 			int numRead;
@@ -151,6 +187,8 @@ public class FileUtils {
 				numRead = fis.read(buffer);
 				if(numRead > 0) {
 					complete.update(buffer, 0, numRead);
+				} else {
+					break;
 				}
 				byte[] digest = complete.digest();
 				String result = "";
@@ -167,13 +205,13 @@ public class FileUtils {
 		return null;
 	}
 
-	public void unifyBlocks(BlockedFile bf) throws Exception {
+	public static void unifyBlocks(BlockedFile bf) throws Exception {
 		int numberParts = bf.getBlockList().size();
 		String outputPath = bf.getPath();
 		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputPath));
 		File[] blocks = new File(bf.getBlocksFolder()).listFiles();
 		if(blocks.length != numberParts) {
-			Utilities.log(this, "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")");
+			Utilities.log("atrium.FileUtils", "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")");
 			out.close();
 			return;
 		}
@@ -199,7 +237,7 @@ public class FileUtils {
 		}
 		blocksDir.delete();
 		if(blocksDir.exists()) {
-			Utilities.log(this, "Unable to clear data for " + bf.getPointer().getName());
+			Utilities.log("atrium.FileUtils", "Unable to clear data for " + bf.getPointer().getName());
 		}
 		//Set complete flag
 		bf.setComplete(true);
