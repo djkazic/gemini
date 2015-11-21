@@ -68,9 +68,10 @@ public class MainWindow extends JFrame {
 	private JTabbedPane tabbedPane;
 	private JScrollPane libraryScrollPane;
 	private JTable libraryTable;
-	private JPanel panel;
+	private JPanel searchPanel;
 	private JTextField searchInput;
 	private JLabel lblSearchResults;
+	private JPanel panel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -141,12 +142,12 @@ public class MainWindow extends JFrame {
 			tabbedPane.setBounds(10, 11, 614, 519);
 			contentPane.add(tabbedPane);
 
-			panel = new JPanel();
-			tabbedPane.addTab("Search", null, panel, null);
-			panel.setLayout(null);
+			searchPanel = new JPanel();
+			tabbedPane.addTab("Search", null, searchPanel, null);
+			searchPanel.setLayout(null);
 			
 						searchInput = new JTextField();
-						searchInput.setBounds(10, 11, 490, 20);
+						searchInput.setBounds(10, 10, 490, 23);
 						
 									searchInput.addKeyListener(new KeyAdapter() {
 										@Override
@@ -180,7 +181,7 @@ public class MainWindow extends JFrame {
 											}
 										}
 									});
-									panel.add(searchInput);
+									searchPanel.add(searchInput);
 									searchInput.setColumns(10);
 			
 						JButton btnSearch = new JButton("Search");
@@ -213,16 +214,16 @@ public class MainWindow extends JFrame {
 								searchInput.setText("");
 							}
 						});
-						btnSearch.setBounds(510, 10, 89, 23);
-						panel.add(btnSearch);
+						btnSearch.setBounds(510, 11, 89, 23);
+						searchPanel.add(btnSearch);
 			
 						lblSearchResults = new JLabel(" Search Results");
 						lblSearchResults.setBounds(10, 42, 80, 14);
-						panel.add(lblSearchResults);
+						searchPanel.add(lblSearchResults);
 
 			searchResScrollPane = new JScrollPane();
 			searchResScrollPane.setBounds(10, 57, 589, 197);
-			panel.add(searchResScrollPane);
+			searchPanel.add(searchResScrollPane);
 
 			searchRes = new JTable(searchModel);
 			searchRes.setDefaultRenderer(Object.class, betterRenderer);
@@ -235,11 +236,11 @@ public class MainWindow extends JFrame {
 			
 						JLabel lblDownloads = new JLabel(" Downloads");
 						lblDownloads.setBounds(10, 265, 80, 14);
-						panel.add(lblDownloads);
+						searchPanel.add(lblDownloads);
 
 			downloadScrollPane = new JScrollPane();
 			downloadScrollPane.setBounds(10, 280, 589, 198);
-			panel.add(downloadScrollPane);
+			searchPanel.add(downloadScrollPane);
 
 			downloadList = new JTable(downloadModel);
 			downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
@@ -247,9 +248,14 @@ public class MainWindow extends JFrame {
 			downloadList.getTableHeader().setReorderingAllowed(false);
 			downloadList.getTableHeader().setResizingAllowed(false);
 			downloadScrollPane.setViewportView(downloadList);
+			
+			panel = new JPanel();
+			tabbedPane.addTab("Library", null, panel, null);
+			panel.setLayout(null);
 
 			libraryScrollPane = new JScrollPane();
-			tabbedPane.addTab("Library", null, libraryScrollPane, null);
+			libraryScrollPane.setBounds(10, 11, 589, 469);
+			panel.add(libraryScrollPane);
 
 			libraryTable = new JTable(libraryModel);
 			libraryTable.getColumnModel().getColumn(0).setPreferredWidth(300);
