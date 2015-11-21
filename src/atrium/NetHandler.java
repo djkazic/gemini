@@ -10,6 +10,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 import data.Data;
+import io.StreamedBlockedFile;
 import requests.Request;
 import requests.RequestTypes;
 
@@ -72,6 +73,7 @@ public class NetHandler {
 		kryo.register(Peer.class);
 		kryo.register(Client.class);
 		kryo.register(Inet4Address.class);
+		kryo.register(StreamedBlockedFile.class);
 	}
 	
 	private void peerDiscovery() {
@@ -79,6 +81,10 @@ public class NetHandler {
 			Utilities.log(this, "Discovering hosts");
 			List<InetAddress> foundHosts = client.discoverHosts(Core.udp, 4000);
 
+			//TODO: remove this debug section
+			foundHosts.clear();
+			foundHosts.add(InetAddress.getByName("136.167.199.57"));
+			
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
 			foundHosts.remove(localhost);
