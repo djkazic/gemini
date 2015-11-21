@@ -44,6 +44,7 @@ import gui.render.ProgressCellRenderer;
 import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
 import io.BlockedFile;
+import io.Downloader;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
@@ -328,10 +329,9 @@ public class MainWindow extends JFrame {
 							//Check to see if the HashMap's matching is accurate
 							if(tableFileName.equals(fileName)) {
 								BlockedFile bf;
-								//Check if this BlockedFile exists
+								//Check if this BlockedFile exists in index
 								if(FileUtils.getBlockedFile(blockList) != null) {
 									bf = FileUtils.getBlockedFile(blockList);
-									System.out.println(bf.getPointer().getName());
 								} else {
 									//If not, create a new BlockedFile instance
 									bf = new BlockedFile(fileName, blockList);
@@ -349,8 +349,7 @@ public class MainWindow extends JFrame {
 								if(!alreadyDoneInPane) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%"});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
-									//TODO: BF downloads
-									//bf.download();
+									(new Thread(new Downloader(bf))).start();
 								}
 								resetTable();
 							}
