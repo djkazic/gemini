@@ -33,25 +33,32 @@ public class Core {
 		Log.set(Log.LEVEL_INFO);
 		
 		//Set mutex
+		Utilities.log("atrium.Core", "Calculating mutex");
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
+		Utilities.log("atrium.Core", "Initializing RSA / AES workers");
 		rsa = new RSA();
 		aes = new AES(mutex);
 		
-		//Var initialization
-		blockDex = new ArrayList<BlockedFile> ();
-		index = new HashMap<String, ArrayList<String>> ();
-		
 		//File inits
+		Utilities.log("atrium.Core", "Checking for file structures");
 		FileUtils.initDirs();
 		
+		//Var initialization
+		Utilities.log("atrium.Core", "Generating block index");
+		blockDex = new ArrayList<BlockedFile> ();
+		FileUtils.genBlockIndex();
+		index = new HashMap<String, ArrayList<String>> ();
+		
 		//GUI inits
+		Utilities.log("atrium.Core", "Setting graphical preferences");
 		try {
 			UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
+		Utilities.log("atrium.Core", "Initializing front-end");
 		mainWindow = new MainWindow();
 		
 		//Start NetHandling
