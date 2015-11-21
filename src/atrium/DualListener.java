@@ -165,6 +165,7 @@ public class DualListener extends Listener {
 								bfa.add(sbl.toBlockedFile(foundPeer.getAES()));
 							}
 						}
+						Utilities.log(this, "\tSize of reply: " + bfa.size());
 					}
 					break;
 			}

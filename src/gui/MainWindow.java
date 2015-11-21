@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
@@ -30,6 +31,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -44,12 +46,12 @@ import gui.render.TableModelSpec;
 import io.BlockedFile;
 
 import javax.swing.JTabbedPane;
+import javax.swing.JButton;
 
 public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = -5729024992996472278L;
 	private JPanel contentPane;
-	private JTextField searchInput;
 	private JTable searchRes;
 	private JTable downloadList;
 	private DefaultTableModel searchModel;
@@ -59,27 +61,42 @@ public class MainWindow extends JFrame {
 	private CountDownLatch resLatch;
 	private JScrollPane searchResScrollPane;
 	private JScrollPane downloadScrollPane;
-	private JSeparator separator;
 	private JLabel lblPeers;
-	private JMenuBar menuBar;
-	private JMenu mnFile;
 	private JPopupMenu downloadPopupMenu;
 	private boolean searchMode;
 	private JMenuItem downloadPopupMenuRemoveFromList;
 	private JTabbedPane tabbedPane;
 	private JScrollPane libraryScrollPane;
 	private JTable libraryTable;
+	private JPanel panel;
+	private JTextField searchInput;
+	private JLabel lblSearchResults;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+					MainWindow frame = new MainWindow();
+					frame.setVisible(true);
+					frame.out("Test");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	/**
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		if(!Core.headless) {
+		if(true) {
 			setResizable(false);
 			searchMode = false;
 			setTitle("Radiator Beta");
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			setBounds(100, 100, 550, 570);
+			setBounds(100, 100, 640, 590);
 			contentPane = new JPanel();
 			contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 			setContentPane(contentPane);
@@ -105,22 +122,7 @@ public class MainWindow extends JFrame {
 			libraryModel.addColumn("Date");
 
 			resLatch = new CountDownLatch(1);
-
-			searchInput = new JTextField();
-			searchInput.setBounds(8, 39, 516, 25);
-			searchInput.setColumns(10);
-			searchInput.setFocusable(false);
-			searchInput.setEditable(false);
-			contentPane.add(searchInput);
-
 			contentPane.setLayout(null);
-
-			menuBar = new JMenuBar();
-			menuBar.setBounds(0, -4, 546, 30);
-			contentPane.add(menuBar);
-
-			mnFile = new JMenu("Help");
-			menuBar.add(mnFile);
 
 			try {
 				//ImageIcon imageIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/res/imgres/glasses.png")));
@@ -128,21 +130,6 @@ public class MainWindow extends JFrame {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-
-			downloadScrollPane = new JScrollPane();
-			downloadScrollPane.setBounds(6, 346, 520, 149);
-			contentPane.add(downloadScrollPane);
-
-			separator = new JSeparator();
-			separator.setBounds(0, 507, 532, 2);
-			contentPane.add(separator);
-
-			lblPeers = new JLabel("");
-			lblPeers.setToolTipText("[0|0]");
-			//lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
-			lblPeers.setBounds(508, 515, 24, 24);
-			lblPeers.setFont(new Font("Tahoma", Font.PLAIN, 11));
-			contentPane.add(lblPeers);
 			betterRenderer = new DefaultTableCellRenderer();
 			betterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -150,19 +137,92 @@ public class MainWindow extends JFrame {
 			downloadPopupMenuRemoveFromList = new JMenuItem("Remove from list");
 			downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
 
-			downloadList = new JTable(downloadModel);
-			downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
-			downloadList.getColumnModel().getColumn(1).setCellRenderer(betterRenderer);
-			downloadList.getTableHeader().setReorderingAllowed(false);
-			downloadList.getTableHeader().setResizingAllowed(false);
-			downloadScrollPane.setViewportView(downloadList);
-
 			tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-			tabbedPane.setBounds(6, 75, 520, 260);
+			tabbedPane.setBounds(10, 11, 614, 519);
 			contentPane.add(tabbedPane);
 
+			panel = new JPanel();
+			tabbedPane.addTab("Search", null, panel, null);
+			panel.setLayout(null);
+			
+						searchInput = new JTextField();
+						searchInput.setBounds(10, 11, 490, 20);
+						
+									searchInput.addKeyListener(new KeyAdapter() {
+										@Override
+										public void keyPressed(KeyEvent arg0) {
+											int key = arg0.getKeyCode();
+											if(key == KeyEvent.VK_ENTER) {
+												//clear any previous res
+												clearTable(searchModel);
+												//clear core index
+												Core.index.clear();
+						
+												if(NetHandler.peers.size() == 0) {
+													out("No peers connected. Query is not possible.");
+												} else {
+													String input = searchInput.getText();
+													if(input.equals("")) {
+														out("You cannot search for a blank query.");
+													} else if(input.length() < 3) {
+														out("You cannot search for a query shorter than 3 characters.");
+													} else {
+														if(!searchMode) {
+															removeColumnAndData(searchRes, 0);
+															searchModel.addColumn("Filename");
+															searchModel.addColumn("Size");
+															searchMode = true;
+														}
+														NetHandler.doSearch(input);
+													}
+												}
+												searchInput.setText("");
+											}
+										}
+									});
+									panel.add(searchInput);
+									searchInput.setColumns(10);
+			
+						JButton btnSearch = new JButton("Search");
+						btnSearch.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseClicked(MouseEvent arg0) {
+								//clear any previous res
+								clearTable(searchModel);
+								//clear core index
+								Core.index.clear();
+
+								if(NetHandler.peers.size() == 0) {
+									out("No peers connected. Query is not possible.");
+								} else {
+									String input = searchInput.getText();
+									if(input.equals("")) {
+										out("You cannot search for a blank query.");
+									} else if(input.length() < 3) {
+										out("You cannot search for a query shorter than 3 characters.");
+									} else {
+										if(!searchMode) {
+											removeColumnAndData(searchRes, 0);
+											searchModel.addColumn("Filename");
+											searchModel.addColumn("Size");
+											searchMode = true;
+										}
+										NetHandler.doSearch(input);
+									}
+								}
+								searchInput.setText("");
+							}
+						});
+						btnSearch.setBounds(510, 10, 89, 23);
+						panel.add(btnSearch);
+			
+						lblSearchResults = new JLabel(" Search Results");
+						lblSearchResults.setBounds(10, 42, 80, 14);
+						panel.add(lblSearchResults);
+
 			searchResScrollPane = new JScrollPane();
-			tabbedPane.addTab("Search", null, searchResScrollPane, null);
+			searchResScrollPane.setBounds(10, 57, 589, 197);
+			panel.add(searchResScrollPane);
 
 			searchRes = new JTable(searchModel);
 			searchRes.setDefaultRenderer(Object.class, betterRenderer);
@@ -172,6 +232,21 @@ public class MainWindow extends JFrame {
 			searchResScrollPane.setViewportView(searchRes);
 			searchRes.setCellSelectionEnabled(true);
 			searchRes.setColumnSelectionAllowed(true);
+			
+						JLabel lblDownloads = new JLabel(" Downloads");
+						lblDownloads.setBounds(10, 265, 80, 14);
+						panel.add(lblDownloads);
+
+			downloadScrollPane = new JScrollPane();
+			downloadScrollPane.setBounds(10, 280, 589, 198);
+			panel.add(downloadScrollPane);
+
+			downloadList = new JTable(downloadModel);
+			downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
+			downloadList.getColumnModel().getColumn(1).setCellRenderer(betterRenderer);
+			downloadList.getTableHeader().setReorderingAllowed(false);
+			downloadList.getTableHeader().setResizingAllowed(false);
+			downloadScrollPane.setViewportView(downloadList);
 
 			libraryScrollPane = new JScrollPane();
 			tabbedPane.addTab("Library", null, libraryScrollPane, null);
@@ -181,6 +256,12 @@ public class MainWindow extends JFrame {
 			libraryTable.getTableHeader().setReorderingAllowed(false);
 			libraryTable.getTableHeader().setResizingAllowed(false);
 			libraryScrollPane.setViewportView(libraryTable);
+			
+						lblPeers = new JLabel("");
+						lblPeers.setBounds(610, 537, 24, 24);
+						contentPane.add(lblPeers);
+						lblPeers.setToolTipText("[0|0]");
+						lblPeers.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
 			registerListeners();
 		}
@@ -205,40 +286,6 @@ public class MainWindow extends JFrame {
 						downloadList.changeSelection(tableRow, 0, false, false);
 					}
 					downloadPopupMenu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
-				}
-			}
-		});
-
-		searchInput.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent arg0) {
-				int key = arg0.getKeyCode();
-				if(key == KeyEvent.VK_ENTER) {
-					//clear any previous res
-					clearTable(searchModel);
-					//clear core index
-					Core.index.clear();
-
-					if(NetHandler.peers.size() == 0) {
-						out("No peers connected. Query is not possible.");
-					} else {
-						String input = searchInput.getText();
-						if(input.equals("")) {
-							out("You cannot search for a blank query.");
-						} else if(input.length() < 3) {
-							out("You cannot search for a query shorter than 3 characters.");
-						} else {
-							if(!searchMode) {
-								removeColumnAndData(searchRes, 0);
-								searchModel.addColumn("Filename");
-								searchModel.addColumn("Size");
-								searchMode = true;
-							}
-							NetHandler.doSearch(input);
-						}
-						//dump results
-					}
-					searchInput.setText("");
 				}
 			}
 		});

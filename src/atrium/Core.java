@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import javax.swing.UIManager;
 import com.esotericsoftware.minlog.Log;
 import crypto.AES;
 import crypto.RSA;
@@ -47,6 +47,11 @@ public class Core {
 		FileUtils.initDirs();
 		
 		//GUI inits
+		try {
+			UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
 		mainWindow = new MainWindow();
 		
 		//Start NetHandling
