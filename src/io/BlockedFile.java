@@ -44,7 +44,6 @@ public class BlockedFile {
 	 */
 	public BlockedFile(String pointer, ArrayList<String> blockList) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
-		checksum = FileUtils.generateChecksum(this.pointer);
 		this.blockList = blockList;
 		blackList = new ArrayList<String> ();
 		complete = false;
@@ -126,7 +125,7 @@ public class BlockedFile {
 	public StreamedBlockedFile toStreamedBlockedFile() {
 		ArrayList<String> encryptedList = new ArrayList<String> ();
 		for(int i=0; i < blockList.size(); i++) {
-			encryptedList.set(i, Core.aes.encrypt(blockList.get(i)));
+			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), encryptedList);
 	}
