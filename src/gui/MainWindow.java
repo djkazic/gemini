@@ -40,6 +40,7 @@ import atrium.Core;
 import atrium.FileUtils;
 import atrium.NetHandler;
 import atrium.Peer;
+import atrium.Utilities;
 import gui.render.ProgressCellRenderer;
 import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
@@ -346,10 +347,12 @@ public class MainWindow extends JFrame {
 										}
 									}
 								}
-								if(!alreadyDoneInPane) {
+								if(!alreadyDoneInPane && !bf.isComplete()) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%"});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									(new Thread(new Downloader(bf))).start();
+								} else if(bf.isComplete()) {
+									Utilities.log(this, "This file is already downloaded.");
 								}
 								resetTable();
 							}
