@@ -15,6 +15,7 @@ public class Downloader implements Runnable {
 	
 	public void run() {
 		try {
+			blockedFile.setBlacklist(FileUtils.enumerateIncompleteBlacklist(blockedFile));
 			String currentBlock;
 			while((currentBlock = blockedFile.getNextBlock()) != null) {
 				Utilities.log(this, "Requesting block " + currentBlock);

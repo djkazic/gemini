@@ -11,6 +11,13 @@ import atrium.Utilities;
 import crypto.AES;
 
 public class BlockedFile {
+	
+	public static void main(String[] args) {
+		Core.blockDex = new ArrayList<BlockedFile> ();
+		BlockedFile bf = new BlockedFile(new File("libGLESv2.dll"), true);
+		System.out.println(bf.getBlockList());
+		System.out.println(FileUtils.findBlockRAF(bf, 12));
+	}
 
 	private File pointer;
 	private String checksum;
@@ -28,10 +35,11 @@ public class BlockedFile {
 		if(finished) {
 			checksum = FileUtils.generateChecksum(pointer);
 			blockList = FileUtils.enumerateBlocks(pointer);
+			blackList = blockList;
 		} else {
 			blockList = new ArrayList<String> ();
+			blackList = new ArrayList<String> ();
 		}
-		blackList = new ArrayList<String> ();
 		this.complete = finished;
 		progress = "";
 		Core.blockDex.add(this);
@@ -95,6 +103,16 @@ public class BlockedFile {
 
 	public ArrayList<String> getBlacklist() {
 		return blackList;
+	}
+	
+	public void setBlacklist(ArrayList<String> in) {
+		blackList = in;
+	}
+	
+	public void logBlock(String str) {
+		if(!blackList.contains(str)) {
+			blackList.add(str);
+		}
 	}
 
 	public boolean isComplete() {

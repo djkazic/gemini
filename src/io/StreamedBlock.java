@@ -21,11 +21,11 @@ public class StreamedBlock {
 		fileBytes = null;
 	}
 	
-	public StreamedBlock(String origin, String blockName, File file) {
+	public StreamedBlock(String origin, String blockName, byte[] searchRes) {
 		this.origin = Core.aes.encrypt(origin);
 		this.blockName = Core.aes.encrypt(blockName);
 		try {
-			fileBytes = Core.aes.encrypt(Files.readAllBytes(file.toPath()));
+			fileBytes = Core.aes.encrypt(searchRes);
 		} catch (Exception ex) {
 			Utilities.log(this, "Could not get file bytes for StreamedBlock");
 		}
@@ -40,21 +40,23 @@ public class StreamedBlock {
 	}
 	
 	public void insertSelf(AES aes) {
+		String blockDest = aes.decrypt(blockName);
 		byte[] decrypted = aes.decrypt(fileBytes);
 		Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
 		BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
+		bf.logBlock(blockDest);
 		File folder = new File(bf.getBlocksFolder());
-		String blockDest = aes.decrypt(blockName);
 		File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
-		bf.getBlacklist().add(blockDest);
+
 		try {
 			if(!folder.exists()) {
+				Utilities.log(this, "Creating directory: " + folder);
 				folder.mkdirs();
 			}
 			if(!dest.exists()) {
 				//TODO: remove debugging
 				Utilities.log(this, "Writing block to " + dest);
-				FileOutputStream fos = new FileOutputStream(dest, true);
+				FileOutputStream fos = new FileOutputStream(dest);
 				fos.write(decrypted);
 				fos.close();
 			} else {
