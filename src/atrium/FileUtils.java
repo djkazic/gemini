@@ -8,8 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 
@@ -105,32 +107,23 @@ public class FileUtils {
 		return null;
 	}
 	
-	public static File findBlockRAF(BlockedFile bf, int blockIndex) {
+	public static byte[] findBlockRAF(BlockedFile bf, int blockIndex) {
 		try {
-			File temp = File.createTempFile("temp-block-" + bf.getPointer().getName(), ".tmp");
-			temp.deleteOnExit();
-			FileOutputStream fos = new FileOutputStream(temp);
-			InputStream fis = new FileInputStream(bf.getPointer());
-			byte[] buffer = new byte[Core.blockSize];
-
-			int blockPos = 0;
-			int numRead;
-			do {
-				blockPos++;
-				numRead = fis.read(buffer);
-				if(numRead > 0) {
-					fos.write(buffer, 0, numRead);
-				} else {
-					break;
+			int res = 0;
+			try {
+				byte[] rafBuffer = new byte[Core.blockSize];
+				RandomAccessFile raf = new RandomAccessFile(bf.getPointer(), "r");
+				raf.seek(Core.blockSize * (blockIndex));
+				res = raf.read(rafBuffer);
+				raf.close();
+				if(res != rafBuffer.length) {
+					byte[] smallChunk = new byte[res];
+					System.arraycopy(rafBuffer, 0, smallChunk, 0, res);
+					return smallChunk;
 				}
-			} while(numRead != -1 && blockPos < blockIndex);
-			fis.close();
-			fos.close();
-			
-			if(blockPos > 0) {
-				return temp;
-			} else {
-				return null;
+				return rafBuffer;
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -178,8 +171,6 @@ public class FileUtils {
 			ArrayList<String> blockList = new ArrayList<String> ();
 			InputStream fis = new FileInputStream(file);
 			byte[] buffer = new byte[Core.blockSize];
-			
-			System.out.println(file.length());
 
 			MessageDigest complete = MessageDigest.getInstance("SHA1");
 			int numRead;
@@ -199,6 +190,25 @@ public class FileUtils {
 			} while(numRead != -1);
 			fis.close();
 			return blockList;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static ArrayList<String> enumerateIncompleteBlacklist(BlockedFile bf) {
+		try {
+			ArrayList<String> output = new ArrayList<String> ();
+			File bfDir = new File(bf.getBlocksFolder());
+			if(bfDir.exists()) {
+				File[] files = bfDir.listFiles();
+				for(File file : files) {
+					if(FileUtils.generateChecksum(file).equals(file.getName())) {
+						output.add(file.getName());
+					}
+				}
+			}
+			return output;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
