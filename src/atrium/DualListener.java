@@ -1,6 +1,5 @@
 package atrium;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
