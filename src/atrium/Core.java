@@ -21,7 +21,7 @@ public class Core {
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<String, ArrayList<String>> index;
 	
-	public static int blockSize = 384000;
+	public static int blockSize = 192000;
 	public static int tcp = 35500;
 	public static int udp = 35501;
 	public static String mutex;
@@ -31,25 +31,6 @@ public class Core {
 		//TODO: remove for production
 		//Set logging
 		Log.set(Log.LEVEL_INFO);
-		
-		//Set mutex
-		Utilities.log("atrium.Core", "Calculating mutex");
-		mutex = Utilities.getMutex();
-		
-		//Initialize crypto routines
-		Utilities.log("atrium.Core", "Initializing RSA / AES workers");
-		rsa = new RSA();
-		aes = new AES(mutex);
-		
-		//File inits
-		Utilities.log("atrium.Core", "Checking for file structures");
-		FileUtils.initDirs();
-		
-		//Var initialization
-		Utilities.log("atrium.Core", "Generating block index");
-		blockDex = new ArrayList<BlockedFile> ();
-		FileUtils.genBlockIndex();
-		index = new HashMap<String, ArrayList<String>> ();
 		
 		//GUI inits
 		Utilities.log("atrium.Core", "Setting graphical preferences");
@@ -61,7 +42,31 @@ public class Core {
 		Utilities.log("atrium.Core", "Initializing front-end");
 		mainWindow = new MainWindow();
 		
+		//Set mutex
+		Utilities.log("atrium.Core", "Calculating mutex");
+		mainWindow.out("Calculating mutex");
+		mutex = Utilities.getMutex();
+		
+		//Initialize crypto routines
+		Utilities.log("atrium.Core", "Initializing RSA / AES workers");
+		mainWindow.out("Initializing RSA / AES workers");
+		rsa = new RSA();
+		aes = new AES(mutex);
+		
+		//File inits
+		Utilities.log("atrium.Core", "Checking for file structures");
+		mainWindow.out("Checking for file structures");
+		FileUtils.initDirs();
+		
+		//Var initialization
+		Utilities.log("atrium.Core", "Generating block index");
+		mainWindow.out("Generating block index");
+		blockDex = new ArrayList<BlockedFile> ();
+		FileUtils.genBlockIndex();
+		index = new HashMap<String, ArrayList<String>> ();
+		
 		//Start NetHandling
+		mainWindow.out("Ready");
 		netHandler = new NetHandler();
 	}
 }

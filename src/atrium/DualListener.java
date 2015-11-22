@@ -1,6 +1,7 @@
 package atrium;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -103,34 +104,42 @@ public class DualListener extends Listener {
 					String blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
 					String blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 					
-					//TODO: search for block
-					BlockedFile foundBlock;
-					if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
-						int blockPosition;
-						if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
-							
-							File searchRes = null;
-							if(foundBlock.isComplete()) {
-								//Attempt complete search
-								searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
+					(new Thread(new Runnable() {
+						public void run() {
+							//TODO: search for block
+							BlockedFile foundBlock;
+							if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
+								int blockPosition;
+								if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+									
+									byte[] searchRes = null;
+									if(foundBlock.isComplete()) {
+										//Attempt complete search
+										searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
+									} else {
+										//Attempt incomplete search
+										try {
+											searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
+										} catch (Exception ex) {
+											ex.printStackTrace();
+										}
+									}
+									
+									if(searchRes != null) {
+										Utilities.log(this, "\tSending back block, length: " + searchRes.length);
+										connection.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+									} else {
+										Utilities.log(this, "\tFailure: could not find block " + blockName);
+									}
+								} else {
+									Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
+														+ foundBlock.getBlockList());
+								}
 							} else {
-								//Attempt incomplete search
-								searchRes = FileUtils.findBlockAppData(blockOrigin, blockName);
+								Utilities.log(this, "\tFailure: don't have origin BlockedFile");
 							}
-							
-							if(searchRes != null) {
-								Utilities.log(this, "\tSending back block: " + searchRes.getName());
-								connection.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-							} else {
-								Utilities.log(this, "\tFailure: could not find block " + blockName);
-							}
-						} else {
-							Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-												+ foundBlock.getBlockList());
 						}
-					} else {
-						Utilities.log(this, "\tFailure: don't have origin BlockedFile");
-					}
+					})).start();
 					break;
 			}
 		} else if(object instanceof Data) {
@@ -219,7 +228,7 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received block data");
 					StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
 					String origin = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
-					Utilities.log(this, "\tBlock origin: " + origin);
+					Utilities.log(this, "\tBlock origin: " + origin + ", size = " + foundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
 					streamedBlock.insertSelf(foundPeer.getAES());
 					break;
 			}
