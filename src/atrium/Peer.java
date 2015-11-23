@@ -3,8 +3,8 @@ package atrium;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
+import javax.xml.bind.DatatypeConverter;
 import com.esotericsoftware.kryonet.Connection;
 import crypto.AES;
 import data.Data;
@@ -117,8 +117,7 @@ public class Peer {
 
 	public boolean setPubkey(String pubkey) {
 		try {
-			byte[] pubKeyBytes = pubkey.getBytes();
-			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(pubKeyBytes));
+			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(DatatypeConverter.parseBase64Binary(pubkey));
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			PublicKey pk = kf.generatePublic(keySpec);
 			this.pubkey = pk;

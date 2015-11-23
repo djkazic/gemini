@@ -70,10 +70,10 @@ public class FileUtils {
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
 		directory = fw.getDefaultDirectory().toString();
-		if(Utilities.isWindows()) {
-			directory += "/Radiator";
-		} else { 
+		if(Utilities.isMac()) { 
 			directory += "/Documents/Radiator";
+		} else {
+			directory += "/Radiator";
 		}
 		return directory;
 	}

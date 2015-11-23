@@ -6,10 +6,10 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.xml.bind.DatatypeConverter;
 
 import atrium.Core;
 
@@ -22,7 +22,7 @@ public class RSA {
 		kpg = KeyPairGenerator.getInstance("RSA");
 		myPair = kpg.generateKeyPair();
 		byte[] pubKeyBytes = myPair.getPublic().getEncoded();
-		Core.pubKey = new String(Base64.getEncoder().encode(pubKeyBytes));
+		Core.pubKey = new String(DatatypeConverter.printBase64Binary(pubKeyBytes));
 	}
 	
 	/**

@@ -87,7 +87,14 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		if(true) {
+		if(!Core.headless) {
+			Utilities.log("atrium.Core", "Setting graphical preferences");
+			try {
+				UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+		
 			setResizable(false);
 			searchMode = false;
 			setTitle("Radiator Beta");
