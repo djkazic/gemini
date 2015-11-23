@@ -1,6 +1,5 @@
 package atrium;
 
-import java.nio.file.Files;
 import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -39,6 +38,11 @@ public class DualListener extends Listener {
 		}
 	}
 
+	public void disconnected(Connection connection, Object object) {
+		Peer foundPeer = Peer.findPeer(connection);
+		NetHandler.peers.remove(foundPeer);
+	}
+	
 	//New incoming packet post-connection
 	public void received(Connection connection, Object object) {
 		Peer foundPeer = Peer.findPeer(connection);
