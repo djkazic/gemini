@@ -31,7 +31,7 @@ public class NetHandler {
 
 	public void registerServerListeners() {
 		try {
-			server = new Server(480000, 480000);
+			server = new Server(512000, 512000);
 			registerClasses(server.getKryo());
 
 			Utilities.log(this, "Registering server listeners");

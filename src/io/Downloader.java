@@ -20,7 +20,7 @@ public class Downloader implements Runnable {
 			while((currentBlock = blockedFile.getNextBlock()) != null) {
 				Utilities.log(this, "Requesting block " + currentBlock);
 				NetHandler.requestBlock(blockedFile.getPointer().getName(), currentBlock);
-				Thread.sleep(500);
+				Thread.sleep(250);
 			}
 			FileUtils.unifyBlocks(blockedFile);
 		} catch (Exception ex) {
