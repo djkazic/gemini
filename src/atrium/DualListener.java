@@ -15,8 +15,6 @@ import requests.RequestTypes;
 public class DualListener extends Listener {
 	
 	private int inOut;
-	private String blockOrigin;
-	private String blockName;
 	
 	public DualListener(int inOut) {
 		super();
@@ -99,50 +97,6 @@ public class DualListener extends Listener {
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
-				case RequestTypes.BLOCK:
-					Utilities.log(this, "Received request for block:");
-					String[] encryptedBlock = (String[]) request.getPayload();
-					blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
-					blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
-					final Connection blockConn = connection;
-					
-					(new Thread(new Runnable() {
-						public void run() {
-							//TODO: search for block
-							BlockedFile foundBlock;
-							if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
-								int blockPosition;
-								if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
-									
-									byte[] searchRes = null;
-									if(foundBlock.isComplete()) {
-										//Attempt complete search
-										searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
-									} else {
-										//Attempt incomplete search
-										try {
-											searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
-										} catch (Exception ex) {
-											ex.printStackTrace();
-										}
-									}
-									
-									if(searchRes != null) {
-										Utilities.log(this, "\tSending back block, length: " + searchRes.length);
-										blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-									} else {
-										Utilities.log(this, "\tFailure: could not find block " + blockName);
-									}
-								} else {
-									Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-														+ foundBlock.getBlockList());
-								}
-							} else {
-								Utilities.log(this, "\tFailure: don't have origin BlockedFile");
-							}
-						}
-					})).start();
-					break;
 			}
 		} else if(object instanceof Data) {
 			Data data = (Data) object;

@@ -36,6 +36,7 @@ public class NetHandler {
 
 			Utilities.log(this, "Registering server listeners");
 			server.addListener(new DualListener(1));
+			server.addListener(new BlockListener());
 
 			Utilities.log(this, "Starting server component");
 			server.bind(Core.tcp, Core.udp);
