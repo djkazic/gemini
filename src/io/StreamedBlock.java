@@ -42,27 +42,31 @@ public class StreamedBlock {
 		byte[] decrypted = aes.decrypt(fileBytes);
 		Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
 		BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
-		File folder = new File(bf.getBlocksFolder());
-		File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
+		if(bf.isComplete()) {
+			Utilities.log(this, "Discarding block, BlockedFile is done");
+		} else {
+			File folder = new File(bf.getBlocksFolder());
+			File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
 
-		try {
-			if(!folder.exists()) {
-				Utilities.log(this, "Creating directory: " + folder);
-				folder.mkdirs();
+			try {
+				if(!folder.exists()) {
+					Utilities.log(this, "Creating directory: " + folder);
+					folder.mkdirs();
+				}
+				if(!dest.exists()) {
+					Utilities.log(this, "Writing block to " + dest);
+					Utilities.log(this, "Logging block into blacklist");
+					bf.logBlock(blockDest);
+					FileOutputStream fos = new FileOutputStream(dest);
+					fos.write(decrypted);
+					fos.close();
+				} else {
+					//TODO: remove debugging
+					Utilities.log(this, "Race condition: already have this block");
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
-			if(!dest.exists()) {
-				Utilities.log(this, "Writing block to " + dest);
-				Utilities.log(this, "Logging block into blacklist");
-				bf.logBlock(blockDest);
-				FileOutputStream fos = new FileOutputStream(dest);
-				fos.write(decrypted);
-				fos.close();
-			} else {
-				//TODO: remove debugging
-				Utilities.log(this, "Race condition: already have this block");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 }

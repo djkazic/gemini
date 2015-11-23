@@ -115,10 +115,13 @@ public class BlockedFile {
 	}
 
 	private void updateProgress() {
-		double dProgress = ((double) blackList.size()) / blockList.size();
-		dProgress *= 100;
-		progress = Math.round(dProgress) + "%";
-		Utilities.log(this, pointer.getName() + " @ " + progress); 
+		if(complete) {
+			progress = "100%";
+		} else {
+			double dProgress = ((double) blackList.size()) / blockList.size();
+			dProgress *= 100;
+			progress = Math.round(dProgress) + "%";
+		}
 		if(!Core.headless) {
 			Core.mainWindow.updateProgress(pointer.getName(), progress);
 		}
