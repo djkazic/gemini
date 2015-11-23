@@ -87,192 +87,192 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		if(!Core.headless) {
-			Utilities.log("atrium.Core", "Setting graphical preferences");
-			try {
-				UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
-			} catch(Exception ex) {
-				ex.printStackTrace();
-			}
-		
-			setResizable(false);
-			searchMode = false;
-			setTitle("Radiator Beta");
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			setBounds(100, 100, 640, 590);
-			contentPane = new JPanel();
-			contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-			setContentPane(contentPane);
 
-			//Set title icon
-			try {
-				//Image iconImage = ImageIO.read(getClass().getResourceAsStream("/res/imgres/titleicon.png"));
-				//setIconImage(iconImage);
-			} catch(Exception ex) {
-				ex.printStackTrace();
-			}
-
-			searchModel = new TableModelSpec();
-			searchModel.addColumn("Status");
-
-			downloadModel = new TableModelDL();
-			downloadModel.addColumn("Filename");
-			downloadModel.addColumn("Progress");
-
-			libraryModel = new TableModelSpec();
-			libraryModel.addColumn("Filename");
-			libraryModel.addColumn("Size");
-			libraryModel.addColumn("Date");
-
-			resLatch = new CountDownLatch(1);
-			contentPane.setLayout(null);
-
-			try {
-				//ImageIcon imageIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/res/imgres/glasses.png")));
-				//mntmAbout.setIcon(imageIcon);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-			betterRenderer = new DefaultTableCellRenderer();
-			betterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-			downloadPopupMenu = new JPopupMenu();
-			downloadPopupMenuRemoveFromList = new JMenuItem("Remove from list");
-			downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
-
-			tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-			tabbedPane.setBounds(10, 11, 614, 519);
-			contentPane.add(tabbedPane);
-
-			searchPanel = new JPanel();
-			tabbedPane.addTab("Search", null, searchPanel, null);
-			searchPanel.setLayout(null);
-			
-						searchInput = new JTextField();
-						searchInput.setBounds(10, 10, 490, 23);
-						
-									searchInput.addKeyListener(new KeyAdapter() {
-										@Override
-										public void keyPressed(KeyEvent arg0) {
-											int key = arg0.getKeyCode();
-											if(key == KeyEvent.VK_ENTER) {
-												//clear any previous res
-												clearTable(searchModel);
-												//clear core index
-												Core.index.clear();
-						
-												if(NetHandler.peers.size() == 0) {
-													out("No peers connected. Query is not possible.");
-												} else {
-													String input = searchInput.getText();
-													if(input.equals("")) {
-														out("You cannot search for a blank query.");
-													} else if(input.length() < 3) {
-														out("You cannot search for a query shorter than 3 characters.");
-													} else {
-														if(!searchMode) {
-															removeColumnAndData(searchRes, 0);
-															searchModel.addColumn("Filename");
-															searchModel.addColumn("Size");
-															searchMode = true;
-														}
-														NetHandler.doSearch(input);
-													}
-												}
-												searchInput.setText("");
-											}
-										}
-									});
-									searchPanel.add(searchInput);
-									searchInput.setColumns(10);
-			
-						JButton btnSearch = new JButton("Search");
-						btnSearch.addMouseListener(new MouseAdapter() {
-							@Override
-							public void mouseClicked(MouseEvent arg0) {
-								//clear any previous res
-								clearTable(searchModel);
-								//clear core index
-								Core.index.clear();
-
-								if(NetHandler.peers.size() == 0) {
-									out("No peers connected. Query is not possible.");
-								} else {
-									String input = searchInput.getText();
-									if(input.equals("")) {
-										out("You cannot search for a blank query.");
-									} else if(input.length() < 3) {
-										out("You cannot search for a query shorter than 3 characters.");
-									} else {
-										if(!searchMode) {
-											removeColumnAndData(searchRes, 0);
-											searchModel.addColumn("Filename");
-											searchModel.addColumn("Size");
-											searchMode = true;
-										}
-										NetHandler.doSearch(input);
-									}
-								}
-								searchInput.setText("");
-							}
-						});
-						btnSearch.setBounds(510, 11, 89, 23);
-						searchPanel.add(btnSearch);
-			
-						lblSearchResults = new JLabel(" Search Results");
-						lblSearchResults.setBounds(10, 42, 80, 14);
-						searchPanel.add(lblSearchResults);
-
-			searchResScrollPane = new JScrollPane();
-			searchResScrollPane.setBounds(10, 57, 589, 197);
-			searchPanel.add(searchResScrollPane);
-
-			searchRes = new JTable(searchModel);
-			searchRes.setDefaultRenderer(Object.class, betterRenderer);
-			//.getColumn(0).setCellRenderer(betterRenderer);
-			searchRes.getTableHeader().setReorderingAllowed(false);
-			searchRes.getTableHeader().setResizingAllowed(false);
-			searchResScrollPane.setViewportView(searchRes);
-			searchRes.setCellSelectionEnabled(true);
-			searchRes.setColumnSelectionAllowed(true);
-			
-						JLabel lblDownloads = new JLabel(" Downloads");
-						lblDownloads.setBounds(10, 265, 80, 14);
-						searchPanel.add(lblDownloads);
-
-			downloadScrollPane = new JScrollPane();
-			downloadScrollPane.setBounds(10, 280, 589, 198);
-			searchPanel.add(downloadScrollPane);
-
-			downloadList = new JTable(downloadModel);
-			downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
-			downloadList.getColumnModel().getColumn(1).setCellRenderer(betterRenderer);
-			downloadList.getTableHeader().setReorderingAllowed(false);
-			downloadList.getTableHeader().setResizingAllowed(false);
-			downloadScrollPane.setViewportView(downloadList);
-			
-			panel = new JPanel();
-			tabbedPane.addTab("Library", null, panel, null);
-			panel.setLayout(null);
-
-			libraryScrollPane = new JScrollPane();
-			libraryScrollPane.setBounds(10, 11, 589, 469);
-			panel.add(libraryScrollPane);
-
-			libraryTable = new JTable(libraryModel);
-			libraryTable.getColumnModel().getColumn(0).setPreferredWidth(300);
-			libraryTable.getTableHeader().setReorderingAllowed(false);
-			libraryTable.getTableHeader().setResizingAllowed(false);
-			libraryScrollPane.setViewportView(libraryTable);
-			
-						lblPeers = new JLabel("");
-						lblPeers.setBounds(610, 537, 24, 24);
-						contentPane.add(lblPeers);
-						lblPeers.setToolTipText("[0|0]");
-						lblPeers.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-			registerListeners();
+		Utilities.log("atrium.Core", "Setting graphical preferences");
+		try {
+			UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
+
+		setResizable(false);
+		searchMode = false;
+		setTitle("Radiator Beta");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 640, 590);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+
+		//Set title icon
+		try {
+			//Image iconImage = ImageIO.read(getClass().getResourceAsStream("/res/imgres/titleicon.png"));
+			//setIconImage(iconImage);
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+
+		searchModel = new TableModelSpec();
+		searchModel.addColumn("Status");
+
+		downloadModel = new TableModelDL();
+		downloadModel.addColumn("Filename");
+		downloadModel.addColumn("Progress");
+
+		libraryModel = new TableModelSpec();
+		libraryModel.addColumn("Filename");
+		libraryModel.addColumn("Size");
+		libraryModel.addColumn("Date");
+
+		resLatch = new CountDownLatch(1);
+		contentPane.setLayout(null);
+
+		try {
+			//ImageIcon imageIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/res/imgres/glasses.png")));
+			//mntmAbout.setIcon(imageIcon);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		betterRenderer = new DefaultTableCellRenderer();
+		betterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+		downloadPopupMenu = new JPopupMenu();
+		downloadPopupMenuRemoveFromList = new JMenuItem("Remove from list");
+		downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
+
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(10, 11, 614, 519);
+		contentPane.add(tabbedPane);
+
+		searchPanel = new JPanel();
+		tabbedPane.addTab("Search", null, searchPanel, null);
+		searchPanel.setLayout(null);
+
+		searchInput = new JTextField();
+		searchInput.setBounds(10, 10, 490, 23);
+
+		searchInput.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				int key = arg0.getKeyCode();
+				if(key == KeyEvent.VK_ENTER) {
+					//clear any previous res
+					clearTable(searchModel);
+					//clear core index
+					Core.index.clear();
+
+					if(NetHandler.peers.size() == 0) {
+						out("No peers connected. Query is not possible.");
+					} else {
+						String input = searchInput.getText();
+						if(input.equals("")) {
+							out("You cannot search for a blank query.");
+						} else if(input.length() < 3) {
+							out("You cannot search for a query shorter than 3 characters.");
+						} else {
+							if(!searchMode) {
+								removeColumnAndData(searchRes, 0);
+								searchModel.addColumn("Filename");
+								searchModel.addColumn("Size");
+								searchMode = true;
+							}
+							NetHandler.doSearch(input);
+						}
+					}
+					searchInput.setText("");
+				}
+			}
+		});
+		searchPanel.add(searchInput);
+		searchInput.setColumns(10);
+
+		JButton btnSearch = new JButton("Search");
+		btnSearch.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				//clear any previous res
+				clearTable(searchModel);
+				//clear core index
+				Core.index.clear();
+
+				if(NetHandler.peers.size() == 0) {
+					out("No peers connected. Query is not possible.");
+				} else {
+					String input = searchInput.getText();
+					if(input.equals("")) {
+						out("You cannot search for a blank query.");
+					} else if(input.length() < 3) {
+						out("You cannot search for a query shorter than 3 characters.");
+					} else {
+						if(!searchMode) {
+							removeColumnAndData(searchRes, 0);
+							searchModel.addColumn("Filename");
+							searchModel.addColumn("Size");
+							searchMode = true;
+						}
+						NetHandler.doSearch(input);
+					}
+				}
+				searchInput.setText("");
+			}
+		});
+		btnSearch.setBounds(510, 11, 89, 23);
+		searchPanel.add(btnSearch);
+
+		lblSearchResults = new JLabel(" Search Results");
+		lblSearchResults.setBounds(10, 42, 80, 14);
+		searchPanel.add(lblSearchResults);
+
+		searchResScrollPane = new JScrollPane();
+		searchResScrollPane.setBounds(10, 57, 589, 197);
+		searchPanel.add(searchResScrollPane);
+
+		searchRes = new JTable(searchModel);
+		searchRes.setDefaultRenderer(Object.class, betterRenderer);
+		//.getColumn(0).setCellRenderer(betterRenderer);
+		searchRes.getTableHeader().setReorderingAllowed(false);
+		searchRes.getTableHeader().setResizingAllowed(false);
+		searchResScrollPane.setViewportView(searchRes);
+		searchRes.setCellSelectionEnabled(true);
+		searchRes.setColumnSelectionAllowed(true);
+
+		JLabel lblDownloads = new JLabel(" Downloads");
+		lblDownloads.setBounds(10, 265, 80, 14);
+		searchPanel.add(lblDownloads);
+
+		downloadScrollPane = new JScrollPane();
+		downloadScrollPane.setBounds(10, 280, 589, 198);
+		searchPanel.add(downloadScrollPane);
+
+		downloadList = new JTable(downloadModel);
+		downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
+		downloadList.getColumnModel().getColumn(1).setCellRenderer(betterRenderer);
+		downloadList.getTableHeader().setReorderingAllowed(false);
+		downloadList.getTableHeader().setResizingAllowed(false);
+		downloadScrollPane.setViewportView(downloadList);
+
+		panel = new JPanel();
+		tabbedPane.addTab("Library", null, panel, null);
+		panel.setLayout(null);
+
+		libraryScrollPane = new JScrollPane();
+		libraryScrollPane.setBounds(10, 11, 589, 469);
+		panel.add(libraryScrollPane);
+
+		libraryTable = new JTable(libraryModel);
+		libraryTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+		libraryTable.getTableHeader().setReorderingAllowed(false);
+		libraryTable.getTableHeader().setResizingAllowed(false);
+		libraryScrollPane.setViewportView(libraryTable);
+
+		lblPeers = new JLabel("");
+		lblPeers.setBounds(610, 537, 24, 24);
+		contentPane.add(lblPeers);
+		lblPeers.setToolTipText("[0|0]");
+		lblPeers.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		registerListeners();
+
 	}
 
 	public void registerListeners() {
@@ -396,83 +396,82 @@ public class MainWindow extends JFrame {
 	}
 
 	public void out(String str) {
-		if(!Core.headless) {
-			try {
-				resLatch.await();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if(searchMode) {
-				removeColumnAndData(searchRes, 1);
-				removeColumnAndData(searchRes, 0);
-				searchModel.addColumn("Status");
-				searchMode = false;
-			}
-			clearTable(searchModel);
-			searchModel.addRow(new String[]{str});
+
+		try {
+			resLatch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		if(searchMode) {
+			removeColumnAndData(searchRes, 1);
+			removeColumnAndData(searchRes, 0);
+			searchModel.addColumn("Status");
+			searchMode = false;
+		}
+		clearTable(searchModel);
+		searchModel.addRow(new String[]{str});
+
 	}
 
 	public void updatePeerCount() {
-		if(!Core.headless) {
-			//String peers = peersCountIcon();
-			//lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/" + peers + ".png")));
-			lblPeers.setToolTipText(peerToolTip());
-		}
+
+		//String peers = peersCountIcon();
+		//lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/" + peers + ".png")));
+		lblPeers.setToolTipText(peerToolTip());
+
 	}
 
 	public void updateProgress(String forFile, String progress) {
-		if(!Core.headless) {
-			int rowCount = downloadModel.getRowCount();
-			for(int i=0; i < rowCount; i++) {
-				if(downloadModel.getValueAt(i, 0).equals(forFile)) {
-					downloadModel.setValueAt(progress, i, 1);
-				}
+		int rowCount = downloadModel.getRowCount();
+		for(int i=0; i < rowCount; i++) {
+			if(downloadModel.getValueAt(i, 0).equals(forFile)) {
+				downloadModel.setValueAt(progress, i, 1);
 			}
 		}
+
 	}
 
 	public void updateLibrary() {
-		if(!Core.headless) {
-			clearTable(libraryModel);
-			for(BlockedFile bf : Core.blockDex) {
-				if(bf.isComplete()) {
-					String fileEstimateStr = "";
-					long fileEstimateKb = bf.getPointer().length() / 1000;
-					if(fileEstimateKb > 1000) {
-						double fileEstimateMb = (fileEstimateKb / 1000D);
-						fileEstimateStr += fileEstimateMb + "MB";
-					} else {
-						fileEstimateStr += fileEstimateKb+ "KB";
-					}
-					libraryModel.addRow(new String[]{bf.getPointer().getName(), fileEstimateStr, bf.getDateModified()});
+
+		clearTable(libraryModel);
+		for(BlockedFile bf : Core.blockDex) {
+			if(bf.isComplete()) {
+				String fileEstimateStr = "";
+				long fileEstimateKb = bf.getPointer().length() / 1000;
+				if(fileEstimateKb > 1000) {
+					double fileEstimateMb = (fileEstimateKb / 1000D);
+					fileEstimateStr += fileEstimateMb + "MB";
+				} else {
+					fileEstimateStr += fileEstimateKb+ "KB";
 				}
+				libraryModel.addRow(new String[]{bf.getPointer().getName(), fileEstimateStr, bf.getDateModified()});
 			}
 		}
+
 	}
 
 	public void setSearchFocusable() {
-		if(!Core.headless) {
-			searchInput.setFocusable(true);
-		}
+
+		searchInput.setFocusable(true);
+
 	}
 
 	public void setSearchEditable() {
-		if(!Core.headless) {
-			searchInput.setEditable(true);
-		}
+
+		searchInput.setEditable(true);
+
 	}
 
 	public void resetTable() {
-		if(!Core.headless) {
-			out("Enter your search query and press Enter.");
-		}
+
+		out("Enter your search query and press Enter.");
+
 	}
 
 	public void addRowToSearchModel(String[] info) {
-		if(!Core.headless) {
-			searchModel.addRow(info);
-		}
+
+		searchModel.addRow(info);
+
 	}
 
 	public String peersCountIcon() {
