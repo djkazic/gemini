@@ -20,12 +20,13 @@ public class NetHandler {
 	public static ArrayList<Peer> peers;
 	
 	private Server server;
-	private Client client;
 
 	public NetHandler() {
 		peers = new ArrayList<Peer> ();
 		registerServerListeners();
-		registerClientListeners();
+		Client initialClient = getClient();
+		registerClientListeners(initialClient);
+		peerDiscovery(initialClient);
 	}
 
 	public void registerServerListeners() {
@@ -42,22 +43,23 @@ public class NetHandler {
 
 		} catch (Exception ex) {}
 	}
+	
+	private Client getClient() {
+		Client client = new Client(480000, 480000);
+		registerClientListeners(client);
+		return client;
+	}
 
-	public void registerClientListeners() {
+	public void registerClientListeners(Client client) {
 		try {
-			client = new Client(480000, 480000);
 			registerClasses(client.getKryo());
-
-			Utilities.log(this, "Registering client listeners");
+			Utilities.log(this, "Registered client listeners");
 
 			//Use listeners, not arbitrary code
 			client.addListener(new DualListener(0));
 
 			Utilities.log(this, "Starting client component");
 			client.start();
-
-			//Do peer discovery
-			peerDiscovery();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -79,7 +81,7 @@ public class NetHandler {
 		kryo.register(StreamedBlock.class);
 	}
 	
-	private void peerDiscovery() {
+	private void peerDiscovery(Client client) {
 		try {
 			Utilities.log(this, "Discovering hosts");
 			List<InetAddress> foundHosts = client.discoverHosts(Core.udp, 4000);
@@ -88,6 +90,7 @@ public class NetHandler {
 			foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			foundHosts.add(InetAddress.getByName("136.167.192.28"));
 			
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
@@ -127,7 +130,8 @@ public class NetHandler {
 			for(InetAddress ia : foundHosts) {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
-					client.connect(5000, ia, Core.tcp, Core.udp);
+					Client newConnection = getClient();
+					newConnection.connect(8000, ia, Core.tcp, Core.udp);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed");
 				}

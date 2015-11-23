@@ -42,7 +42,7 @@ public class DualListener extends Listener {
 	}
 
 	//New incoming packet post-connection
-	public void received(final Connection connection, Object object) {
+	public void received(Connection connection, Object object) {
 		Peer foundPeer = Peer.findPeer(connection);
 		
 		if(object instanceof Request) {
@@ -104,6 +104,7 @@ public class DualListener extends Listener {
 					String[] encryptedBlock = (String[]) request.getPayload();
 					blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
 					blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+					final Connection blockConn = connection;
 					
 					(new Thread(new Runnable() {
 						public void run() {
@@ -128,7 +129,7 @@ public class DualListener extends Listener {
 									
 									if(searchRes != null) {
 										Utilities.log(this, "\tSending back block, length: " + searchRes.length);
-										connection.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+										blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 									} else {
 										Utilities.log(this, "\tFailure: could not find block " + blockName);
 									}
