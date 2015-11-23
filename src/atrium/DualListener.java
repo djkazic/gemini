@@ -15,6 +15,8 @@ import requests.RequestTypes;
 public class DualListener extends Listener {
 	
 	private int inOut;
+	private String blockOrigin;
+	private String blockName;
 	
 	public DualListener(int inOut) {
 		super();
@@ -40,7 +42,7 @@ public class DualListener extends Listener {
 	}
 
 	//New incoming packet post-connection
-	public void received(Connection connection, Object object) {
+	public void received(final Connection connection, Object object) {
 		Peer foundPeer = Peer.findPeer(connection);
 		
 		if(object instanceof Request) {
@@ -100,8 +102,8 @@ public class DualListener extends Listener {
 				case RequestTypes.BLOCK:
 					Utilities.log(this, "Received request for block:");
 					String[] encryptedBlock = (String[]) request.getPayload();
-					String blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
-					String blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+					blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
+					blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 					
 					(new Thread(new Runnable() {
 						public void run() {
