@@ -126,7 +126,10 @@ public class DualListener extends Listener {
 					try {
 						String mutexData = Core.rsa.decrypt(encryptedMutex);
 						//Update foundPeer
-						foundPeer = Peer.findPeer(connection);
+						while(foundPeer == null) {
+							foundPeer = Peer.findPeer(connection);
+							Thread.sleep(100);
+						}
 						if(foundPeer.mutexCheck(mutexData)) {
 							foundPeer.getCryptoLatch().countDown();
 						}
