@@ -22,7 +22,7 @@ public class BlockListener extends TcpIdleSender {
 	public BlockListener() {
 		sendQueue = new ArrayList<Object> ();
 	}
-	
+
 	public void idle(Connection connection) {
 		connection.setIdleThreshold(0.4f);
 		super.idle(connection);
@@ -30,47 +30,51 @@ public class BlockListener extends TcpIdleSender {
 
 	public void received(Connection connection, Object object) {
 		if(object instanceof Request) {
-			Peer foundPeer = Peer.findPeer(connection);
-			Request request = (Request) object;
+			final Peer foundPeer = Peer.findPeer(connection);
+			final Request request = (Request) object;
 			if(request.getType().equals(RequestTypes.BLOCK)) {
-				Utilities.log(this, "Received request for block:");
-				String[] encryptedBlock = (String[]) request.getPayload();
-				blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
-				blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+				(new Thread(new Runnable() {
+					public void run() {
+						Utilities.log(this, "Received request for block:");
+						String[] encryptedBlock = (String[]) request.getPayload();
+						blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
+						blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 
-				//TODO: search for block
-				BlockedFile foundBlock;
-				if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
-					int blockPosition;
-					if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+						//TODO: search for block
+						BlockedFile foundBlock;
+						if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
+							int blockPosition;
+							if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
 
-						byte[] searchRes = null;
-						if(foundBlock.isComplete()) {
-							//Attempt complete search
-							searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
-						} else {
-							//Attempt incomplete search
-							try {
-								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
-							} catch (Exception ex) {
-								ex.printStackTrace();
+								byte[] searchRes = null;
+								if(foundBlock.isComplete()) {
+									//Attempt complete search
+									searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
+								} else {
+									//Attempt incomplete search
+									try {
+										searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
+									} catch (Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+
+								if(searchRes != null) {
+									Utilities.log(this, "\tSending back block, length: " + searchRes.length);
+									sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+									//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+								} else {
+									Utilities.log(this, "\tFailure: could not find block " + blockName);
+								}
+							} else {
+								Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
+										+ foundBlock.getBlockList());
 							}
-						}
-
-						if(searchRes != null) {
-							Utilities.log(this, "\tSending back block, length: " + searchRes.length);
-							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
-							Utilities.log(this, "\tFailure: could not find block " + blockName);
+							Utilities.log(this, "\tFailure: don't have origin BlockedFile");
 						}
-					} else {
-						Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-								+ foundBlock.getBlockList());
 					}
-				} else {
-					Utilities.log(this, "\tFailure: don't have origin BlockedFile");
-				}
+				})).start();
 			}
 		}
 	}
