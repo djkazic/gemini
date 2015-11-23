@@ -24,15 +24,15 @@ public class Peer {
 	private int inOut;  //= 1 for incoming
 
 	public Peer(Connection connection, int inOut) {
+		//Add ourselves to peers without data
+		NetHandler.peers.add(this);
+				
 		deferredRequesting = new CountDownLatch(1);
 		pubkeyDone = new CountDownLatch(1);
 		cryptoDone = new CountDownLatch(1);
 		this.connection = connection;
 		this.inOut = inOut;
 
-		//Add ourselves to peers without data
-		NetHandler.peers.add(this);
-		
 		bootstrapRequests();
 	}
 	
