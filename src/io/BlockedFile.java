@@ -77,18 +77,13 @@ public class BlockedFile {
 	}
 	
 	public String getNextBlock() {
-		ArrayList<String> qualified = new ArrayList<String> ();
 		for(int i=0; i < blockList.size(); i++) {
 			String thisBlock = blockList.get(i);
 			if(!blackList.contains(thisBlock)) {
-				qualified.add(thisBlock);
+				return thisBlock;
 			}
 		}
-		if(qualified.size() == 0) {
-			return null;
-		} else {
-			return qualified.get((int) (Math.random() * qualified.size()));
-		}
+		return null;
 	}
 
 	public String getChecksum() {
