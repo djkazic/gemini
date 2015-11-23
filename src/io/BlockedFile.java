@@ -111,8 +111,18 @@ public class BlockedFile {
 		if(!blackList.contains(str)) {
 			blackList.add(str);
 		}
+		updateProgress();
 	}
 
+	private void updateProgress() {
+		double dProgress = ((double) blackList.size()) / blockList.size();
+		dProgress *= 100;
+		progress = Math.round(dProgress) + "%";
+		if(!Core.headless) {
+			Core.mainWindow.updateProgress(pointer.getName(), progress);
+		}
+	}
+	
 	public boolean isComplete() {
 		return complete;
 	}
