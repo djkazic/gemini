@@ -42,7 +42,6 @@ public class StreamedBlock {
 		byte[] decrypted = aes.decrypt(fileBytes);
 		Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
 		BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
-		bf.logBlock(blockDest);
 		File folder = new File(bf.getBlocksFolder());
 		File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
 
@@ -52,14 +51,15 @@ public class StreamedBlock {
 				folder.mkdirs();
 			}
 			if(!dest.exists()) {
-				//TODO: remove debugging
 				Utilities.log(this, "Writing block to " + dest);
+				Utilities.log(this, "Logging block into blacklist");
+				bf.logBlock(blockDest);
 				FileOutputStream fos = new FileOutputStream(dest);
 				fos.write(decrypted);
 				fos.close();
 			} else {
 				//TODO: remove debugging
-				Utilities.log(this, "Duplication error: already have this block");
+				Utilities.log(this, "Race condition: already have this block");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

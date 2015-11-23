@@ -22,6 +22,11 @@ public class BlockListener extends TcpIdleSender {
 	public BlockListener() {
 		sendQueue = new ArrayList<Object> ();
 	}
+	
+	public void idle(Connection connection) {
+		connection.setIdleThreshold(0.4f);
+		super.idle(connection);
+	}
 
 	public void received(Connection connection, Object object) {
 		if(object instanceof Request) {

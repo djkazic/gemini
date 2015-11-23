@@ -189,10 +189,17 @@ public class DualListener extends Listener {
 					
 				case DataTypes.BLOCK:
 					Utilities.log(this, "Received block data");
-					StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
-					String origin = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
-					Utilities.log(this, "\tBlock origin: " + origin + ", size = " + foundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
-					streamedBlock.insertSelf(foundPeer.getAES());
+					final Data blockFoundData = data;
+					final Peer blockFoundPeer = foundPeer;
+					//Threaded decryption
+					(new Thread(new Runnable() {
+						public void run() {
+							StreamedBlock streamedBlock = (StreamedBlock) blockFoundData.getPayload();
+							String origin = blockFoundPeer.getAES().decrypt(streamedBlock.getOrigin());
+							Utilities.log(this, "\tBlock origin: " + origin + ", size = " + blockFoundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
+							streamedBlock.insertSelf(blockFoundPeer.getAES());
+						}
+					})).start();
 					break;
 			}
 		}
