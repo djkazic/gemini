@@ -1,5 +1,7 @@
 package io;
 
+import java.util.ArrayList;
+
 import atrium.FileUtils;
 import atrium.NetHandler;
 import atrium.Utilities;
@@ -17,12 +19,32 @@ public class Downloader implements Runnable {
 		try {
 			blockedFile.setBlacklist(FileUtils.enumerateIncompleteBlacklist(blockedFile));
 			String currentBlock;
+			/**
 			while((currentBlock = blockedFile.getNextBlock()) != null) {
 				Utilities.log(this, "Requesting block " + currentBlock);
 				NetHandler.requestBlock(blockedFile.getPointer().getName(), currentBlock);
-				Thread.sleep(250);
+				Thread.sleep(300);
 			}
-			blockedFile.setComplete(true);
+			 */
+			int repeatRounds = 1;
+			ArrayList<String> blockList = blockedFile.getBlockList();
+			while(true) {
+				for(int i=0; i < blockList.size(); i++) {
+					if(!blockedFile.getBlacklist().contains(blockList.get(i))) {
+						Utilities.log(this, "Requesting block " + blockList.get(i));
+						NetHandler.requestBlock(blockedFile.getPointer().getName(), blockList.get(i));
+						Thread.sleep(100);
+					}
+				}
+				if(blockedFile.getProgressNum() == 100) {
+					blockedFile.setComplete(true);
+					break;
+				}
+				repeatRounds++;
+				Utilities.log(this, "DL round " + repeatRounds);
+				Thread.sleep(2000);
+			}
+			Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
 			FileUtils.unifyBlocks(blockedFile);
 		} catch (Exception ex) {
 			Utilities.log(this, "Downloader exception:");

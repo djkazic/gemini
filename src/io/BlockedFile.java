@@ -130,6 +130,12 @@ public class BlockedFile {
 		complete = bool;
 	}
 
+	public double getProgressNum() {
+		double dProgress = ((double) blackList.size()) / blockList.size();
+		dProgress *= 100;
+		return dProgress;
+	}
+	
 	public String getProgress() {
 		return progress;
 	}
