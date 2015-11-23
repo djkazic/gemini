@@ -91,7 +91,7 @@ public class NetHandler {
 			foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			foundHosts.add(InetAddress.getByName("136.167.192.28"));
+			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
 			
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
