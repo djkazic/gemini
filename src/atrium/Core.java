@@ -25,10 +25,12 @@ public class Core {
 	public static int udp = 35501;
 	public static String mutex;
 	public static boolean headless = false;
+	public static String debugHost;
 	
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		if(args.length > 0 && args[0].equals("-daemon")) {
 			headless = true;
+			debugHost = args[1];
 		}
 		
 		//TODO: remove for production
