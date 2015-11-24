@@ -54,7 +54,8 @@ public class BlockedFile {
 		blackList = new ArrayList<String> ();
 		complete = false;
 		progress = "";
-		Core.blockDex.add(this);
+		//Don't add to blockDex until mature
+		//Core.blockDex.add(this);
 	}
 
 	public boolean matchSearch(String searchQuery) {
