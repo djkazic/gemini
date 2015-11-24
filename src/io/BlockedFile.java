@@ -148,7 +148,7 @@ public class BlockedFile {
 	public String getDateModified() {
 		if(complete) {
 			Date date = new Date (pointer.lastModified());
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 			return formatter.format(date);
 		} 
 		return null;

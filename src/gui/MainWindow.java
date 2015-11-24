@@ -26,6 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -66,7 +68,7 @@ public class MainWindow extends JFrame {
 	private JPanel searchPanel;
 	private JTextField searchInput;
 	private JLabel lblSearchResults;
-	private JPanel panel;
+	private JPanel libPanel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -251,13 +253,21 @@ public class MainWindow extends JFrame {
 		downloadList.getTableHeader().setResizingAllowed(false);
 		downloadScrollPane.setViewportView(downloadList);
 
-		panel = new JPanel();
-		tabbedPane.addTab("Library", null, panel, null);
-		panel.setLayout(null);
+		libPanel = new JPanel();
+		tabbedPane.addTab("Library", null, libPanel, null);
+		libPanel.setLayout(null);
+		
+		tabbedPane.addChangeListener(new ChangeListener() {
+	        public void stateChanged(ChangeEvent e) {
+	            if(tabbedPane.getSelectedIndex() == 1) {
+	            	updateLibrary();
+	            }
+	        }
+	    });
 
 		libraryScrollPane = new JScrollPane();
 		libraryScrollPane.setBounds(10, 11, 589, 469);
-		panel.add(libraryScrollPane);
+		libPanel.add(libraryScrollPane);
 
 		libraryTable = new JTable(libraryModel);
 		libraryTable.getColumnModel().getColumn(0).setPreferredWidth(300);
@@ -304,7 +314,7 @@ public class MainWindow extends JFrame {
 				int tableRow = libraryTable.rowAtPoint(clickPoint);
 				if(arg0.getClickCount() == 2) {
 					String fileName = (String) libraryModel.getValueAt(tableRow, 0);
-					BlockedFile bf = FileUtils.getBlockedFile(fileName);
+					BlockedFile bf = FileUtils.getBlockedFile(fileName.substring(1));
 					FileUtils.openBlockedFile(bf);
 				}
 			}
@@ -436,19 +446,20 @@ public class MainWindow extends JFrame {
 	}
 
 	public void updateLibrary() {
-
 		clearTable(libraryModel);
 		for(BlockedFile bf : Core.blockDex) {
 			if(bf.isComplete()) {
 				String fileEstimateStr = "";
-				long fileEstimateKb = bf.getPointer().length() / 1000;
+				double fileEstimateKb = bf.getPointer().length() / 1000D;
 				if(fileEstimateKb > 1000) {
 					double fileEstimateMb = (fileEstimateKb / 1000D);
-					fileEstimateStr += fileEstimateMb + "MB";
+					fileEstimateStr += String.format("%.2f", fileEstimateMb) + " MB";
 				} else {
-					fileEstimateStr += fileEstimateKb+ "KB";
+					fileEstimateStr += String.format("%.2f", fileEstimateKb) + " KB";
 				}
-				libraryModel.addRow(new String[]{bf.getPointer().getName(), fileEstimateStr, bf.getDateModified()});
+				libraryModel.addRow(new String[]{" " + bf.getPointer().getName(), 
+												 " " + fileEstimateStr, 
+												 " " + bf.getDateModified()});
 			}
 		}
 
