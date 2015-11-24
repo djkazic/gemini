@@ -55,7 +55,7 @@ public class BlockedFile {
 		complete = false;
 		progress = "";
 		//Don't add to blockDex until mature
-		//Core.blockDex.add(this);
+		Core.blockDex.add(this);
 	}
 
 	public boolean matchSearch(String searchQuery) {
