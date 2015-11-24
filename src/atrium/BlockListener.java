@@ -28,14 +28,14 @@ public class BlockListener extends TcpIdleSender {
 		super.idle(connection);
 	}
 
-	public void received(Connection connection, Object object) {
+	public void received(final Connection connection, Object object) {
 		if(object instanceof Request) {
-			final Peer foundPeer = Peer.findPeer(connection);
 			final Request request = (Request) object;
 			if(request.getType().equals(RequestTypes.BLOCK)) {
 				(new Thread(new Runnable() {
 					public void run() {
 						Utilities.log(this, "Received request for block:");
+						Peer foundPeer = Peer.findPeer(connection);
 						String[] encryptedBlock = (String[]) request.getPayload();
 						blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
 						blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
