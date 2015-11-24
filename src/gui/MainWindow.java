@@ -367,8 +367,12 @@ public class MainWindow extends JFrame {
 	}
 
 	private void clearTable(DefaultTableModel tableModel) {
-		for(int i=0; i < tableModel.getRowCount(); i++) {
-			tableModel.removeRow(i);
+		int rowCount = tableModel.getRowCount();
+		if(rowCount > 0) {
+			for(int i=0; i < tableModel.getRowCount(); i++) {
+				tableModel.removeRow(i);
+				i--;
+			}
 		}
 	}
 
