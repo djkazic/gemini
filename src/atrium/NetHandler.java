@@ -31,7 +31,7 @@ public class NetHandler {
 
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000, 512000);
+			server = new Server(512000 * 4, 512000 * 4);
 			registerClasses(server.getKryo());
 
 			Utilities.log(this, "Registering server listeners");
@@ -46,7 +46,7 @@ public class NetHandler {
 	}
 	
 	private Client getClient() {
-		Client client = new Client(480000, 480000);
+		Client client = new Client(512000 * 4, 512000 * 4);
 		registerClientListeners(client);
 		return client;
 	}
@@ -90,7 +90,7 @@ public class NetHandler {
 			//TODO: remove this debug section
 			foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
-			foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			foundHosts.add(InetAddress.getByName("136.167.252.117"));
 			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
 			
 			//Filter out local IP
