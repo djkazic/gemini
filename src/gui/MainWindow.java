@@ -28,6 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.synth.SynthLookAndFeel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -74,7 +75,7 @@ public class MainWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					MainWindow frame = new MainWindow();
 					frame.setVisible(true);
 					frame.out("Test");
@@ -120,6 +121,7 @@ public class MainWindow extends JFrame {
 		downloadModel = new TableModelDL();
 		downloadModel.addColumn("Filename");
 		downloadModel.addColumn("Progress");
+		downloadModel.addColumn("Time Remaining");
 
 		libraryModel = new TableModelSpec();
 		libraryModel.addColumn("Filename");
@@ -358,7 +360,7 @@ public class MainWindow extends JFrame {
 									}
 								}
 								if(!alreadyDoneInPane && !bf.isComplete()) {
-									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%"});
+									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", "?"});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									(new Thread(new Downloader(bf))).start();
 								} else if(bf.isComplete()) {
@@ -435,6 +437,15 @@ public class MainWindow extends JFrame {
 
 	}
 
+	public void updateTime(String forFile, String time) {
+		int rowCount = downloadModel.getRowCount();
+		for(int i=0; i < rowCount; i++) {
+			if(downloadModel.getValueAt(i, 0).equals(forFile)) {
+				downloadModel.setValueAt(" " + time, i, 2);
+			}
+		}
+	}
+	
 	public void updateProgress(String forFile, String progress) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
@@ -442,7 +453,6 @@ public class MainWindow extends JFrame {
 				downloadModel.setValueAt(progress, i, 1);
 			}
 		}
-
 	}
 
 	public void updateLibrary() {

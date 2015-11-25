@@ -40,7 +40,7 @@ public class StreamedBlock {
 	public void insertSelf(AES aes) {
 		String blockDest = aes.decrypt(blockName);
 		byte[] decrypted = aes.decrypt(fileBytes);
-		Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
+		//Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
 		BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
 		if(bf.isComplete()) {
 			Utilities.log(this, "Discarding block, BlockedFile is done");
@@ -54,7 +54,7 @@ public class StreamedBlock {
 					folder.mkdirs();
 				}
 				if(!dest.exists()) {
-					Utilities.log(this, "Writing block to " + dest);
+					//Utilities.log(this, "Writing block to " + dest);
 					Utilities.log(this, "Logging block into blacklist");
 					bf.logBlock(blockDest);
 					FileOutputStream fos = new FileOutputStream(dest);

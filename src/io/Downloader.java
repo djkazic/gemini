@@ -35,7 +35,7 @@ public class Downloader implements Runnable {
 				}
 				repeatRounds++;
 				Utilities.log(this, "DL round " + repeatRounds);
-				Thread.sleep(2000);
+				Thread.sleep(2500);
 			}
 			Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
 			FileUtils.unifyBlocks(blockedFile);

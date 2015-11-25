@@ -23,6 +23,8 @@ public class BlockedFile {
 	private ArrayList<String> blackList;
 	private boolean complete;
 	private String progress;
+	private float blockRate;
+	private long lastChecked;
 
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -107,12 +109,39 @@ public class BlockedFile {
 		if(!blackList.contains(str)) {
 			blackList.add(str);
 		}
+		if(blackList.size() % 8 == 0) {
+			if(lastChecked == 0) {
+				lastChecked = System.currentTimeMillis();
+			}
+			blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
+			int blocksLeft = blockList.size() - blackList.size();
+			float res = (blocksLeft / blockRate);
+			String units = " sec";
+			if(res > 60 && res < 360) {
+				res /= 60;
+				units = " min";
+			}
+			if(res > 60) {
+				res /= 60;
+				units = " hr";
+			}
+			int ires = (int) res;
+			updateTime(ires + units);
+			lastChecked = System.currentTimeMillis();
+		}
 		updateProgress();
 	}
 
+	private void updateTime(String time) {
+		if(!Core.headless) {
+			Core.mainWindow.updateTime(pointer.getName(), time);
+		}
+	}
+	
 	private void updateProgress() {
 		if(complete) {
 			progress = "100%";
+			updateTime("0 sec");
 		} else {
 			double dProgress = ((double) blackList.size()) / blockList.size();
 			dProgress *= 100;
