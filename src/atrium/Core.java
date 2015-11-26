@@ -49,7 +49,7 @@ public class Core {
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
-		Utilities.switchGui("atrium.Core", "Initializing RSA / AES workers");
+		Utilities.switchGui("atrium.Core", "Initializing RSA / AES");
 		rsa = new RSA();
 		aes = new AES(mutex);
 		

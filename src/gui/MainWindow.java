@@ -18,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -366,9 +367,14 @@ public class MainWindow extends JFrame {
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									(new Thread(new Downloader(bf))).start();
 								} else if(bf.isComplete()) {
+									String bfFileName = bf.getPointer().getName();
 									Utilities.log(this, "This file is already downloaded.");
+									JOptionPane.showMessageDialog(null, bfFileName + 
+												" has already been downloaded.", "",
+		                                    	JOptionPane.INFORMATION_MESSAGE);
+									resetTable();
 								}
-								resetTable();
+								//resetTable();
 							}
 							it.remove();
 						}
@@ -490,15 +496,20 @@ public class MainWindow extends JFrame {
 	}
 
 	public void resetTable() {
-
 		out("Enter your search query and press Enter.");
-
 	}
 
 	public void addRowToSearchModel(String[] info) {
-
 		searchModel.addRow(info);
-
+	}
+	
+	public void removeRowFromSearchModel(String pointerName) {
+		for(int i=0; i < searchModel.getRowCount(); i++) {
+			if(searchModel.getValueAt(i, 0).equals(pointerName)) {
+				searchModel.removeRow(i);
+				return;
+			}
+		}
 	}
 
 	public String peersCountIcon() {
