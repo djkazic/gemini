@@ -107,24 +107,30 @@ public class FileUtils {
 		return null;
 	}
 	
-	public static byte[] findBlockRAF(BlockedFile bf, int blockIndex) {
+	public static byte[] findBlockFromComplete(BlockedFile bf, int blockIndex) {
 		try {
-			int res = 0;
-			try {
-				byte[] rafBuffer = new byte[Core.blockSize];
-				RandomAccessFile raf = new RandomAccessFile(bf.getPointer(), "r");
-				raf.seek(Core.blockSize * (blockIndex));
-				res = raf.read(rafBuffer);
-				raf.close();
-				if(res != rafBuffer.length) {
-					byte[] smallChunk = new byte[res];
-					System.arraycopy(rafBuffer, 0, smallChunk, 0, res);
-					return smallChunk;
+			InputStream fis = new FileInputStream(bf.getPointer());
+			byte[] buffer = new byte[Core.blockSize];
+
+			int blockNum = 0;
+			int numRead;
+			do {
+				numRead = fis.read(buffer);
+				if(numRead > 0) {
+					blockNum++;
+				} else {
+					break;
 				}
-				return rafBuffer;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+				if(blockNum == blockIndex) {
+					byte[] res = new byte[numRead];
+					for(int i=0; i < res.length; i++) {
+						res[i] = buffer[i];
+					}
+					fis.close();
+					return res;
+				}
+			} while(numRead != -1);
+			fis.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

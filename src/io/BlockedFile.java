@@ -14,7 +14,7 @@ public class BlockedFile {
 		Core.blockDex = new ArrayList<BlockedFile> ();
 		BlockedFile bf = new BlockedFile(new File("libGLESv2.dll"), true);
 		System.out.println(bf.getBlockList());
-		System.out.println(FileUtils.findBlockRAF(bf, 12));
+		System.out.println(FileUtils.findBlockFromComplete(bf, 12));
 	}
 
 	private File pointer;

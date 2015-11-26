@@ -49,7 +49,7 @@ public class BlockListener extends TcpIdleSender {
 								byte[] searchRes = null;
 								if(foundBlock.isComplete()) {
 									//Attempt complete search
-									searchRes = FileUtils.findBlockRAF(foundBlock, blockPosition);
+									searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
 								} else {
 									//Attempt incomplete search
 									try {
