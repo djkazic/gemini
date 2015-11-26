@@ -37,36 +37,40 @@ public class StreamedBlock {
 		return fileBytes;
 	}
 	
-	public void insertSelf(AES aes) {
-		String blockDest = aes.decrypt(blockName);
-		byte[] decrypted = aes.decrypt(fileBytes);
-		//Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
-		BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
-		if(bf.isComplete()) {
-			Utilities.log(this, "Discarding block, BlockedFile is done");
-		} else {
-			File folder = new File(bf.getBlocksFolder());
-			File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
-
-			try {
-				if(!folder.exists()) {
-					Utilities.log(this, "Creating directory: " + folder);
-					folder.mkdirs();
-				}
-				if(!dest.exists()) {
-					//Utilities.log(this, "Writing block to " + dest);
-					Utilities.log(this, "Logging block into blacklist");
-					bf.logBlock(blockDest);
-					FileOutputStream fos = new FileOutputStream(dest);
-					fos.write(decrypted);
-					fos.close();
+	public void insertSelf(final AES aes) {
+		(new Thread(new Runnable() {
+			public void run() {
+				String blockDest = aes.decrypt(blockName);
+				byte[] decrypted = aes.decrypt(fileBytes);
+				//Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
+				BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
+				if(bf.isComplete()) {
+					Utilities.log(this, "Discarding block, BlockedFile is done");
 				} else {
-					//TODO: remove debugging
-					Utilities.log(this, "Race condition: already have this block");
+					File folder = new File(bf.getBlocksFolder());
+					File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
+
+					try {
+						if(!folder.exists()) {
+							Utilities.log(this, "Creating directory: " + folder);
+							folder.mkdirs();
+						}
+						if(!dest.exists()) {
+							//Utilities.log(this, "Writing block to " + dest);
+							Utilities.log(this, "Logging block into blacklist");
+							bf.logBlock(blockDest);
+							FileOutputStream fos = new FileOutputStream(dest);
+							fos.write(decrypted);
+							fos.close();
+						} else {
+							//TODO: remove debugging
+							Utilities.log(this, "Race condition: already have this block");
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
-		}
+		})).start();
 	}
 }

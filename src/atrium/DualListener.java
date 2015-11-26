@@ -41,8 +41,7 @@ public class DualListener extends Listener {
 	public void disconnected(Connection connection) {
 		Peer foundPeer = Peer.findPeer(connection);
 		if(foundPeer != null) {
-			Utilities.log(this, "Peer disconnected: " + foundPeer.getMutex().substring(0, 4));
-			NetHandler.peers.remove(foundPeer);
+			foundPeer.disconnect();
 		}
 	}
 	
