@@ -26,7 +26,7 @@ public class Downloader implements Runnable {
 					if(!blockedFile.getBlacklist().contains(blockList.get(i))) {
 						Utilities.log(this, "Requesting block " + blockList.get(i));
 						NetHandler.requestBlock(blockedFile.getPointer().getName(), blockList.get(i));
-						Thread.sleep(80);
+						Thread.sleep(70);
 					}
 				}
 				if(blockedFile.getProgressNum() == 100) {
@@ -35,7 +35,7 @@ public class Downloader implements Runnable {
 				}
 				repeatRounds++;
 				Utilities.log(this, "DL round " + repeatRounds);
-				Thread.sleep(4000);
+				Thread.sleep(1000);
 			}
 			Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
 			FileUtils.unifyBlocks(blockedFile);
