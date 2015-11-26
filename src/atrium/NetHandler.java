@@ -34,11 +34,11 @@ public class NetHandler {
 			server = new Server(512000 * 4, 512000 * 4);
 			registerClasses(server.getKryo());
 
-			Utilities.log(this, "Registering server listeners");
+			Utilities.switchGui(this, "Registering server listeners");
 			server.addListener(new DualListener(1));
 			server.addListener(new BlockListener());
 
-			Utilities.log(this, "Starting server component");
+			Utilities.switchGui(this, "Starting server component");
 			server.bind(Core.tcp, Core.udp);
 			server.start();
 
@@ -84,13 +84,15 @@ public class NetHandler {
 	
 	private void peerDiscovery(Client client) {
 		try {
+			Utilities.switchGui(this, "Finding peers...");
 			Utilities.log(this, "Discovering hosts");
+			
 			List<InetAddress> foundHosts = client.discoverHosts(Core.udp, 4000);
 
 			//TODO: remove this debug section
 			foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
-			foundHosts.add(InetAddress.getByName("136.167.252.117"));
+			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
 			
 			//Filter out local IP
@@ -139,6 +141,24 @@ public class NetHandler {
 			}
 
 			Utilities.log(this, "Terminated peer discovery");
+			(new Thread(new Runnable() {
+				public void run() {
+					while(true) {
+						if(!Core.headless) {
+							if(peers.isEmpty()) {
+								try {
+									Thread.sleep(1000);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							} else {
+								Core.mainWindow.ready();
+								break;
+							}
+						}
+					}
+				}
+			})).start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
