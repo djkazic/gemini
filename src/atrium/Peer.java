@@ -26,6 +26,9 @@ public class Peer {
 	public Peer(Connection connection, int inOut) {
 		//Add ourselves to peers without data
 		NetHandler.peers.add(this);
+		if(!Core.headless) {
+			Core.mainWindow.updatePeerCount();
+		}
 				
 		deferredRequesting = new CountDownLatch(1);
 		pubkeyDone = new CountDownLatch(1);
@@ -80,6 +83,9 @@ public class Peer {
 			Utilities.log(this, "Peer disconnected (mutex was null on disconnect");
 		}
 		NetHandler.peers.remove(this);
+		if(!Core.headless) {
+			Core.mainWindow.updatePeerCount();
+		}
 		connection.close();
 	}
 

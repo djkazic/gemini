@@ -44,6 +44,7 @@ import io.BlockedFile;
 import io.Downloader;
 
 import javax.swing.JTabbedPane;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public class MainWindow extends JFrame {
@@ -281,9 +282,11 @@ public class MainWindow extends JFrame {
 		libraryScrollPane.setViewportView(libraryTable);
 
 		lblPeers = new JLabel("");
-		lblPeers.setBounds(610, 537, 24, 24);
+		lblPeers.setBounds(606, 535, 24, 24);
 		contentPane.add(lblPeers);
 		lblPeers.setToolTipText("[0|0]");
+		lblPeers.setOpaque(false);
+		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
 		lblPeers.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
 		registerListeners();
@@ -438,11 +441,9 @@ public class MainWindow extends JFrame {
 	}
 
 	public void updatePeerCount() {
-
-		//String peers = peersCountIcon();
-		//lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/" + peers + ".png")));
+		String peers = peersCountIcon();
+		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/" + peers + ".png")));
 		lblPeers.setToolTipText(peerToolTip());
-
 	}
 
 	public void updateTime(String forFile, String time) {
