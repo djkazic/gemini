@@ -13,10 +13,18 @@ public class Utilities {
 		System.out.println("<LOG> [" + someClass + "]: " + msg);
 	}
 	
-	public static void switchGui(String msg) {
+	public static void switchGui(Object someClass, String msg) {
 		if(Core.mainWindow != null) {
 			Core.mainWindow.out(msg);
 		}
+		log(someClass, msg);
+	}
+	
+	public static void switchGui(String someClass, String msg) {
+		if(Core.mainWindow != null) {
+			Core.mainWindow.out(msg);
+		}
+		log(someClass, msg);
 	}
 	
 	public static String getMutex() {

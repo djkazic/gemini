@@ -70,6 +70,7 @@ public class MainWindow extends JFrame {
 	private JTextField searchInput;
 	private JLabel lblSearchResults;
 	private JPanel libPanel;
+	private JButton btnSearch;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -189,8 +190,9 @@ public class MainWindow extends JFrame {
 		});
 		searchPanel.add(searchInput);
 		searchInput.setColumns(10);
+		searchInput.setEnabled(false);
 
-		JButton btnSearch = new JButton("Search");
+		btnSearch = new JButton("Search");
 		btnSearch.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -222,6 +224,7 @@ public class MainWindow extends JFrame {
 		});
 		btnSearch.setBounds(510, 11, 89, 23);
 		searchPanel.add(btnSearch);
+		btnSearch.setEnabled(false);
 
 		lblSearchResults = new JLabel(" Search Results");
 		lblSearchResults.setBounds(10, 42, 80, 14);
@@ -527,5 +530,11 @@ public class MainWindow extends JFrame {
 			}
 		}
 		return "[" + inCount + "|" + outCount + "]";
+	}
+	
+	public void ready() {
+		searchInput.setEnabled(true);
+		btnSearch.setEnabled(true);
+		out("Ready");
 	}
 }

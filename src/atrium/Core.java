@@ -46,30 +46,25 @@ public class Core {
 		}
 		
 		//Set mutex
-		Utilities.log("atrium.Core", "Calculating mutex");
-		Utilities.switchGui("Calculating mutex");
+		Utilities.switchGui("atrium.Core", "Calculating mutex");
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
-		Utilities.log("atrium.Core", "Initializing RSA / AES workers");
-		Utilities.switchGui("Initializing RSA / AES workers");
+		Utilities.switchGui("atrium.Core", "Initializing RSA / AES workers");
 		rsa = new RSA();
 		aes = new AES(mutex);
 		
 		//File inits
-		Utilities.log("atrium.Core", "Checking for file structures");
-		Utilities.switchGui("Checking for file structures");
+		Utilities.switchGui("atrium.Core", "Checking for file structures");
 		FileUtils.initDirs();
 		
 		//Var initialization
-		Utilities.log("atrium.Core", "Generating block index");
-		Utilities.switchGui("Generating block index");
+		Utilities.switchGui("atrium.Core", "Generating block index");
 		blockDex = new ArrayList<BlockedFile> ();
 		FileUtils.genBlockIndex();
 		index = new HashMap<String, ArrayList<String>> ();
 		
 		//Start NetHandling
-		Utilities.switchGui("Ready");
 		netHandler = new NetHandler();
 	}
 }
