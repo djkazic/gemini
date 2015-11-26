@@ -37,7 +37,7 @@ public class RSA {
 	 */
 	public String encrypt(String str, PublicKey pk) {
 		try {
-			Cipher cipher = Cipher.getInstance("RSA");
+			Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, pk);
 			return new String(cipher.doFinal(str.getBytes()), "ISO-8859-1");
 		} catch (Exception ex) {
@@ -48,7 +48,7 @@ public class RSA {
 	
 	public String decrypt(String in) {
 		try {
-			Cipher decipher = Cipher.getInstance("RSA");
+			Cipher decipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
 			decipher.init(Cipher.DECRYPT_MODE, myPair.getPrivate());
 			String output = new String(decipher.doFinal(in.getBytes("ISO-8859-1")));
 			return output;

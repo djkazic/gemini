@@ -30,7 +30,6 @@ public class Core {
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		if(args.length > 0 && args[0].equals("-daemon")) {
 			headless = true;
-			debugHost = args[1];
 		}
 		
 		//TODO: remove for production
