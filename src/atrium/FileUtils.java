@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
@@ -112,7 +111,7 @@ public class FileUtils {
 			InputStream fis = new FileInputStream(bf.getPointer());
 			byte[] buffer = new byte[Core.blockSize];
 
-			int blockNum = 0;
+			int blockNum = -1;
 			int numRead;
 			do {
 				numRead = fis.read(buffer);
