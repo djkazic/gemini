@@ -149,7 +149,8 @@ public class Request extends Message {
 			}
 		} else {
 			Utilities.log(this, "Peer for message " + getSenderId() + "S | R" + getReceiverId()  + " not found");
-			Utilities.log(this, "\tDump of peers: " + NetHandler.peers);
+			Utilities.log(this, "\tDump of peers: " + NetHandler.peers.get(0).getClientId());
+			Utilities.log(this, "Req type: " + type);
 		}
 	}
 

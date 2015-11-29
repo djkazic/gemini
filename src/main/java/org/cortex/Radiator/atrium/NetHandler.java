@@ -17,7 +17,7 @@ public class NetHandler {
 
 	public NetHandler() {
 		peers = new ArrayList<Peer> ();
-		//configServer();
+		configServer();
 		configClient();
 		//peerDiscovery(initialClient);
 		connectCheck();
@@ -28,6 +28,7 @@ public class NetHandler {
 		Config serverConfig = new Config();
 		serverConfig.setBindPort(Core.udp);
 		serverConfig.serverHooks = new ServerHook();
+		serverConfig.maximumUdpPacketSize = 2048;
 		Core.server = new Server(serverConfig);
 		Utilities.log("atrium.Core", "Starting server component");
 		Core.server.start();
@@ -36,7 +37,8 @@ public class NetHandler {
 	private void configClient() {
 		Config clientConfig = new Config();
 		clientConfig.setPort(Core.udp);
-		clientConfig.host = "136.167.192.28";
+		clientConfig.maximumUdpPacketSize = 2048;
+		//clientConfig.host = "136.167.192.28";
 		Core.client = new Client(clientConfig);
 		Utilities.log("atrium.Core", "Starting client component");
 		Core.client.start();

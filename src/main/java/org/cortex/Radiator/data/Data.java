@@ -33,14 +33,11 @@ public class Data extends Message {
 		
 			case DataTypes.PUBKEY:
 				Utilities.log(this, "Received pubkey data: ");
-				(new Thread(new Runnable() {
-					public void run() {
-						String pubkeyData = (String) payload;
-						if(foundPeer.setPubkey(pubkeyData)) {
-							foundPeer.getPubkeyLatch().countDown();
-						}
-					}
-				})).start();
+				String pubkeyData = (String) payload;
+				Utilities.log(this, "\tData: " + pubkeyData);
+				if(foundPeer.setPubkey(pubkeyData)) {
+					foundPeer.getPubkeyLatch().countDown();
+				}
 				break;
 		
 			case DataTypes.MUTEX:
