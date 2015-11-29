@@ -95,7 +95,7 @@ public class MainWindow extends JFrame {
 
 		Utilities.log("atrium.Core", "Setting graphical preferences");
 		try {
-			UIManager.setLookAndFeel("com.jgoodies.looks.windows.WindowsLookAndFeel");
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
