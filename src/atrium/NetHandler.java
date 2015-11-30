@@ -9,11 +9,14 @@ import java.util.List;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
-import data.Data;
+
 import io.StreamedBlock;
 import io.StreamedBlockedFile;
-import requests.Request;
-import requests.RequestTypes;
+import listeners.BlockListener;
+import listeners.DualListener;
+import packets.data.Data;
+import packets.requests.Request;
+import packets.requests.RequestTypes;
 
 public class NetHandler {
 

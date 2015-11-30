@@ -1,16 +1,16 @@
-package data;
+package packets.requests;
 
-public class Data {
+public class Request {
 
 	private String type;
 	private Object payload;
 	
-	public Data() {
+	public Request() {
 		type = null;
 		payload = null;
 	}
 	
-	public Data(String type, Object payload) {
+	public Request(String type, Object payload) {
 		this.type = type;
 		this.payload = payload;
 	}

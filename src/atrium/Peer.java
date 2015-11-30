@@ -7,10 +7,10 @@ import java.util.concurrent.CountDownLatch;
 import javax.xml.bind.DatatypeConverter;
 import com.esotericsoftware.kryonet.Connection;
 import crypto.AES;
-import data.Data;
-import data.DataTypes;
-import requests.Request;
-import requests.RequestTypes;
+import packets.data.Data;
+import packets.data.DataTypes;
+import packets.requests.Request;
+import packets.requests.RequestTypes;
 
 public class Peer {
 

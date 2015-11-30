@@ -1,4 +1,4 @@
-package atrium;
+package listeners;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
 
-import data.Data;
-import data.DataTypes;
+import atrium.FileUtils;
+import atrium.Peer;
+import atrium.Utilities;
 import io.BlockedFile;
 import io.StreamedBlock;
-import requests.Request;
-import requests.RequestTypes;
+import packets.data.Data;
+import packets.data.DataTypes;
+import packets.requests.Request;
+import packets.requests.RequestTypes;
 
 public class BlockListener extends TcpIdleSender {
 

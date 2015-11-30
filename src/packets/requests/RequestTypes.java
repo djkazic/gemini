@@ -1,4 +1,4 @@
-package requests;
+package packets.requests;
 
 public class RequestTypes {
 	

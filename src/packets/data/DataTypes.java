@@ -1,4 +1,4 @@
-package data;
+package packets.data;
 
 public class DataTypes {
 
