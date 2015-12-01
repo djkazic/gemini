@@ -5,9 +5,9 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import atrium.Core;
-import atrium.NetHandler;
 import atrium.Peer;
 import atrium.Utilities;
+import crypto.RSA;
 import io.BlockedFile;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
@@ -65,7 +65,7 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received request for pubkey");
 					(new Thread(new Runnable() {
 						public void run() {
-							connection.sendTCP(new Data(DataTypes.PUBKEY, Core.pubKey));
+							connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
 							Utilities.log(this, "\tSent pubkey back");
 						}
 					})).start();
@@ -89,7 +89,7 @@ public class DualListener extends Listener {
 					(new Thread(new Runnable() {
 						public void run() {
 							ArrayList<String> refinedPeerList = new ArrayList<String> ();
-							for(Peer peer : NetHandler.peers) {
+							for(Peer peer : Core.peers) {
 								//if(peer.externallyVisible())
 								String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
 												+ peer.getConnection().getRemoteAddressTCP().getPort();

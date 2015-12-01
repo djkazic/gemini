@@ -1,39 +1,38 @@
 package crypto;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.xml.bind.DatatypeConverter;
 
-import atrium.Core;
-
+/**
+ * RSA cryptography helper class
+ * @author Kevin Cai
+ */
 public class RSA {
 	
 	private KeyPairGenerator kpg;
+	public static String pubKey;
 	public KeyPair myPair;
 	
+	/**
+	 * Initializes a KeyPairGenerator, then stores it
+	 * @throws NoSuchAlgorithmException
+	 */
 	public RSA() throws NoSuchAlgorithmException {
 		kpg = KeyPairGenerator.getInstance("RSA");
 		myPair = kpg.generateKeyPair();
 		byte[] pubKeyBytes = myPair.getPublic().getEncoded();
-		Core.pubKey = new String(DatatypeConverter.printBase64Binary(pubKeyBytes));
+		RSA.pubKey = new String(DatatypeConverter.printBase64Binary(pubKeyBytes));
 	}
 	
 	/**
-	 * Encrypts a string using a generated key, and generates a key pair if not there
-	 * @param str
-	 * @return
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * Encrypts a string using our public key
+	 * @param str input string
+	 * @param pk public key used to encrypt
+	 * @return encrypted data
 	 */
 	public String encrypt(String str, PublicKey pk) {
 		try {
@@ -46,6 +45,11 @@ public class RSA {
 		return null;
 	}
 	
+	/**
+	 * Decrypts an input string data using our public key
+	 * @param in input data
+	 * @return the decrypted string
+	 */
 	public String decrypt(String in) {
 		try {
 			Cipher decipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");

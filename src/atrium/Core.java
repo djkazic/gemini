@@ -11,11 +11,15 @@ import gui.MainWindow;
 import io.BlockedFile;
 import io.FileUtils;
 
+/**
+ * Holds centralized data (variables and instances)
+ * @author Kevin Cai
+ */
 public class Core {
 	
 	public static RSA rsa;
 	public static AES aes;
-	public static String pubKey;
+	public static ArrayList<Peer> peers;
 	public static NetHandler netHandler;
 	public static MainWindow mainWindow;
 	public static ArrayList<BlockedFile> blockDex;

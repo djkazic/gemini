@@ -7,6 +7,10 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES cryptography helper class
+ * @author Kevin Cai
+ */
 public class AES {
 	
 	private SecretKeySpec key;

@@ -3,16 +3,35 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
+/**
+ * General utility methods class
+ * @author Kevin Cai
+ */
 public class Utilities {
 
+	/**
+	 * Primary logging method
+	 * @param someClass origin class of debug
+	 * @param msg debug message
+	 */
 	public static void log(Object someClass, String msg) {
 		System.out.println("<LOG> [" + someClass.getClass().getName() + "]: " + msg);
 	}
 	
+	/**
+	 * Secondary logging method (if not object class)
+	 * @param someClass pseudo-class name of debug
+	 * @param msg debug message
+	 */
 	public static void log(String someClass, String msg) {
 		System.out.println("<LOG> [" + someClass + "]: " + msg);
 	}
 	
+	/**
+	 * Primary dynamic switching method for debug; if headless, no GUI out
+	 * @param someClass origin class of debug
+	 * @param msg debug message
+	 */
 	public static void switchGui(Object someClass, String msg) {
 		if(Core.mainWindow != null) {
 			Core.mainWindow.out(msg);
@@ -20,6 +39,11 @@ public class Utilities {
 		log(someClass, msg);
 	}
 	
+	/**
+	 * Secondary dynamic switching method for debug; if headless, no GUI out
+	 * @param someClass origin class of debug
+	 * @param msg debug message
+	 */
 	public static void switchGui(String someClass, String msg) {
 		if(Core.mainWindow != null) {
 			Core.mainWindow.out(msg);
@@ -27,6 +51,10 @@ public class Utilities {
 		log(someClass, msg);
 	}
 	
+	/**
+	 * Calculates a mutex for duplicate connection avoidance
+	 * @return the mutex data generated
+	 */
 	public static String getMutex() {
 		try {
 			String firstInterfaceFound = null;        

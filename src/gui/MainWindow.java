@@ -47,6 +47,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+/**
+ * Main GUI container/hub
+ * @author Kevin Cai
+ */
 public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = -5729024992996472278L;
@@ -73,6 +77,10 @@ public class MainWindow extends JFrame {
 	private JPanel libPanel;
 	private JButton btnSearch;
 
+	/**
+	 * Tester method
+	 * @param args test arguments
+	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -89,7 +97,7 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * Create the frame.
+	 * Constructs and initializes the JFrame
 	 */
 	public MainWindow() {
 
@@ -167,7 +175,7 @@ public class MainWindow extends JFrame {
 					//clear core index
 					Core.index.clear();
 
-					if(NetHandler.peers.size() == 0) {
+					if(Core.peers.size() == 0) {
 						out("No peers connected. Query is not possible.");
 					} else {
 						String input = searchInput.getText();
@@ -202,7 +210,7 @@ public class MainWindow extends JFrame {
 				//clear core index
 				Core.index.clear();
 
-				if(NetHandler.peers.size() == 0) {
+				if(Core.peers.size() == 0) {
 					out("No peers connected. Query is not possible.");
 				} else {
 					String input = searchInput.getText();
@@ -293,6 +301,9 @@ public class MainWindow extends JFrame {
 
 	}
 
+	/**
+	 * Registers GUI listeners to the instance variables
+	 */
 	public void registerListeners() {
 		downloadPopupMenuRemoveFromList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -389,6 +400,10 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 
+	/**
+	 * Clears a given table of its entries
+	 * @param tableModel tableModel of table to clear
+	 */
 	private void clearTable(DefaultTableModel tableModel) {
 		int rowCount = tableModel.getRowCount();
 		if(rowCount > 0) {
@@ -399,6 +414,11 @@ public class MainWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Removes the column of a table
+	 * @param table table to remove column from
+	 * @param vColIndex index of column to remove
+	 */
 	private void removeColumnAndData(JTable table, int vColIndex) {
 		TableModelSpec model = (TableModelSpec)table.getModel();
 		TableColumn col = table.getColumnModel().getColumn(vColIndex);
@@ -422,8 +442,11 @@ public class MainWindow extends JFrame {
 		model.fireTableStructureChanged();
 	}
 
+	/**
+	 * Outputs a string into the main GUI
+	 * @param str output data
+	 */
 	public void out(String str) {
-
 		try {
 			resLatch.await();
 		} catch (InterruptedException e) {
@@ -440,12 +463,20 @@ public class MainWindow extends JFrame {
 
 	}
 
+	/**
+	 * Updates the icon for peers and its tooltip
+	 */
 	public void updatePeerCount() {
 		String peers = peersCountIcon();
 		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/" + peers + ".png")));
 		lblPeers.setToolTipText(peerToolTip());
 	}
 
+	/**
+	 * Updates the time given for a BlockedFile in download
+	 * @param forFile the BlockedFile's filename
+	 * @param time the updated amount of time left
+	 */
 	public void updateTime(String forFile, String time) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
@@ -455,6 +486,11 @@ public class MainWindow extends JFrame {
 		}
 	}
 	
+	/**
+	 * Updates the progress percentage for a BlockedFile in download
+	 * @param forFile the BlockedFile's filename
+	 * @param progress the updated level of progress
+	 */
 	public void updateProgress(String forFile, String progress) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
@@ -464,6 +500,9 @@ public class MainWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Updates the contents of the library tab
+	 */
 	public void updateLibrary() {
 		clearTable(libraryModel);
 		for(BlockedFile bf : Core.blockDex) {
@@ -484,26 +523,39 @@ public class MainWindow extends JFrame {
 
 	}
 
+	/**
+	 * Sets the GUI focus to the search bar
+	 */
 	public void setSearchFocusable() {
-
 		searchInput.setFocusable(true);
-
 	}
 
+	/**
+	 * Sets the search bar to editable
+	 */
 	public void setSearchEditable() {
-
 		searchInput.setEditable(true);
-
 	}
 
+	/**
+	 * Resets the output bar to its default output
+	 */
 	public void resetTable() {
 		out("Enter your search query and press Enter.");
 	}
 
+	/**
+	 * Adds a specific row to the search results table
+	 * @param info string array of data [Filename, Est. Size]
+	 */
 	public void addRowToSearchModel(String[] info) {
 		searchModel.addRow(info);
 	}
 	
+	/**
+	 * Removes a specific row from the search results table
+	 * @param pointerName pointer reference for the BlockedFile to remove
+	 */
 	public void removeRowFromSearchModel(String pointerName) {
 		for(int i=0; i < searchModel.getRowCount(); i++) {
 			if(searchModel.getValueAt(i, 0).equals(pointerName)) {
@@ -513,8 +565,12 @@ public class MainWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Returns the value of the correct peer count icon
+	 * @return string value of the correct PNG file for this number of peers
+	 */
 	public String peersCountIcon() {
-		int size = NetHandler.peers.size();
+		int size = Core.peers.size();
 		if(size == 0) {
 			//0 peers
 			return "0bars";
@@ -530,10 +586,14 @@ public class MainWindow extends JFrame {
 		return null;
 	}
 
+	/**
+	 * Returns value of tooltip for a given peer count
+	 * @return value of tooltip as a string
+	 */
 	public String peerToolTip() {
 		int inCount = 0;
 		int outCount = 0;
-		for(Peer peer : NetHandler.peers) {
+		for(Peer peer : Core.peers) {
 			if(peer.getInOut() == 1) {
 				inCount++;
 			} else {
@@ -543,9 +603,13 @@ public class MainWindow extends JFrame {
 		return "[" + inCount + "|" + outCount + "]";
 	}
 	
+	/**
+	 * Sets the GUI to a ready state, with search enabled
+	 */
 	public void ready() {
 		searchInput.setEnabled(true);
 		btnSearch.setEnabled(true);
+		setSearchFocusable();
 		out("Ready");
 	}
 }

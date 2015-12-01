@@ -18,14 +18,16 @@ import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
 
+/**
+ * Handles server, client, and discovery operations
+ * @author Kevin Cai
+ */
 public class NetHandler {
 
-	public static ArrayList<Peer> peers;
-	
 	private Server server;
 
 	public NetHandler() {
-		peers = new ArrayList<Peer> ();
+		Core.peers = new ArrayList<Peer> ();
 		registerServerListeners();
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
@@ -148,7 +150,7 @@ public class NetHandler {
 				public void run() {
 					while(true) {
 						if(!Core.headless) {
-							if(peers.isEmpty()) {
+							if(Core.peers.isEmpty()) {
 								try {
 									Thread.sleep(1000);
 								} catch (Exception ex) {
@@ -168,13 +170,13 @@ public class NetHandler {
 	}
 	
 	public static void doSearch(String keyword) {
-		for(Peer peer : peers) {
+		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
 	
 	public static void requestBlock(String origin, String block) {
-		for(Peer peer : peers) {
+		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
 		}
 	}

@@ -7,11 +7,17 @@ import java.util.concurrent.CountDownLatch;
 import javax.xml.bind.DatatypeConverter;
 import com.esotericsoftware.kryonet.Connection;
 import crypto.AES;
+import crypto.RSA;
 import packets.data.Data;
 import packets.data.DataTypes;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
 
+/**
+ * Representation of a incoming or outgoing peer.
+ * Handles data storage and abstract data exchange for P2P communication.
+ * @author Kevin Cai
+ */
 public class Peer {
 
 	private CountDownLatch deferredRequesting;
@@ -25,7 +31,7 @@ public class Peer {
 
 	public Peer(Connection connection, int inOut) {
 		//Add ourselves to peers without data
-		NetHandler.peers.add(this);
+		Core.peers.add(this);
 		if(!Core.headless) {
 			Core.mainWindow.updatePeerCount();
 		}
@@ -46,7 +52,7 @@ public class Peer {
 					if(inOut == 1) {
 						//Pro-active request approach as a psuedo-server
 						Utilities.log(this, "Sending our pubkey first");
-						connection.sendTCP(new Data(DataTypes.PUBKEY, Core.pubKey));
+						connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
 						Utilities.log(this, "Requesting peer's pubkey");
 						connection.sendTCP(new Request(RequestTypes.PUBKEY, null));
 						Utilities.log(this, "Awaiting peer's pubkey");
@@ -82,7 +88,7 @@ public class Peer {
 		} else {
 			Utilities.log(this, "Peer disconnected (mutex was null on disconnect");
 		}
-		NetHandler.peers.remove(this);
+		Core.peers.remove(this);
 		if(!Core.headless) {
 			Core.mainWindow.updatePeerCount();
 		}
@@ -139,7 +145,7 @@ public class Peer {
 	}
 
 	public static Peer findPeer(Connection connection) {
-		for(Peer peer : NetHandler.peers) {
+		for(Peer peer : Core.peers) {
 			if(peer.getConnection().equals(connection)) {
 				return peer;
 			}
@@ -153,7 +159,7 @@ public class Peer {
 			return false;
 		} else {
 			boolean passed = true;
-			for(Peer peer : NetHandler.peers) {
+			for(Peer peer : Core.peers) {
 				if(peer != this && peer.getMutex().equals(mutexData)) {
 					passed = false;
 					break;
