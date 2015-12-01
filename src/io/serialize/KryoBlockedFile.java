@@ -1,7 +1,9 @@
-package io;
+package io.serialize;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import io.BlockedFile;
 
 public class KryoBlockedFile {
 	

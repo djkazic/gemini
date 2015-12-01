@@ -33,7 +33,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import atrium.Core;
-import atrium.FileUtils;
 import atrium.NetHandler;
 import atrium.Peer;
 import atrium.Utilities;
@@ -42,6 +41,7 @@ import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
 import io.BlockedFile;
 import io.Downloader;
+import io.FileUtils;
 
 import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;

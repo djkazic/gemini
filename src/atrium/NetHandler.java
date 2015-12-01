@@ -10,8 +10,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 
-import io.StreamedBlock;
-import io.StreamedBlockedFile;
+import io.serialize.StreamedBlock;
+import io.serialize.StreamedBlockedFile;
 import listeners.BlockListener;
 import listeners.DualListener;
 import packets.data.Data;

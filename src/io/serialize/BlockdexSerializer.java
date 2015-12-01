@@ -1,4 +1,4 @@
-package atrium;
+package io.serialize;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
-import io.KryoBlockedFile;
+
+import atrium.Core;
+import io.FileUtils;
 
 public class BlockdexSerializer {
 

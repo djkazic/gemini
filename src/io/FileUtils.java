@@ -1,4 +1,4 @@
-package atrium;
+package io;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -16,8 +16,11 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
-import io.BlockedFile;
-import io.KryoBlockedFile;
+
+import atrium.Core;
+import atrium.Utilities;
+import io.serialize.BlockdexSerializer;
+import io.serialize.KryoBlockedFile;
 
 public class FileUtils {
 

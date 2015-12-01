@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
 
-import atrium.FileUtils;
 import atrium.Peer;
 import atrium.Utilities;
 import io.BlockedFile;
-import io.StreamedBlock;
+import io.FileUtils;
+import io.serialize.StreamedBlock;
 import packets.data.Data;
 import packets.data.DataTypes;
 import packets.requests.Request;

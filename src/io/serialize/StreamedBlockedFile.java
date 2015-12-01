@@ -1,7 +1,8 @@
-package io;
+package io.serialize;
 
 import java.util.ArrayList;
 import crypto.AES;
+import io.BlockedFile;
 
 /**
  * Representation of a BlockedFile for transmission

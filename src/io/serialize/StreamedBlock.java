@@ -1,11 +1,12 @@
-package io;
+package io.serialize;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import atrium.Core;
-import atrium.FileUtils;
 import atrium.Utilities;
 import crypto.AES;
+import io.BlockedFile;
+import io.FileUtils;
 
 public class StreamedBlock {
 

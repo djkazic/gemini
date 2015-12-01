@@ -9,6 +9,7 @@ import crypto.AES;
 import crypto.RSA;
 import gui.MainWindow;
 import io.BlockedFile;
+import io.FileUtils;
 
 public class Core {
 	

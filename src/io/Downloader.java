@@ -2,7 +2,6 @@ package io;
 
 import java.util.ArrayList;
 
-import atrium.FileUtils;
 import atrium.NetHandler;
 import atrium.Utilities;
 
