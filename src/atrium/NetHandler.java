@@ -1,8 +1,13 @@
 package atrium;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -24,14 +29,75 @@ import packets.requests.RequestTypes;
  */
 public class NetHandler {
 
+	public static String externalIp;
+	public static boolean extVisible;
+
 	private Server server;
 
 	public NetHandler() {
+		externalIp = getExtIp();
+		extVisible = checkExtVisibility();
 		Core.peers = new ArrayList<Peer> ();
 		registerServerListeners();
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
 		peerDiscovery(initialClient);
+	}
+
+	private String getExtIp() {
+		try {
+			URL apiUrl = new URL("http://ip.appspot.com");
+			HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+
+			if (conn.getResponseCode() != 200) {
+				throw new IOException(conn.getResponseMessage());
+			}
+
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = rd.readLine()) != null) {
+				sb.append(line);
+			}
+			rd.close();
+			conn.disconnect();
+			String finalStr = sb.toString();
+			Utilities.log(this, "External IP is: " + finalStr);
+			return finalStr;
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	private boolean checkExtVisibility() {
+		if(externalIp != null) {
+			try {
+				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Core.tcp);
+				HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+
+				if (conn.getResponseCode() != 200) {
+					throw new IOException(conn.getResponseMessage());
+				}
+
+				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = rd.readLine()) != null) {
+					sb.append(line);
+				}
+				rd.close();
+				conn.disconnect();
+				String finalStr = sb.toString();
+				if(finalStr != null) {
+					Utilities.log(this, "Externally visible: " + finalStr);
+					return Boolean.parseBoolean(finalStr);
+				}
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return false;
 	}
 
 	public void registerServerListeners() {
@@ -49,7 +115,7 @@ public class NetHandler {
 
 		} catch (Exception ex) {}
 	}
-	
+
 	private Client getClient() {
 		Client client = new Client(512000 * 4, 512000 * 4);
 		registerClientListeners(client);
@@ -76,7 +142,7 @@ public class NetHandler {
 		kryo.register(String[].class);
 		kryo.register(ArrayList.class);
 		kryo.register(byte[].class);
-		
+
 		//Specifics import
 		kryo.register(Data.class);
 		kryo.register(Request.class);
@@ -86,12 +152,12 @@ public class NetHandler {
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
 	}
-	
+
 	private void peerDiscovery(Client client) {
 		try {
 			Utilities.switchGui(this, "Finding peers...");
 			Utilities.log(this, "Discovering hosts");
-			
+
 			List<InetAddress> foundHosts = client.discoverHosts(Core.udp, 4000);
 
 			//TODO: remove this debug section
@@ -99,7 +165,7 @@ public class NetHandler {
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
-			
+
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
 			foundHosts.remove(localhost);
@@ -168,13 +234,13 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public static void doSearch(String keyword) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
-	
+
 	public static void requestBlock(String origin, String block) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
