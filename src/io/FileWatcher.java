@@ -25,27 +25,30 @@ public class FileWatcher implements Runnable {
 		try {
 			WatchService fileWatcher = regDir.getFileSystem().newWatchService();
 			watchKey = regDir.register(fileWatcher, 
-							StandardWatchEventKinds.ENTRY_CREATE, 
-							StandardWatchEventKinds.ENTRY_DELETE);
+									   StandardWatchEventKinds.ENTRY_CREATE, 
+									   StandardWatchEventKinds.ENTRY_DELETE);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		Utilities.log(this, "FileWatcher registered to normal directory");
 	}
 	
+	/**
+	 * Main FileWatcher loop; examines the workspace directory for changes
+	 */
 	public void run() {
 		while(true) {
 			List<WatchEvent<?>> events = watchKey.pollEvents();
 			for(WatchEvent<?> we : events) {
 				if(we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-					System.out.println("Created: " + we.context().toString());
+					Utilities.log(this, "Created: " + we.context().toString());
 					new BlockedFile(new File(FileUtils.getWorkspaceDir() + "/" + we.context().toString()), true);
 					if(!Core.headless) {
 						Core.mainWindow.updateLibrary();
 					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-					System.out.println("Deleted: " + we.context().toString());
+					Utilities.log(this, "Deleted: " + we.context().toString());
 					BlockedFile bf = FileUtils.getBlockedFile(we.context().toString());
 					if(bf != null) {
 						Core.blockDex.remove(bf);
@@ -57,7 +60,7 @@ public class FileWatcher implements Runnable {
 				}
 			}
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(300);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}

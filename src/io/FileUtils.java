@@ -180,7 +180,7 @@ public class FileUtils {
 		int physicalBfCount = 0;
 		File[] list = baseFolder.listFiles();
 		for(int i=0; i < list.length; i++) {
-			if(list[i].isFile()) {
+			if(list[i].isFile() && !list[i].getName().startsWith(".")) {
 				physicalBfCount++;
 			}
 		}
@@ -188,7 +188,7 @@ public class FileUtils {
 			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
 					      + " but detected " + physicalBfCount);
 			for(int i=0; i < list.length; i++) {
-				if(list[i].isFile() && !haveInBlockDex(list[i])) {
+				if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
 					new BlockedFile(list[i], true);
 				}
 			}
