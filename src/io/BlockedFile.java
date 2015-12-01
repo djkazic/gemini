@@ -4,6 +4,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import atrium.BlockdexSerializer;
 import atrium.Core;
 import atrium.FileUtils;
 import atrium.Utilities;
@@ -25,7 +27,7 @@ public class BlockedFile {
 	private String progress;
 	private float blockRate;
 	private long lastChecked;
-
+	
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
 	 * @param pointer
@@ -43,6 +45,7 @@ public class BlockedFile {
 		this.complete = finished;
 		progress = "";
 		Core.blockDex.add(this);
+		BlockdexSerializer.run();
 	}
 	
 	/**
@@ -56,8 +59,33 @@ public class BlockedFile {
 		blackList = new ArrayList<String> ();
 		complete = false;
 		progress = "";
-		//Don't add to blockDex until mature
 		Core.blockDex.add(this);
+		BlockdexSerializer.run();
+	}
+
+	/**
+	 * Kryo conversion constructor
+	 * @param file
+	 * @param checksum
+	 * @param blockList
+	 * @param blackList
+	 * @param complete
+	 * @param progress
+	 * @param blockRate
+	 * @param lastChecked
+	 */
+	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
+					   boolean complete, String progress, float blockRate, long lastChecked) {
+		this.pointer = file;
+		this.checksum = checksum;
+		this.blockList = blockList;
+		this.blackList = blackList;
+		this.complete = complete;
+		this.progress = progress;
+		this.blockRate = blockRate;
+		this.lastChecked = lastChecked;
+		Core.blockDex.add(this);
+		BlockdexSerializer.run();
 	}
 
 	public boolean matchSearch(String searchQuery) {
@@ -189,5 +217,16 @@ public class BlockedFile {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), encryptedList);
+	}
+
+	public KryoBlockedFile toKryoBlockedFile() {
+		return new KryoBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
+								   complete, progress, blockRate, lastChecked);
+	}
+	
+	public String toString() {
+		return pointer.getName() + " | " + 
+			   blockList + " " + blackList + " | " + complete + " | " + progress 
+			   + " | " + blockRate + " | " + lastChecked;
 	}
 }

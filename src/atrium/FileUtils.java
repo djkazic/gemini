@@ -8,13 +8,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
-
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import io.BlockedFile;
+import io.KryoBlockedFile;
 
 public class FileUtils {
 
@@ -34,7 +37,7 @@ public class FileUtils {
 				Utilities.log("atrium.FileUtils", "Successfully created directory");
 			}
 		}
-		File configDir = new File(getWorkspaceDir() + "/" + ".config");
+		File configDir = new File(getConfigDir());
 		if(!configDir.exists()) {
 			Utilities.log("atrium.FileUtils", "Could not find config directory, creating");
 			boolean attempt = false;
@@ -85,6 +88,10 @@ public class FileUtils {
 			scratchDirectory = getWorkspaceDir() + "/.cache";
 		}
 		return scratchDirectory;
+	}
+	
+	public static String getConfigDir() {
+		return getWorkspaceDir() + "/.config";
 	}
 
 	public static File findBlockAppData(String origin, String block) {
@@ -137,11 +144,42 @@ public class FileUtils {
 	}
 
 	public static void genBlockIndex() {
-		File baseFolder = new File(getWorkspaceDir());
-		File[] list = baseFolder.listFiles();
-		for(int i=0; i < list.length; i++) {
-			if(list[i].isFile()) {
-				new BlockedFile(list[i], true);
+		File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
+		File cacheFile = new File(getConfigDir() + "/blockdex.dat");
+		if(encCacheFile.exists()) {
+			Utilities.log("atrium.FileUtils", "Attempting to read blockdex cache");
+			try {
+				byte[] encFileBytes = Files.readAllBytes(encCacheFile.toPath());
+				byte[] decryptedBytes = Core.aes.decrypt(encFileBytes);
+				FileOutputStream fos = new FileOutputStream(cacheFile);
+				fos.write(decryptedBytes);
+				fos.close();
+				encCacheFile.delete();
+				Kryo kryo = new Kryo();
+				Input input = new Input(new FileInputStream(cacheFile));
+
+				try {
+					ArrayList<?> uKbf = kryo.readObject(input, ArrayList.class);
+					Utilities.log("atrium.FileUtils", "Read " + uKbf.size() + " entries from cache");
+					for(int i=0; i < uKbf.size(); i++) {
+						((KryoBlockedFile) uKbf.get(i)).toBlockedFile();
+					}
+				} catch(Exception ex) {
+					ex.printStackTrace();
+				}
+				input.close();
+				cacheFile.delete();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		} else {
+			Utilities.log("atrium.FileUtils", "Directly generating blockdex");
+			File baseFolder = new File(getWorkspaceDir());
+			File[] list = baseFolder.listFiles();
+			for(int i=0; i < list.length; i++) {
+				if(list[i].isFile()) {
+					new BlockedFile(list[i], true);
+				}
 			}
 		}
 	}
@@ -285,5 +323,13 @@ public class FileUtils {
 			}
 		}
 		return null;
+	}
+	
+	public static void copyStream(InputStream is, OutputStream os) throws IOException {
+		int i;
+		byte[] b = new byte[1024];
+		while((i=is.read(b))!=-1) {
+			os.write(b, 0, i);
+		}
 	}
 }

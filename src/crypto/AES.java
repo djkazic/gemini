@@ -58,4 +58,19 @@ public class AES {
 		}
 		return null;
 	}
+	
+	public Cipher getCipher(boolean enc) {
+		Cipher cipher = null;
+		try {
+			cipher = Cipher.getInstance("AES");
+			if(enc) {
+				cipher.init(Cipher.ENCRYPT_MODE, key);
+			} else {
+				cipher.init(Cipher.DECRYPT_MODE, key);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return cipher;
+	}
 }
