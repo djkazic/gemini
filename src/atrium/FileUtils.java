@@ -172,16 +172,54 @@ public class FileUtils {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-		} else {
-			Utilities.log("atrium.FileUtils", "Directly generating blockdex");
-			File baseFolder = new File(getWorkspaceDir());
-			File[] list = baseFolder.listFiles();
+		}
+		File baseFolder = new File(getWorkspaceDir());
+		int physicalBfCount = 0;
+		File[] list = baseFolder.listFiles();
+		for(int i=0; i < list.length; i++) {
+			if(list[i].isFile()) {
+				physicalBfCount++;
+			}
+		}
+		if(Core.blockDex.size() < physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+					      + " but detected " + physicalBfCount);
 			for(int i=0; i < list.length; i++) {
-				if(list[i].isFile()) {
+				if(list[i].isFile() && !haveInBlockDex(list[i])) {
 					new BlockedFile(list[i], true);
 				}
 			}
+			BlockdexSerializer.run();
+		} else if(Core.blockDex.size() > physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+		      			  + " but detected " + physicalBfCount);
+			for(int i=0; i < Core.blockDex.size(); i++) {
+				BlockedFile curBf = Core.blockDex.get(i);
+				File curPointer = curBf.getPointer();
+				boolean found = false;
+				for(int j=0; j < list.length; j++) {
+					if(curPointer.equals(list[j])) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					Core.blockDex.remove(curBf);
+				}
+			}
+			BlockdexSerializer.run();
 		}
+		Utilities.log("atrium.FileUtils", "Final validity check: cached " + Core.blockDex.size() 
+	                  + " and detected " + physicalBfCount);
+	}
+	
+	public static boolean haveInBlockDex(File file) {
+		for(BlockedFile bf : Core.blockDex) {
+			if(bf.getPointer().equals(file)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static String generateChecksum(File file) {
