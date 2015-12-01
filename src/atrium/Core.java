@@ -10,6 +10,7 @@ import crypto.RSA;
 import gui.MainWindow;
 import io.BlockedFile;
 import io.FileUtils;
+import io.FileWatcher;
 
 /**
  * Holds centralized data (variables and instances)
@@ -58,11 +59,14 @@ public class Core {
 		rsa = new RSA();
 		aes = new AES(mutex);
 		
-		//File inits
+		//File directory checks
 		Utilities.switchGui("atrium.Core", "Checking for file structures");
 		FileUtils.initDirs();
 		
-		//Var initialization
+		//FileWatcher initialization
+		(new Thread(new FileWatcher())).start();
+		
+		//Vars initialization
 		Utilities.switchGui("atrium.Core", "Generating block index");
 		blockDex = new ArrayList<BlockedFile> ();
 		FileUtils.genBlockIndex();
