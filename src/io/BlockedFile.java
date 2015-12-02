@@ -13,6 +13,10 @@ import io.serialize.StreamedBlockedFile;
 
 public class BlockedFile {
 	
+	/**
+	 * BlockedFile tester method
+	 * @param args test arguments
+	 */
 	public static void main(String[] args) {
 		Core.blockDex = new ArrayList<BlockedFile> ();
 		BlockedFile bf = new BlockedFile(new File("libGLESv2.dll"), true);
@@ -51,8 +55,8 @@ public class BlockedFile {
 	
 	/**
 	 * Constructor for not yet existent BlockedFile
-	 * @param pointer
-	 * @param blockList
+	 * @param pointer string pointer for File
+	 * @param blockList ArrayList<String> of block names
 	 */
 	public BlockedFile(String pointer, ArrayList<String> blockList) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
@@ -66,14 +70,14 @@ public class BlockedFile {
 
 	/**
 	 * Kryo conversion constructor
-	 * @param file
-	 * @param checksum
-	 * @param blockList
-	 * @param blackList
-	 * @param complete
-	 * @param progress
-	 * @param blockRate
-	 * @param lastChecked
+	 * @param file direct file pointer
+	 * @param checksum string checksum
+	 * @param blockList ArrayList<String> of blocks
+	 * @param blackList ArrayList<String> of blocks already had
+	 * @param complete boolean value of completion
+	 * @param progress string representation of progress downloaded
+	 * @param blockRate rate of block downloads
+	 * @param lastChecked last millisecond value checked for blockRate
 	 */
 	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
 					   boolean complete, String progress, float blockRate, long lastChecked) {
@@ -89,6 +93,11 @@ public class BlockedFile {
 		BlockdexSerializer.run();
 	}
 
+	/**
+	 * Returns whether this BlockedFile's name matches a query
+	 * @param searchQuery string query for search
+	 * @return boolean on whether there is a match
+	 */
 	public boolean matchSearch(String searchQuery) {
 		if(pointer.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
 			return true;
@@ -96,18 +105,34 @@ public class BlockedFile {
 		return false;
 	}
 
+	/**
+	 * Returns file pointer
+	 * @return file pointer
+	 */
 	public File getPointer() {
 		return pointer;
 	}
 
+	/**
+	 * Returns path
+	 * @return string path
+	 */
 	public String getPath() {
 		return FileUtils.getWorkspaceDir() + "/" + pointer.getName();
 	}
 
+	/**
+	 * Returns AppData/cache directory for this BlockedFile
+	 * @return string AppData/cache directory for this BlockedFile
+	 */
 	public String getBlocksFolder() {
 		return FileUtils.getAppDataDir() + "/" + Utilities.base64(pointer.getName());
 	}
 	
+	/**
+	 * Returns the next string block we need
+	 * @return string block that's needed
+	 */
 	public String getNextBlock() {
 		for(int i=0; i < blockList.size(); i++) {
 			String thisBlock = blockList.get(i);
@@ -118,22 +143,42 @@ public class BlockedFile {
 		return null;
 	}
 
+	/**
+	 * Returns pre-calculated checksum
+	 * @return string pre-calculated checksum
+	 */
 	public String getChecksum() {
 		return checksum;
 	}
 
+	/**
+	 * Returns ArrayList<String> list of blocks
+	 * @return ArrayList<String> list of blocks
+	 */
 	public ArrayList<String> getBlockList() {
 		return blockList;
 	}
 
+	/**
+	 * Returns ArrayList<String> list of blocks already had
+	 * @return ArrayList<String> list of blocks already had
+	 */
 	public ArrayList<String> getBlacklist() {
 		return blackList;
 	}
 	
+	/**
+	 * Sets the instance variable for the blacklist
+	 * @param in replacement variable provided
+	 */
 	public void setBlacklist(ArrayList<String> in) {
 		blackList = in;
 	}
 	
+	/**
+	 * Logs a block downloaded into the blackList ArrayList
+	 * @param str block name
+	 */
 	public void logBlock(String str) {
 		if(!blackList.contains(str)) {
 			blackList.add(str);
@@ -161,12 +206,19 @@ public class BlockedFile {
 		updateProgress();
 	}
 
+	/**
+	 * Updates the estimated time remaining
+	 * @param time value provided
+	 */
 	private void updateTime(String time) {
 		if(!Core.headless) {
 			Core.mainWindow.updateTime(pointer.getName(), time);
 		}
 	}
 	
+	/**
+	 * Updates the progress value via calculating sizes of blackList/blockList
+	 */
 	private void updateProgress() {
 		if(complete) {
 			progress = "100%";
@@ -181,28 +233,52 @@ public class BlockedFile {
 		}
 	}
 	
+	/**
+	 * Returns boolean value for completeness
+	 * @return boolean value for completeness
+	 */
 	public boolean isComplete() {
 		return complete;
 	}
 
+	/**
+	 * Sets boolean value for completeness
+	 * @param bool value provided
+	 */
 	public void setComplete(boolean bool) {
 		complete = bool;
 	}
 
+	/**
+	 * Returns numerical representation of progress
+	 * @return numerical representation of progress
+	 */
 	public double getProgressNum() {
 		double dProgress = ((double) blackList.size()) / blockList.size();
 		dProgress *= 100;
 		return dProgress;
 	}
 	
+	/**
+	 * Returns string representation of progress
+	 * @return string representation of progress
+	 */
 	public String getProgress() {
 		return progress;
 	}
 
+	/**
+	 * Sets string representation of progress
+	 * @param str value provided
+	 */
 	public void setProgress(String str) {
 		progress = str;
 	}
 	
+	/**
+	 * Calculates and returns date modified for this BlockedFile
+	 * @return string date modified for this BlockedFile
+	 */
 	public String getDateModified() {
 		if(complete) {
 			Date date = new Date (pointer.lastModified());
@@ -212,6 +288,10 @@ public class BlockedFile {
 		return null;
 	}
 	
+	/**
+	 * Converts this BlockedFile to KryoBlockedFile for network transmission
+	 * @return StreamedBlockedFile conversion
+	 */
 	public StreamedBlockedFile toStreamedBlockedFile() {
 		ArrayList<String> encryptedList = new ArrayList<String> ();
 		for(int i=0; i < blockList.size(); i++) {
@@ -220,11 +300,18 @@ public class BlockedFile {
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), encryptedList);
 	}
 
+	/**
+	 * Converts this BlockedFile to KryoBlockedFile for serialization
+	 * @return KryoBlockedFile conversion
+	 */
 	public KryoBlockedFile toKryoBlockedFile() {
 		return new KryoBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
 								   complete, progress, blockRate, lastChecked);
 	}
 	
+	/**
+	 * Debug method for verifying equality of BlockedFiles
+	 */
 	public String toString() {
 		return pointer.getName() + " | " + 
 			   blockList + " " + blackList + " | " + complete + " | " + progress 
