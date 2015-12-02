@@ -11,7 +11,7 @@ public class Downloader implements Runnable {
 	
 	public Downloader(BlockedFile bf) {
 		blockedFile = bf;
-		Utilities.log(this, "Downloader initialized for BlockedFile " + bf.getPointer().getName());
+		Utilities.log(this, "Downloader instance created for BlockedFile " + bf.getPointer().getName());
 	}
 	
 	public void run() {
