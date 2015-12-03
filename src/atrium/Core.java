@@ -1,9 +1,13 @@
 package atrium;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.minlog.Log;
 import crypto.AES;
 import crypto.RSA;
@@ -28,6 +32,7 @@ public class Core {
 	
 	public static boolean headless = false;
 	public static int blockSize = 240000;
+	public static Config config;
 	public static String mutex;
 	
 	/**
@@ -65,6 +70,21 @@ public class Core {
 		//File directory checks
 		Utilities.switchGui("atrium.Core", "Checking for file structures");
 		FileUtils.initDirs();
+		
+		//Load config if exists
+		try {
+			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
+			if(configFile.exists()) {
+				Utilities.log("atrium.Core", "Loaded saved configuration");
+				Kryo kryo = new Kryo();
+				Input input = new Input(new FileInputStream(configFile));
+				config = kryo.readObject(input, Config.class);
+			} else {
+				config = new Config();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		//FileWatcher initialization
 		(new Thread(new FileWatcher())).start();

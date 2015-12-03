@@ -80,7 +80,7 @@ public class NetHandler {
 	private boolean checkExtVisibility() {
 		if(externalIp != null) {
 			try {
-				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Config.tcpPort);
+				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Core.config.tcpPort);
 				HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
 
 				if (conn.getResponseCode() != 200) {
@@ -99,7 +99,9 @@ public class NetHandler {
 				if(finalStr != null) {
 					Utilities.log(this, "Externally visible: " + finalStr);
 					
-					if(!Core.headless && !Config.notifiedPortForwarding) {
+					if(!Core.headless && !Core.config.notifiedPortForwarding) {
+						Core.config.notifiedPortForwarding = true;
+						Core.config.writeConfig();
 						JLabel label = new JLabel();
 						Font font = label.getFont();
 						
@@ -108,7 +110,7 @@ public class NetHandler {
 						style.append("font-size:" + font.getSize() + "pt;");
 						JEditorPane ep = new JEditorPane(
 								"text/html", 
-								"<html><body style=\"" + style + "\">Please consider port forwarding " + Config.tcpPort
+								"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
 								+ " TCP on your network. <br>"
 								+ "Not port forwarding leeches on the network. <br>"
 								+ "Here are some resources for doing so: <br>  <br>"
@@ -149,7 +151,7 @@ public class NetHandler {
 			server.addListener(new BlockListener());
 
 			Utilities.switchGui(this, "Starting server component");
-			server.bind(Config.tcpPort, Config.udpPort);
+			server.bind(Core.config.tcpPort, Core.config.udpPort);
 			server.start();
 
 		} catch (Exception ex) {}
@@ -197,7 +199,7 @@ public class NetHandler {
 			Utilities.switchGui(this, "Finding peers...");
 			Utilities.log(this, "Discovering hosts");
 
-			List<InetAddress> foundHosts = client.discoverHosts(Config.udpPort, 4000);
+			List<InetAddress> foundHosts = client.discoverHosts(Core.config.udpPort, 4000);
 
 			//TODO: remove this debug section
 			foundHosts.clear();
@@ -244,7 +246,7 @@ public class NetHandler {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
 					Client newConnection = getClient();
-					newConnection.connect(8000, ia, Config.tcpPort);
+					newConnection.connect(8000, ia, Core.config.tcpPort);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed");
 				}
