@@ -80,7 +80,7 @@ public class NetHandler {
 	private boolean checkExtVisibility() {
 		if(externalIp != null) {
 			try {
-				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Core.tcp);
+				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Config.tcpPort);
 				HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
 
 				if (conn.getResponseCode() != 200) {
@@ -99,7 +99,7 @@ public class NetHandler {
 				if(finalStr != null) {
 					Utilities.log(this, "Externally visible: " + finalStr);
 					
-					if(!Core.headless) {
+					if(!Core.headless && !Config.notifiedPortForwarding) {
 						JLabel label = new JLabel();
 						Font font = label.getFont();
 						
@@ -108,7 +108,7 @@ public class NetHandler {
 						style.append("font-size:" + font.getSize() + "pt;");
 						JEditorPane ep = new JEditorPane(
 								"text/html", 
-								"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.tcp
+								"<html><body style=\"" + style + "\">Please consider port forwarding " + Config.tcpPort
 								+ " TCP on your network. <br>"
 								+ "Not port forwarding leeches on the network. <br>"
 								+ "Here are some resources for doing so: <br>  <br>"
@@ -149,7 +149,7 @@ public class NetHandler {
 			server.addListener(new BlockListener());
 
 			Utilities.switchGui(this, "Starting server component");
-			server.bind(Core.tcp, Core.udp);
+			server.bind(Config.tcpPort, Config.udpPort);
 			server.start();
 
 		} catch (Exception ex) {}
@@ -197,7 +197,7 @@ public class NetHandler {
 			Utilities.switchGui(this, "Finding peers...");
 			Utilities.log(this, "Discovering hosts");
 
-			List<InetAddress> foundHosts = client.discoverHosts(Core.udp, 4000);
+			List<InetAddress> foundHosts = client.discoverHosts(Config.udpPort, 4000);
 
 			//TODO: remove this debug section
 			foundHosts.clear();
@@ -244,7 +244,7 @@ public class NetHandler {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
 					Client newConnection = getClient();
-					newConnection.connect(8000, ia, Core.tcp, Core.udp);
+					newConnection.connect(8000, ia, Config.tcpPort);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed");
 				}

@@ -27,8 +27,6 @@ public class Core {
 	public static HashMap<String, ArrayList<String>> index;
 	
 	public static int blockSize = 240000;
-	public static int tcp = 35500;
-	public static int udp = 35501;
 	public static String mutex;
 	public static boolean headless = false;
 	public static String debugHost;
