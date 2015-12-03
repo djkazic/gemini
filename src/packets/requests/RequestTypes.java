@@ -7,5 +7,7 @@ public class RequestTypes {
 	public static final String PEERLIST = "REQ_PEERLIST";
 	public static final String SEARCH   = "REQ_SEARCH";
 	public static final String BLOCK    = "REQ_BLOCK";
+	public static final String CACHE    = "REQ_CACHE";
+	public static final String EXTVIS   = "REQ_EXTVIS";
 	
 }

@@ -24,6 +24,7 @@ public class Peer {
 	private CountDownLatch pubkeyDone;
 	private CountDownLatch cryptoDone;
 	private Connection connection;
+	private boolean extVisible;
 	private PublicKey pubkey;
 	private AES aes;
 	private String mutex;
@@ -75,6 +76,8 @@ public class Peer {
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist");
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
+						Utilities.log(this, "Requesting extVisible data");
+						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
 					} else {
 						//When we've received both a pubkey and sent our peerlist out,
 						//Start sending requests to this (out)peer
@@ -86,12 +89,30 @@ public class Peer {
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist");
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
+						Utilities.log(this, "Requesting extVisible data");
+						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 		})).start();
+		
+		//If we are a cacher, also send cache requests every minute
+		if(Core.config.cacheEnabled) {
+			(new Thread(new Runnable() {
+				public void run() {
+					try {
+						while(connection.isConnected()) {
+							connection.sendTCP(new Request(RequestTypes.CACHE, null));
+							Thread.sleep(60000);
+						}
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			})).start();
+		}
 	}
 	
 	/**
@@ -150,6 +171,22 @@ public class Peer {
 		return aes;
 	}
 
+	/**
+	 * Returns external visibility of this peer
+	 * @return boolean external visibility of this peer
+	 */
+	public boolean getExtVis() {
+		return extVisible;
+	}
+	
+	/**
+	 * Sets this peer's external visibility
+	 * @param in value provided
+	 */
+	public void setExtVis(boolean in) {
+		extVisible = in;
+	}
+	
 	/**
 	 * Returns this peer's deferredLatch CountDown object
 	 * @return CountDown deferredLatch object of this peer

@@ -124,6 +124,20 @@ public class DualListener extends Listener {
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
+				case RequestTypes.EXTVIS:
+					Utilities.log(this, "Received request for external visibility");
+					(new Thread(new Runnable() {
+						public void run() {
+							connection.sendTCP(new Data(DataTypes.EXTVIS, Core.config.cacheEnabled));
+							Utilities.log(this, "\tSent external visibility data back");
+						}
+					})).start();
+					break;
+					
+				case RequestTypes.CACHE:
+					Utilities.log(this, "Received request for cache feed");
+					break;
+					
 			}
 		} else if(object instanceof Data) {
 			final Data data = (Data) object;
@@ -240,6 +254,30 @@ public class DualListener extends Listener {
 							streamedBlock.insertSelf(foundPeer.getAES());
 						}
 					})).start();
+					break;
+					
+				case DataTypes.EXTVIS:
+					Utilities.log(this, "Received external visibility data");
+					(new Thread(new Runnable() {
+						public void run() {
+							boolean vis = (boolean) data.getPayload();
+							foundPeer.setExtVis(vis);
+						}
+					})).start();
+					break;
+					
+				case DataTypes.CACHE:
+					Utilities.log(this, "Received cache data");
+					if(!Core.config.cacheEnabled) {
+						Utilities.log(this, "Garbage cache data, discarded");
+						break;
+					} else {
+						(new Thread(new Runnable() {
+							public void run() {
+								//TODO: implement cache
+							}
+						})).start();
+					}
 					break;
 			}
 		}
