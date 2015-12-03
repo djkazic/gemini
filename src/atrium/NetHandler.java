@@ -43,7 +43,7 @@ public class NetHandler {
 
 	public NetHandler() {
 		externalIp = getExtIp();
-		extVisible = checkExtVisibility();
+		checkExtVisibility();
 		Core.peers = new ArrayList<Peer> ();
 		registerServerListeners();
 		Client initialClient = getClient();
@@ -77,7 +77,7 @@ public class NetHandler {
 		return null;
 	}
 
-	private boolean checkExtVisibility() {
+	private void checkExtVisibility() {
 		if(externalIp != null) {
 			try {
 				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Core.config.tcpPort);
@@ -97,48 +97,52 @@ public class NetHandler {
 				conn.disconnect();
 				String finalStr = sb.toString();
 				if(finalStr != null) {
-					Utilities.log(this, "Externally visible: " + finalStr);
-					
-					if(!Core.headless && !Core.config.notifiedPortForwarding) {
-						Core.config.notifiedPortForwarding = true;
-						Core.config.writeConfig();
-						JLabel label = new JLabel();
-						Font font = label.getFont();
-						
-						StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
-						style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
-						style.append("font-size:" + font.getSize() + "pt;");
-						JEditorPane ep = new JEditorPane(
-								"text/html", 
-								"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
-								+ " TCP on your network. <br>"
-								+ "Not port forwarding leeches on the network. <br>"
-								+ "Here are some resources for doing so: <br>  <br>"
-								+ "<a href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
-								+ "How to Port Forward</a>"
-						);
-						ep.addHyperlinkListener(new HyperlinkListener() {
-							@Override
-							public void hyperlinkUpdate(HyperlinkEvent he) {
-								if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-									try {
-										Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
-									} catch(Exception ex) {
-										ex.printStackTrace();
+					Boolean works = Boolean.parseBoolean(finalStr);
+					extVisible = Core.config.cacheEnabled = works;
+					if(!Core.headless) {
+						if(!extVisible && !Core.config.notifiedPortForwarding) {
+							Utilities.log(this, "Not externally visible, caching disabled");
+							Core.config.notifiedPortForwarding = true;
+							Core.config.writeConfig();
+							JLabel label = new JLabel();
+							Font font = label.getFont();
+
+							StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+							style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
+							style.append("font-size:" + font.getSize() + "pt;");
+							JEditorPane ep = new JEditorPane(
+									"text/html", 
+									"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
+									+ " TCP on your network. <br>"
+									+ "Not port forwarding leeches on the network. <br>"
+									+ "Here are some resources for doing so: <br>  <br>"
+									+ "<a href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
+									+ "How to Port Forward</a>"
+									);
+							ep.addHyperlinkListener(new HyperlinkListener() {
+								@Override
+								public void hyperlinkUpdate(HyperlinkEvent he) {
+									if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+										try {
+											Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
+										} catch(Exception ex) {
+											ex.printStackTrace();
+										}
 									}
 								}
-							}
-						});
-						ep.setEditable(false);
-						JOptionPane.showMessageDialog(null, ep);
+							});
+							ep.setEditable(false);
+							JOptionPane.showMessageDialog(null, ep);
+						} else {
+							Utilities.log(this, "Externally visible, caching enabled");
+						}
 					}
-					return Boolean.parseBoolean(finalStr);
 				}
 			} catch(Exception ex) {
 				ex.printStackTrace();
 			}
 		}
-		return false;
+		extVisible = false;
 	}
 
 	public void registerServerListeners() {

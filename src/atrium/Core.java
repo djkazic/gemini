@@ -86,6 +86,14 @@ public class Core {
 			ex.printStackTrace();
 		}
 		
+		//ShutdownHook for config
+		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {
+			public void run() {
+				Utilities.log(this, "Writing config before shutting down");
+				config.writeConfig();
+			}
+		})));
+		
 		//FileWatcher initialization
 		(new Thread(new FileWatcher())).start();
 		
