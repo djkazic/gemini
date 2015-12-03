@@ -26,11 +26,16 @@ public class Core {
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<String, ArrayList<String>> index;
 	
+	public static boolean headless = false;
 	public static int blockSize = 240000;
 	public static String mutex;
-	public static boolean headless = false;
-	public static String debugHost;
 	
+	/**
+	 * Entry point of application
+	 * @param args command-line arguments
+	 * @throws NoSuchAlgorithmException
+	 * @throws UnsupportedEncodingException
+	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		if(args.length > 0 && args[0].equals("-daemon")) {
 			headless = true;
