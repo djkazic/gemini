@@ -1,5 +1,7 @@
 package atrium;
 
+import java.awt.Desktop;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,14 +9,19 @@ import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
-
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import listeners.BlockListener;
@@ -91,6 +98,38 @@ public class NetHandler {
 				String finalStr = sb.toString();
 				if(finalStr != null) {
 					Utilities.log(this, "Externally visible: " + finalStr);
+					
+					if(!Core.headless) {
+						JLabel label = new JLabel();
+						Font font = label.getFont();
+						
+						StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+						style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
+						style.append("font-size:" + font.getSize() + "pt;");
+						JEditorPane ep = new JEditorPane(
+								"text/html", 
+								"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.tcp
+								+ " TCP on your network. <br>"
+								+ "Not port forwarding leeches on the network. <br>"
+								+ "Here are some resources for doing so: <br>  <br>"
+								+ "<a href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
+								+ "How to Port Forward</a>"
+						);
+						ep.addHyperlinkListener(new HyperlinkListener() {
+							@Override
+							public void hyperlinkUpdate(HyperlinkEvent he) {
+								if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+									try {
+										Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
+									} catch(Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+							}
+						});
+						ep.setEditable(false);
+						JOptionPane.showMessageDialog(null, ep);
+					}
 					return Boolean.parseBoolean(finalStr);
 				}
 			} catch(Exception ex) {

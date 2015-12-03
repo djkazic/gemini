@@ -167,9 +167,9 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Search", null, searchPanel, null);
 		GridBagLayout gbl_searchPanel = new GridBagLayout();
 		gbl_searchPanel.columnWidths = new int[]{89, 389, 59, 25, 0};
-		gbl_searchPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 25, 0};
+		gbl_searchPanel.rowHeights = new int[]{0, 5, 0, 0, 0, 0, 25, 0};
 		gbl_searchPanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_searchPanel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_searchPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		searchPanel.setLayout(gbl_searchPanel);
 		
 		searchInput = new JTextField();
@@ -259,7 +259,7 @@ public class MainWindow extends JFrame {
 		gbc_lblSearchResults.anchor = GridBagConstraints.WEST;
 		gbc_lblSearchResults.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSearchResults.gridx = 0;
-		gbc_lblSearchResults.gridy = 1;
+		gbc_lblSearchResults.gridy = 2;
 		searchPanel.add(lblSearchResults, gbc_lblSearchResults);
 		
 		searchResScrollPane = new JScrollPane();
@@ -268,7 +268,7 @@ public class MainWindow extends JFrame {
 		gbc_searchResScrollPane.gridwidth = 4;
 		gbc_searchResScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_searchResScrollPane.gridx = 0;
-		gbc_searchResScrollPane.gridy = 2;
+		gbc_searchResScrollPane.gridy = 3;
 		searchPanel.add(searchResScrollPane, gbc_searchResScrollPane);
 		
 		searchRes = new JTable(searchModel);
@@ -284,7 +284,7 @@ public class MainWindow extends JFrame {
 		gbc_lblDownloads.anchor = GridBagConstraints.WEST;
 		gbc_lblDownloads.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDownloads.gridx = 0;
-		gbc_lblDownloads.gridy = 3;
+		gbc_lblDownloads.gridy = 4;
 		searchPanel.add(lblDownloads, gbc_lblDownloads);
 		
 		downloadScrollPane = new JScrollPane();
@@ -293,7 +293,7 @@ public class MainWindow extends JFrame {
 		gbc_downloadScrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_downloadScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_downloadScrollPane.gridx = 0;
-		gbc_downloadScrollPane.gridy = 4;
+		gbc_downloadScrollPane.gridy = 5;
 		searchPanel.add(downloadScrollPane, gbc_downloadScrollPane);
 		
 		downloadList = new JTable(downloadModel);
@@ -306,7 +306,7 @@ public class MainWindow extends JFrame {
 		lblPeers = new JLabel("");
 		GridBagConstraints gbc_lblPeers = new GridBagConstraints();
 		gbc_lblPeers.gridx = 3;
-		gbc_lblPeers.gridy = 5;
+		gbc_lblPeers.gridy = 6;
 		lblPeers.setToolTipText("[0|0]");
 		lblPeers.setOpaque(false);
 		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
