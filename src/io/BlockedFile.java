@@ -289,7 +289,7 @@ public class BlockedFile {
 	}
 	
 	/**
-	 * Converts this BlockedFile to KryoBlockedFile for network transmission
+	 * Converts this BlockedFile to SerialBlockedFile for network transmission
 	 * @return StreamedBlockedFile conversion
 	 */
 	public StreamedBlockedFile toStreamedBlockedFile() {
