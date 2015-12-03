@@ -8,7 +8,7 @@ import java.util.Date;
 import atrium.Core;
 import atrium.Utilities;
 import io.serialize.BlockdexSerializer;
-import io.serialize.KryoBlockedFile;
+import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
 
 public class BlockedFile {
@@ -301,11 +301,11 @@ public class BlockedFile {
 	}
 
 	/**
-	 * Converts this BlockedFile to KryoBlockedFile for serialization
-	 * @return KryoBlockedFile conversion
+	 * Converts this BlockedFile to SerialBlockedFile for serialization
+	 * @return SerialBlockedFile conversion
 	 */
-	public KryoBlockedFile toKryoBlockedFile() {
-		return new KryoBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
+	public SerialBlockedFile toSerialBlockedFile() {
+		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
 								   complete, progress, blockRate, lastChecked);
 	}
 	

@@ -20,7 +20,7 @@ import com.esotericsoftware.kryo.io.Input;
 import atrium.Core;
 import atrium.Utilities;
 import io.serialize.BlockdexSerializer;
-import io.serialize.KryoBlockedFile;
+import io.serialize.SerialBlockedFile;
 
 public class FileUtils {
 
@@ -165,7 +165,7 @@ public class FileUtils {
 					ArrayList<?> uKbf = kryo.readObject(input, ArrayList.class);
 					Utilities.log("atrium.FileUtils", "Read " + uKbf.size() + " entries from cache");
 					for(int i=0; i < uKbf.size(); i++) {
-						((KryoBlockedFile) uKbf.get(i)).toBlockedFile();
+						((SerialBlockedFile) uKbf.get(i)).toBlockedFile();
 					}
 				} catch(Exception ex) {
 					ex.printStackTrace();

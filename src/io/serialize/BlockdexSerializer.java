@@ -28,9 +28,9 @@ public class BlockdexSerializer {
 				Kryo kryo = new Kryo();
 				FileOutputStream fos = new FileOutputStream(protoBlockDexCache);
 				Output out = new Output(fos);
-				ArrayList<KryoBlockedFile> kbf = new ArrayList<KryoBlockedFile> ();
+				ArrayList<SerialBlockedFile> kbf = new ArrayList<SerialBlockedFile> ();
 				for(int i=0; i < Core.blockDex.size(); i++) {
-					kbf.add(Core.blockDex.get(i).toKryoBlockedFile());
+					kbf.add(Core.blockDex.get(i).toSerialBlockedFile());
 				}
 				kryo.writeObject(out, kbf);
 				out.close();

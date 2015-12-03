@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import io.BlockedFile;
 
-public class KryoBlockedFile {
+public class SerialBlockedFile {
 	
 	private String pointerPath;
 	private String checksum;
@@ -16,7 +16,7 @@ public class KryoBlockedFile {
 	private float blockRate;
 	private long lastChecked;
 	
-	public KryoBlockedFile() {
+	public SerialBlockedFile() {
 		pointerPath = "";
 		checksum = "";
 		blockList = null;
@@ -27,7 +27,7 @@ public class KryoBlockedFile {
 		lastChecked = 0;
 	}
 	
-	public KryoBlockedFile(String absolutePath, String checksum, ArrayList<String> blockList,
+	public SerialBlockedFile(String absolutePath, String checksum, ArrayList<String> blockList,
 			               ArrayList<String> blacklist, boolean complete, String progress, 
 			               float blockRate, long lastChecked) {
 		this.pointerPath = absolutePath;
