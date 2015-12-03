@@ -27,30 +27,42 @@ public class Peer {
 	private PublicKey pubkey;
 	private AES aes;
 	private String mutex;
-	private int inOut;  //= 1 for incoming
+	private int inOut;
 
+	/**
+	 * Peer constructor for a Connection and inOut flag
+	 * @param connection the connection this peer is identified for
+	 * @param inOut the status of incoming/outgoing; 0 = out, 1 = in
+	 */
 	public Peer(Connection connection, int inOut) {
 		//Add ourselves to peers without data
 		Core.peers.add(this);
 		if(!Core.headless) {
 			Core.mainWindow.updatePeerCount();
 		}
-				
+		
+		//Set CountDownLatches
 		deferredRequesting = new CountDownLatch(1);
 		pubkeyDone = new CountDownLatch(1);
 		cryptoDone = new CountDownLatch(1);
+		
+		//Store instance vars
 		this.connection = connection;
 		this.inOut = inOut;
 
+		//Begin to bootstrap data from this peer
 		bootstrapRequests();
 	}
 	
+	/**
+	 * New thread to begin requesting data from this peer
+	 */
 	private void bootstrapRequests() {
 		(new Thread(new Runnable() {
 			public void run() {
 				try {
 					if(inOut == 1) {
-						//Pro-active request approach as a psuedo-server
+						//Pro-active request approach to this (in)peer
 						Utilities.log(this, "Sending our pubkey first");
 						connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
 						Utilities.log(this, "Requesting peer's pubkey");
@@ -64,8 +76,8 @@ public class Peer {
 						Utilities.log(this, "Requesting peer's peerlist");
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
 					} else {
-						//When we send back a peerList, it's time to start sending requests
-						//Keeping pubkeyDone as a sequential check
+						//When we've received both a pubkey and sent our peerlist out,
+						//Start sending requests to this (out)peer
 						pubkeyDone.await();
 						deferredRequesting.await();
 						Utilities.log(this, "Requesting peer's mutex");
@@ -82,6 +94,9 @@ public class Peer {
 		})).start();
 	}
 	
+	/**
+	 * Log a disconnect for this peer, with some debug data
+	 */
 	public void disconnect() {
 		if(mutex != null) {
 			Utilities.log(this, "Peer " + mutex + " disconnected");
@@ -95,38 +110,75 @@ public class Peer {
 		connection.close();
 	}
 
+	/**
+	 * Returns this peer's connection object
+	 * @return this peer's connection object
+	 */
 	public Connection getConnection() {
 		return connection;
 	}
 
+	/**
+	 * Returns this peer's public key as a PublicKey
+	 * @return PublicKey object for this peer
+	 */
 	public PublicKey getPubkey() {
 		return pubkey;
 	}
 
+	/**
+	 * Returns this peer's mutex as a String
+	 * @return string mutex of this peer
+	 */
 	public String getMutex() {
 		return mutex;
 	}
 
+	/**
+	 * Returns whether this peer is incoming or outgoing
+	 * @return integer inOut instance variable
+	 */
 	public int getInOut() {
 		return inOut;
 	}
 	
+	/**
+	 * Returns this peer's cryptographic AES object
+	 * @return AES object of this peer
+	 */
 	public AES getAES() {
 		return aes;
 	}
 
+	/**
+	 * Returns this peer's deferredLatch CountDown object
+	 * @return CountDown deferredLatch object of this peer
+	 */
 	public CountDownLatch getDeferredLatch() {
 		return deferredRequesting;
 	}
 	
+	/**
+	 * Returns this peer's pubkeyLatch CountDown object
+	 * @return CountDown pubkeyLatch object of this peer
+	 */
 	public CountDownLatch getPubkeyLatch() {
 		return pubkeyDone;
 	}
 	
+	/**
+	 * Returns this peer's cryptoLatch CountDown object
+	 * @return CountDown cryptoLatch object of this peer
+	 */
 	public CountDownLatch getCryptoLatch() {
 		return cryptoDone;
 	}
 
+	/**
+	 * Sets this peer's pubkey object
+	 * @param pubkey value provided
+	 * @return success value
+	 */
 	public boolean setPubkey(String pubkey) {
 		try {
 			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(DatatypeConverter.parseBase64Binary(pubkey));
@@ -140,19 +192,19 @@ public class Peer {
 		return false;
 	}
 
+	/**
+	 * Sets this peer's mutex
+	 * @param mutex value provided
+	 */
 	public void setMutex(String mutex) {
 		this.mutex = mutex;
 	}
 
-	public static Peer findPeer(Connection connection) {
-		for(Peer peer : Core.peers) {
-			if(peer.getConnection().equals(connection)) {
-				return peer;
-			}
-		}
-		return null;
-	}
-	
+	/**
+	 * Checks if a peer's mutex should warrant a disconnect
+	 * @param mutexData peer mutex
+	 * @return success value
+	 */
 	public boolean mutexCheck(String mutexData) {
 		if(mutexData.equals(Core.mutex)) {
 			disconnect();
@@ -173,5 +225,19 @@ public class Peer {
 				return false;
 			}	
 		}
+	}
+	
+	/**
+	 * Returns a peer, if there is one, that has this connection
+	 * @param connection value provided
+	 * @return peer value
+	 */
+	public static Peer findPeer(Connection connection) {
+		for(Peer peer : Core.peers) {
+			if(peer.getConnection().equals(connection)) {
+				return peer;
+			}
+		}
+		return null;
 	}
 }
