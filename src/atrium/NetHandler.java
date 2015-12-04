@@ -56,7 +56,7 @@ public class NetHandler {
 
 	private String getExtIp() {
 		try {
-			URL apiUrl = new URL("http://ip.appspot.com");
+			URL apiUrl = new URL("http://checkip.amazonaws.com");
 			HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
 
 			if (conn.getResponseCode() != 200) {
@@ -216,10 +216,10 @@ public class NetHandler {
 			discoverClient.join();
 
 			//TODO: remove this debug section
-			foundHosts.clear();
+			//foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			foundHosts.add(InetAddress.getByName("136.167.252.240"));
+			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();

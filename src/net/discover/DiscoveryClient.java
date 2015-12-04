@@ -53,7 +53,7 @@ public class DiscoveryClient implements Runnable {
 
 				String message = new String(receivePacket.getData()).trim();
 				if(message.equals("DISC_RAD_RESP") && 
-				   !NetHandler.foundHosts.contains(receivePacket.getAddress().getHostAddress()) &&
+				   !NetHandler.foundHosts.contains(InetAddress.getByName(receivePacket.getAddress().getHostAddress())) &&
 					!receivePacket.getAddress().getHostAddress().equals("127.0.0.1")) {
 					try {
 						String potentialPeer = receivePacket.getAddress().getHostAddress();
@@ -64,7 +64,7 @@ public class DiscoveryClient implements Runnable {
 					}
 				}
 				searchSocket.close();
-				Thread.sleep(50);
+				Thread.sleep(100);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
