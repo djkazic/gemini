@@ -48,8 +48,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import java.awt.Color;
 
 public class MainWindow extends JFrame {
 
