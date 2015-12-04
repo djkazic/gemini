@@ -159,13 +159,13 @@ public class NetHandler {
 			server.addListener(new BlockListener());
 
 			Utilities.switchGui(this, "Starting server component");
-			server.bind(Core.config.tcpPort, Core.config.udpPort);
+			server.bind(Core.config.tcpPort);
 			server.start();
 
 		} catch (Exception ex) {}
 	}
 
-	private Client getClient() {
+	public Client getClient() {
 		Client client = new Client(512000 * 4, 512000 * 4);
 		registerClientListeners(client);
 		return client;
@@ -204,16 +204,18 @@ public class NetHandler {
 
 	private void peerDiscovery(Client client) {
 		try {
-			Utilities.switchGui(this, "Finding peers...");
+			Utilities.switchGui(this, "Locating peers...");
 			Utilities.log(this, "Discovering hosts");
 
-			List<InetAddress> foundHosts = client.discoverHosts(Core.config.udpPort, 4000);
+			
+			List<InetAddress> foundHosts = new ArrayList<InetAddress> ();
+			//TODO: implement homebrew discovery
 
 			//TODO: remove this debug section
 			foundHosts.clear();
 			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
-			foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
+			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
