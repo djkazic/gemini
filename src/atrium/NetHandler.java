@@ -26,6 +26,8 @@ import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import listeners.BlockListener;
 import listeners.DualListener;
+import net.discover.DiscoveryClient;
+import net.discover.DiscoveryServer;
 import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
@@ -38,6 +40,7 @@ public class NetHandler {
 
 	public static String externalIp;
 	public static boolean extVisible;
+	public static List<InetAddress> foundHosts;
 
 	private Server server;
 
@@ -205,11 +208,12 @@ public class NetHandler {
 	private void peerDiscovery(Client client) {
 		try {
 			Utilities.switchGui(this, "Locating peers...");
-			Utilities.log(this, "Discovering hosts");
 
-			
-			List<InetAddress> foundHosts = new ArrayList<InetAddress> ();
-			//TODO: implement homebrew discovery
+			foundHosts = new ArrayList<InetAddress> ();
+			(new Thread(new DiscoveryServer())).start();
+			Thread discoverClient = new Thread(new DiscoveryClient());
+			discoverClient.start();
+			discoverClient.join();
 
 			//TODO: remove this debug section
 			foundHosts.clear();

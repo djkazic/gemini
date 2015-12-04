@@ -10,7 +10,7 @@ import io.FileUtils;
 public class Config {
 
 	public int tcpPort = 35500;
-	public int udpPort = 35501;
+	public int discoverPort = 35501;
 	public boolean cacheEnabled = false;
 	public boolean notifiedPortForwarding = false;
 	
