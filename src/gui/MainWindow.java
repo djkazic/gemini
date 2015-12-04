@@ -10,6 +10,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 import atrium.Core;
 import atrium.NetHandler;
 import atrium.Peer;
@@ -20,7 +21,6 @@ import gui.render.TableModelSpec;
 import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
-import java.awt.GridLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -48,6 +48,8 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import java.awt.Color;
 
 public class MainWindow extends JFrame {
 
@@ -75,7 +77,8 @@ public class MainWindow extends JFrame {
 	private JLabel lblSearchResults;
 	private JPanel libPanel;
 	private JButton btnSearch;
-	private JLabel label;
+	private JLabel spacerLabel;
+	private JLabel spacerLabel_1;
 	
 	/**
 	 * Launch the application.
@@ -100,7 +103,7 @@ public class MainWindow extends JFrame {
 		
 		Utilities.log("atrium.Core", "Setting graphical preferences");
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
@@ -136,8 +139,6 @@ public class MainWindow extends JFrame {
 
 		resLatch = new CountDownLatch(1);
 		
-		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
-		
 		try {
 			//ImageIcon imageIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/res/imgres/glasses.png")));
 			//mntmAbout.setIcon(imageIcon);
@@ -150,9 +151,20 @@ public class MainWindow extends JFrame {
 		downloadPopupMenu = new JPopupMenu();
 		downloadPopupMenuRemoveFromList = new JMenuItem("Remove from list");
 		downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
+		GridBagLayout gbl_contentPane = new GridBagLayout();
+		gbl_contentPane.columnWidths = new int[]{299, 0};
+		gbl_contentPane.rowHeights = new int[]{460, 26, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		contentPane.setLayout(gbl_contentPane);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		contentPane.add(tabbedPane);
+		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
+		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
+		gbc_tabbedPane.insets = new Insets(0, 0, 5, 0);
+		gbc_tabbedPane.gridx = 0;
+		gbc_tabbedPane.gridy = 0;
+		contentPane.add(tabbedPane, gbc_tabbedPane);
 		
 		tabbedPane.addChangeListener(new ChangeListener() {
 	        public void stateChanged(ChangeEvent e) {
@@ -163,13 +175,13 @@ public class MainWindow extends JFrame {
 	    });
 		
 		searchPanel = new JPanel();
-		searchPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
+		searchPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		tabbedPane.addTab("Search", null, searchPanel, null);
 		GridBagLayout gbl_searchPanel = new GridBagLayout();
 		gbl_searchPanel.columnWidths = new int[]{89, 389, 59, 25, 0};
-		gbl_searchPanel.rowHeights = new int[]{0, 5, 0, 0, 0, 0, 25, 0};
+		gbl_searchPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_searchPanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_searchPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_searchPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		searchPanel.setLayout(gbl_searchPanel);
 		
 		searchInput = new JTextField();
@@ -254,6 +266,13 @@ public class MainWindow extends JFrame {
 		});
 		searchPanel.add(btnSearch, gbc_btnSearch);
 		
+		spacerLabel = new JLabel("");
+		GridBagConstraints gbc_spacerLabel = new GridBagConstraints();
+		gbc_spacerLabel.insets = new Insets(5, 0, 5, 5);
+		gbc_spacerLabel.gridx = 1;
+		gbc_spacerLabel.gridy = 1;
+		searchPanel.add(spacerLabel, gbc_spacerLabel);
+		
 		lblSearchResults = new JLabel("Search Results");
 		GridBagConstraints gbc_lblSearchResults = new GridBagConstraints();
 		gbc_lblSearchResults.anchor = GridBagConstraints.WEST;
@@ -279,21 +298,27 @@ public class MainWindow extends JFrame {
 		searchRes.setColumnSelectionAllowed(true);
 		searchResScrollPane.setViewportView(searchRes);
 		
+		spacerLabel_1 = new JLabel("");
+		GridBagConstraints gbc_spacerLabel_1 = new GridBagConstraints();
+		gbc_spacerLabel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_spacerLabel_1.gridx = 1;
+		gbc_spacerLabel_1.gridy = 4;
+		searchPanel.add(spacerLabel_1, gbc_spacerLabel_1);
+		
 		lblDownloads = new JLabel("Downloads");
 		GridBagConstraints gbc_lblDownloads = new GridBagConstraints();
 		gbc_lblDownloads.anchor = GridBagConstraints.WEST;
 		gbc_lblDownloads.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDownloads.gridx = 0;
-		gbc_lblDownloads.gridy = 4;
+		gbc_lblDownloads.gridy = 5;
 		searchPanel.add(lblDownloads, gbc_lblDownloads);
 		
 		downloadScrollPane = new JScrollPane();
 		GridBagConstraints gbc_downloadScrollPane = new GridBagConstraints();
 		gbc_downloadScrollPane.gridwidth = 4;
-		gbc_downloadScrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_downloadScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_downloadScrollPane.gridx = 0;
-		gbc_downloadScrollPane.gridy = 5;
+		gbc_downloadScrollPane.gridy = 6;
 		searchPanel.add(downloadScrollPane, gbc_downloadScrollPane);
 		
 		downloadList = new JTable(downloadModel);
@@ -302,15 +327,6 @@ public class MainWindow extends JFrame {
 		downloadList.getTableHeader().setReorderingAllowed(false);
 		downloadList.getTableHeader().setResizingAllowed(false);
 		downloadScrollPane.setViewportView(downloadList);
-		
-		lblPeers = new JLabel("");
-		GridBagConstraints gbc_lblPeers = new GridBagConstraints();
-		gbc_lblPeers.gridx = 3;
-		gbc_lblPeers.gridy = 6;
-		lblPeers.setToolTipText("[0|0]");
-		lblPeers.setOpaque(false);
-		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
-		searchPanel.add(lblPeers, gbc_lblPeers);
 		
 		libPanel = new JPanel();
 		libPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -325,6 +341,7 @@ public class MainWindow extends JFrame {
 		
 		libraryScrollPane = new JScrollPane();
 		GridBagConstraints gbc_libraryScrollPane = new GridBagConstraints();
+		gbc_libraryScrollPane.gridwidth = 2;
 		gbc_libraryScrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_libraryScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_libraryScrollPane.gridx = 0;
@@ -337,11 +354,16 @@ public class MainWindow extends JFrame {
 		libraryTable.getTableHeader().setResizingAllowed(false);
 		libraryScrollPane.setViewportView(libraryTable);
 		
-		label = new JLabel("New label");
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.gridx = 1;
-		gbc_label.gridy = 1;
-		libPanel.add(label, gbc_label);
+		lblPeers = new JLabel("");
+		lblPeers.setHorizontalAlignment(SwingConstants.RIGHT);
+		GridBagConstraints gbc_lblPeers = new GridBagConstraints();
+		gbc_lblPeers.anchor = GridBagConstraints.NORTHEAST;
+		gbc_lblPeers.gridx = 0;
+		gbc_lblPeers.gridy = 1;
+		contentPane.add(lblPeers, gbc_lblPeers);
+		lblPeers.setToolTipText("[0|0]");
+		lblPeers.setOpaque(false);
+		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
 		
 		registerListeners();
 	}
