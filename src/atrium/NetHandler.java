@@ -154,12 +154,14 @@ public class NetHandler {
 
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000 * 4, 512000 * 4);
+			server = new Server(512000 * 6, 512000 * 6);
 			registerClasses(server.getKryo());
 
+			Utilities.log(this, "Registering block listener");
+			server.addListener(new BlockListener());
+			
 			Utilities.switchGui(this, "Registering server listeners");
 			server.addListener(new DualListener(1));
-			server.addListener(new BlockListener());
 
 			Utilities.switchGui(this, "Starting server component");
 			server.bind(Core.config.tcpPort);
@@ -216,8 +218,8 @@ public class NetHandler {
 			discoverClient.join();
 
 			//TODO: remove this debug section
-			//foundHosts.clear();
-			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
+			foundHosts.clear();
+			foundHosts.add(InetAddress.getByName("136.167.192.28"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
@@ -239,11 +241,7 @@ public class NetHandler {
 				Enumeration<InetAddress> addresses =  networkInterface.getInetAddresses();
 				while(addresses.hasMoreElements()) {
 					InetAddress inetAddress = addresses.nextElement();
-					if(inetAddress.isLoopbackAddress()) {
-						while(foundHosts.contains(inetAddress)) {
-							foundHosts.remove(inetAddress);
-						}
-					}
+					foundHosts.remove(inetAddress);
 				}
 			}
 
