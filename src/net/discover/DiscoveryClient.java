@@ -15,7 +15,7 @@ public class DiscoveryClient implements Runnable {
 
 	public void run() {
 		long start = System.currentTimeMillis();
-		while(System.currentTimeMillis() < (start + 8000L)) {
+		while(System.currentTimeMillis() < (start + 4000L)) {
 			try {
 				searchSocket = new DatagramSocket();
 				searchSocket.setBroadcast(true);
