@@ -176,6 +176,25 @@ public class BlockedFile {
 	}
 	
 	/**
+	 * Returns a randomly selected needed block
+	 * @return randomly selected needed block
+	 */
+	public String nextBlockNeeded() {
+		ArrayList<String> qualified = new ArrayList<String> ();
+		for(int i=0; i < blockList.size(); i++) {
+			String thisBlock = blockList.get(i);
+			if(!blackList.contains(thisBlock)) {
+				qualified.add(thisBlock);
+			}
+		}
+		if(qualified.size() == 0) {
+			return null;
+		} else {
+			return qualified.get((int) (Math.random() * qualified.size()));
+		}
+	}
+	
+	/**
 	 * Logs a block downloaded into the blackList ArrayList
 	 * @param str block name
 	 */
