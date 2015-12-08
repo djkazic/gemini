@@ -49,7 +49,9 @@ public class BlockedFile {
 		}
 		this.complete = finished;
 		progress = "";
-		Core.blockDex.add(this);
+		if(!Core.blockDex.contains(this)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 	
@@ -64,7 +66,9 @@ public class BlockedFile {
 		blackList = new ArrayList<String> ();
 		complete = false;
 		progress = "";
-		Core.blockDex.add(this);
+		if(!Core.blockDex.contains(this)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 
@@ -89,7 +93,9 @@ public class BlockedFile {
 		this.progress = progress;
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
-		Core.blockDex.add(this);
+		if(!Core.blockDex.contains(this)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 

@@ -184,8 +184,8 @@ public class FileUtils {
 				physicalBfCount++;
 			}
 		}
-		if(Core.blockDex.size() < physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					      + " but detected " + physicalBfCount);
 			for(int i=0; i < list.length; i++) {
 				if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
@@ -193,8 +193,10 @@ public class FileUtils {
 				}
 			}
 			BlockdexSerializer.run();
-		} else if(Core.blockDex.size() > physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+		}
+		
+		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() > physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 		      			  + " but detected " + physicalBfCount);
 			for(int i=0; i < Core.blockDex.size(); i++) {
 				BlockedFile curBf = Core.blockDex.get(i);
@@ -212,8 +214,9 @@ public class FileUtils {
 			}
 			BlockdexSerializer.run();
 		}
-		Utilities.log("atrium.FileUtils", "Final validity check: cached " + Core.blockDex.size() 
-	                  + " and detected " + physicalBfCount);
+		String checkPassFail = (Core.blockDex.size() == physicalBfCount) ? "PASS" : "FAIL";
+		Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
+	                + " and detected " + physicalBfCount);
 	}
 	
 	public static boolean haveInBlockDex(File file) {
