@@ -48,10 +48,11 @@ public class FileWatcher implements Runnable {
 					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-					Utilities.log(this, "Deleted: " + we.context().toString());
+					Utilities.log(this, "Deletion detected : " + we.context().toString());
 					BlockedFile bf = FileUtils.getBlockedFile(we.context().toString());
 					if(bf != null) {
-						Core.blockDex.remove(bf);
+						Utilities.log(this, "Reset: " + bf.getPointer().getName());
+						bf.reset();
 						BlockdexSerializer.run();
 						if(!Core.headless) {
 							Core.mainWindow.updateLibrary();
