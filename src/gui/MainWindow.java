@@ -1,33 +1,8 @@
 package gui;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
-import atrium.Core;
-import atrium.NetHandler;
-import atrium.Peer;
-import atrium.Utilities;
-import gui.render.ProgressCellRenderer;
-import gui.render.TableModelDL;
-import gui.render.TableModelSpec;
-import io.BlockedFile;
-import io.Downloader;
-import io.FileUtils;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -42,12 +17,40 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+
+import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
+
+import atrium.Core;
+import atrium.NetHandler;
+import atrium.Peer;
+import atrium.Utilities;
+import gui.render.ProgressCellRenderer;
+import gui.render.TableModelDL;
+import gui.render.TableModelSpec;
+import io.BlockedFile;
+import io.Downloader;
+import io.FileUtils;
 
 public class MainWindow extends JFrame {
 

@@ -13,9 +13,12 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+
 import javax.swing.filechooser.FileSystemView;
+
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
+
 import atrium.Core;
 import atrium.Utilities;
 import io.serialize.BlockdexSerializer;

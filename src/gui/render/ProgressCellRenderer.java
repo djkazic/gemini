@@ -1,6 +1,7 @@
 package gui.render;
 
 import java.awt.Component;
+
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;

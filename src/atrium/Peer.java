@@ -4,8 +4,11 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.CountDownLatch;
+
 import javax.xml.bind.DatatypeConverter;
+
 import com.esotericsoftware.kryonet.Connection;
+
 import crypto.AES;
 import crypto.RSA;
 import packets.data.Data;
