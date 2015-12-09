@@ -9,13 +9,20 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * AES cryptography helper class
+ * AES cryptography helper class.
  * @author Kevin Cai
  */
 public class AES {
 	
 	private SecretKeySpec key;
 	
+	/**
+	 * Instantiates a new instance of the AES object
+	 *
+	 * @param mutex mutex value
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 */
 	public AES(String mutex) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		byte[] keyBytes = mutex.getBytes("ISO-8859-1");
 		MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -24,6 +31,12 @@ public class AES {
 		key = new SecretKeySpec(keyBytes, "AES");
 	}
 	
+	/**
+	 * Encrypts a string
+	 *
+	 * @param in value provided
+	 * @return encrypted string
+	 */
 	public String encrypt(String in) {
 		try {
 			return new String(encrypt(in.getBytes()), "ISO-8859-1");
@@ -33,6 +46,12 @@ public class AES {
 		return null;
 	}
 	
+	/**
+	 * Encrypt a byte array
+	 *
+	 * @param in value provided
+	 * @return encrypted byte[]
+	 */
 	public byte[] encrypt(byte[] in) {
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
@@ -44,6 +63,12 @@ public class AES {
 		return null;
 	}
 	
+	/**
+	 * Decrypts a string
+	 *
+	 * @param in value provided
+	 * @return decrypted string
+	 */
 	public String decrypt(String in) {
 		try {
 			return new String(decrypt(in.getBytes("ISO-8859-1")));
@@ -53,6 +78,12 @@ public class AES {
 		return null;
 	}
 	
+	/**
+	 * Decrypts a byte array
+	 *
+	 * @param in value provided
+	 * @return decrypted byte[]
+	 */
 	public byte[] decrypt(byte[] in) {
 		try {
 			Cipher decipher = Cipher.getInstance("AES");
@@ -64,6 +95,12 @@ public class AES {
 		return null;
 	}
 	
+	/**
+	 * Gets an instance of the AES cipher object
+	 *
+	 * @param enc toggle for encryption or decryption
+	 * @return cipher instance
+	 */
 	public Cipher getCipher(boolean enc) {
 		Cipher cipher = null;
 		try {
