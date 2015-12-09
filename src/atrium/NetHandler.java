@@ -115,7 +115,7 @@ public class NetHandler {
 				if(finalStr != null) {
 					Boolean works = Boolean.parseBoolean(finalStr);
 					extVisible = Core.config.cacheEnabled = works;
-					if(!Core.headless) {
+					if(!Core.config.hubMode) {
 						if(!extVisible && !Core.config.notifiedPortForwarding) {
 							(new Thread(new Runnable() {
 								public void run() {
@@ -303,7 +303,7 @@ public class NetHandler {
 			(new Thread(new Runnable() {
 				public void run() {
 					while(true) {
-						boolean runCondition = Core.headless;
+						boolean runCondition = Core.config.hubMode;
 						if(!runCondition) {
 							if(Core.peers.isEmpty()) {
 								try {

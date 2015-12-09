@@ -38,7 +38,7 @@ public class Peer {
 	public Peer(Connection connection, int inOut) {
 		//Add ourselves to peers without data
 		Core.peers.add(this);
-		if(!Core.headless) {
+		if(!Core.config.hubMode) {
 			Core.mainWindow.updatePeerCount();
 		}
 		
@@ -125,7 +125,7 @@ public class Peer {
 			Utilities.log(this, "Peer disconnected (mutex was null on disconnect");
 		}
 		Core.peers.remove(this);
-		if(!Core.headless) {
+		if(!Core.config.hubMode) {
 			Core.mainWindow.updatePeerCount();
 		}
 		connection.close();

@@ -13,6 +13,7 @@ public class Config {
 	public int discoverPort = 35501;
 	public boolean cacheEnabled = false;
 	public boolean notifiedPortForwarding = false;
+	public boolean hubMode = false;
 	
 	/**
 	 * Writes configuration to disk (config.dat)

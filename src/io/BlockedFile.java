@@ -220,7 +220,7 @@ public class BlockedFile {
 	 * @param time value provided
 	 */
 	private void updateTime(String time) {
-		if(!Core.headless) {
+		if(!Core.config.hubMode) {
 			Core.mainWindow.updateTime(pointer.getName(), time);
 		}
 	}
@@ -237,7 +237,7 @@ public class BlockedFile {
 			dProgress *= 100;
 			progress = Math.round(dProgress) + "%";
 		}
-		if(!Core.headless) {
+		if(!Core.config.hubMode) {
 			Core.mainWindow.updateProgress(pointer.getName(), progress);
 		}
 	}

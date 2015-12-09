@@ -61,7 +61,7 @@ public class FileWatcher implements Runnable {
 							}
 						}
 					})).start();
-					if(!Core.headless) {
+					if(!Core.config.hubMode) {
 						Core.mainWindow.updateLibrary();
 					}
 				}
@@ -72,7 +72,7 @@ public class FileWatcher implements Runnable {
 						Utilities.log(this, "Reset: " + bf.getPointer().getName());
 						bf.reset();
 						BlockdexSerializer.run();
-						if(!Core.headless) {
+						if(!Core.config.hubMode) {
 							Core.mainWindow.removeDownload(bf);
 							Core.mainWindow.updateLibrary();
 						}
