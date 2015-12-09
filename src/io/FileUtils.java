@@ -115,13 +115,15 @@ public class FileUtils {
 			return null;
 		}
 		File[] listOfFiles = directory.listFiles();
-		for(int i=0; i < listOfFiles.length; i++) {
-			try {
-				if(generateChecksum(listOfFiles[i]).equals(block)) {
-					return listOfFiles[i];
+		if(listOfFiles != null && listOfFiles.length > 0) {
+			for(int i=0; i < listOfFiles.length; i++) {
+				try {
+					if(generateChecksum(listOfFiles[i]).equals(block)) {
+						return listOfFiles[i];
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 		return null;
@@ -184,9 +186,11 @@ public class FileUtils {
 		File baseFolder = new File(getWorkspaceDir());
 		int physicalBfCount = 0;
 		File[] list = baseFolder.listFiles();
-		for(int i=0; i < list.length; i++) {
-			if(list[i].isFile() && !list[i].getName().startsWith(".")) {
-				physicalBfCount++;
+		if(list != null && list.length > 0) {
+			for(int i=0; i < list.length; i++) {
+				if(list[i].isFile() && !list[i].getName().startsWith(".")) {
+					physicalBfCount++;
+				}
 			}
 		}
 		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
@@ -279,7 +283,7 @@ public class FileUtils {
 					result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
 				}
 				blockList.add(result);
-			} while(numRead != -1);
+			} while(numRead > 0);
 			fis.close();
 			return blockList;
 		} catch (Exception ex) {
@@ -294,9 +298,11 @@ public class FileUtils {
 			File bfDir = new File(bf.getBlocksFolder());
 			if(bfDir.exists()) {
 				File[] files = bfDir.listFiles();
-				for(File file : files) {
-					if(FileUtils.generateChecksum(file).equals(file.getName())) {
-						output.add(file.getName());
+				if(files != null && files.length > 0) {
+					for(File file : files) {
+						if(FileUtils.generateChecksum(file).equals(file.getName())) {
+							output.add(file.getName());
+						}
 					}
 				}
 			}
@@ -312,10 +318,12 @@ public class FileUtils {
 		String outputPath = bf.getPath();
 		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputPath));
 		File[] blocks = new File(bf.getBlocksFolder()).listFiles();
-		if(blocks.length != numberParts) {
-			Utilities.log("atrium.FileUtils", "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")");
-			out.close();
-			return;
+		if(blocks != null && blocks.length > 0) {
+			if(blocks.length != numberParts) {
+				Utilities.log("atrium.FileUtils", "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")");
+				out.close();
+				return;
+			}
 		}
 		for(String block : bf.getBlockList()) {
 			File thisBlockFile = new File(bf.getBlocksFolder() + "/" + block);
@@ -334,8 +342,10 @@ public class FileUtils {
 		//Delete contents then the block directory
 		File blocksDir = new File(bf.getBlocksFolder());
 		File[] blocksDirBlocks = blocksDir.listFiles();
-		for(File file : blocksDirBlocks) {
-			file.delete();
+		if(blocksDirBlocks != null && blocksDirBlocks.length > 0) {
+			for(File file : blocksDirBlocks) {
+				file.delete();
+			}
 		}
 		blocksDir.delete();
 		if(blocksDir.exists()) {

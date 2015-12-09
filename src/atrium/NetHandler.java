@@ -52,9 +52,8 @@ public class NetHandler {
 	 * peer, server, client, and discovery data
 	 */
 	public NetHandler() {
-		externalIp = getExtIp();
+		getExtIp();
 		checkExtVisibility();
-		Core.peers = new ArrayList<Peer> ();
 		registerServerListeners();
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
@@ -65,7 +64,7 @@ public class NetHandler {
 	 * Returns external IP
 	 * @returns string external IP
 	 */
-	private String getExtIp() {
+	private void getExtIp() {
 		try {
 			URL apiUrl = new URL("http://checkip.amazonaws.com");
 			HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
@@ -84,11 +83,11 @@ public class NetHandler {
 			conn.disconnect();
 			String finalStr = sb.toString();
 			Utilities.log(this, "External IP is: " + finalStr);
-			return finalStr;
+			externalIp = finalStr;
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
-		return null;
+		externalIp = null;
 	}
 
 	/**
@@ -184,7 +183,10 @@ public class NetHandler {
 			server.bind(Core.config.tcpPort);
 			server.start();
 
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+			Utilities.log(this, "Exception in registering server listeners:");
+			ex.printStackTrace();
+		}
 	}
 
 	/**
@@ -301,7 +303,8 @@ public class NetHandler {
 			(new Thread(new Runnable() {
 				public void run() {
 					while(true) {
-						if(!Core.headless) {
+						boolean runCondition = Core.headless;
+						if(!runCondition) {
 							if(Core.peers.isEmpty()) {
 								try {
 									Thread.sleep(1000);

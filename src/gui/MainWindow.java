@@ -652,13 +652,14 @@ public class MainWindow extends JFrame {
 		if(size == 0) {
 			//0 peers
 			return "0bars";
-		} else if(size <= 2) {
+		} else if(size > 0 && size <= 2) {
 			//1 or 2 peers
 			return "1bars";
-		} else if(size <= 4) {
+		} else if(size > 2 && size <= 4) {
 			//3 or 4 peers
 			return "2bars";
 		} else if(size > 4) {
+			//5+ peers
 			return "3bars";
 		}
 		return null;

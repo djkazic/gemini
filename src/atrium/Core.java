@@ -102,6 +102,7 @@ public class Core {
 		blockDex = new ArrayList<BlockedFile> ();
 		FileUtils.genBlockIndex();
 		index = new HashMap<String, ArrayList<String>> ();
+		peers = new ArrayList<Peer> ();
 		
 		//Start NetHandling
 		netHandler = new NetHandler();

@@ -12,17 +12,6 @@ import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
 
 public class BlockedFile {
-	
-	/**
-	 * BlockedFile tester method
-	 * @param args test arguments
-	 */
-	public static void main(String[] args) {
-		Core.blockDex = new ArrayList<BlockedFile> ();
-		BlockedFile bf = new BlockedFile(new File("libGLESv2.dll"), true);
-		System.out.println(bf.getBlockList());
-		System.out.println(FileUtils.findBlockFromComplete(bf, 12));
-	}
 
 	private File pointer;
 	private String checksum;
