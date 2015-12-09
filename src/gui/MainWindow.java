@@ -567,6 +567,19 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
+	 * Removes specific BlockedFile from Downloads pane
+	 * @param bf
+	 */
+	public void removeDownload(BlockedFile bf) {
+		int numRows = downloadModel.getRowCount();
+		for(int i = 0; i < numRows; i++) {
+			if(downloadModel.getValueAt(i, 0).equals(bf.getPointer().getName())) {
+				downloadModel.removeRow(i);
+			}
+		}
+	}
+	
+	/**
 	 * Updates the contents of the library tab
 	 */
 	public void updateLibrary() {

@@ -15,7 +15,7 @@ public class Downloader implements Runnable {
 
 	public void run() {
 		try {
-			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlacklist(blockedFile));
+			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
 			//Counter for length of blocks until we reach a quadrant of (~32MB)
 			int quadrantMark = 0;

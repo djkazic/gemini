@@ -288,7 +288,7 @@ public class FileUtils {
 		return null;
 	}
 	
-	public static ArrayList<String> enumerateIncompleteBlacklist(BlockedFile bf) {
+	public static ArrayList<String> enumerateIncompleteBlackList(BlockedFile bf) {
 		try {
 			ArrayList<String> output = new ArrayList<String> ();
 			File bfDir = new File(bf.getBlocksFolder());

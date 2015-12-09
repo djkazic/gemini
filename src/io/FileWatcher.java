@@ -55,6 +55,7 @@ public class FileWatcher implements Runnable {
 						bf.reset();
 						BlockdexSerializer.run();
 						if(!Core.headless) {
+							Core.mainWindow.removeDownload(bf);
 							Core.mainWindow.updateLibrary();
 						}
 					}
