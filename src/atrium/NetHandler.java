@@ -38,12 +38,19 @@ import packets.requests.RequestTypes;
  */
 public class NetHandler {
 
-	public static String externalIp;
-	public static boolean extVisible;
-	public static List<InetAddress> foundHosts;
+	public static String externalIp;             //External IP, as reported by web API
+	public static boolean extVisible;            //External visibility
+	public static List<InetAddress> foundHosts;  //Hosts discovered by LAN
+	
+	//TODO: hook foundHosts with peerList processing
 
+	//Instance variable for internal server
 	private Server server;
 
+	/**
+	 * Creates instance of NetHandler, and retrieves external IP / visibility, 
+	 * peer, server, client, and discovery data
+	 */
 	public NetHandler() {
 		externalIp = getExtIp();
 		checkExtVisibility();
@@ -54,6 +61,10 @@ public class NetHandler {
 		peerDiscovery(initialClient);
 	}
 
+	/**
+	 * Returns external IP
+	 * @returns string external IP
+	 */
 	private String getExtIp() {
 		try {
 			URL apiUrl = new URL("http://checkip.amazonaws.com");
@@ -80,6 +91,9 @@ public class NetHandler {
 		return null;
 	}
 
+	/**
+	 * Checks external visibility, and sets instance variable to result
+	 */
 	private void checkExtVisibility() {
 		if(externalIp != null) {
 			try {
@@ -152,6 +166,9 @@ public class NetHandler {
 		extVisible = false;
 	}
 
+	/**
+	 * Registers listener classes to the server instance
+	 */
 	public void registerServerListeners() {
 		try {
 			server = new Server(512000 * 6, 512000 * 6);
@@ -170,12 +187,20 @@ public class NetHandler {
 		} catch (Exception ex) {}
 	}
 
+	/**
+	 * Returns a new instance of a Client for forging out-bound connections
+	 * @return new instance of a Client for forging out-bound connections
+	 */
 	public Client getClient() {
 		Client client = new Client(512000 * 4, 512000 * 4);
 		registerClientListeners(client);
 		return client;
 	}
 
+	/**
+	 * Registers listeners for a client instance
+	 * @param client Client instance specified
+	 */
 	public void registerClientListeners(Client client) {
 		try {
 			registerClasses(client.getKryo());
@@ -191,6 +216,10 @@ public class NetHandler {
 		}
 	}
 
+	/**
+	 * Registers classes for serialization
+	 * @param kryo Kryo serializer instance provided
+	 */
 	private void registerClasses(Kryo kryo) {
 		//Shared fields import
 		kryo.register(String[].class);
@@ -207,6 +236,10 @@ public class NetHandler {
 		kryo.register(StreamedBlock.class);
 	}
 
+	/**
+	 * Begins peer discovery routine
+	 * @param client Client instance provided
+	 */
 	private void peerDiscovery(Client client) {
 		try {
 			Utilities.switchGui(this, "Locating peers...");
@@ -288,12 +321,21 @@ public class NetHandler {
 		}
 	}
 
+	/**
+	 * Broadcasts a search request to connected peers
+	 * @param keyword Keyword string provided
+	 */
 	public static void doSearch(String keyword) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
 
+	/**
+	 * Broadcasts a search request for a block to connected peers
+	 * @param origin BlockedFile pointer name
+	 * @param block BlockedFile block name (auto-hashed)
+	 */
 	public static void requestBlock(String origin, String block) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
