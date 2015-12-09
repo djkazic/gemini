@@ -1,5 +1,6 @@
 package listeners;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -90,10 +91,11 @@ public class DualListener extends Listener {
 						public void run() {
 							ArrayList<String> refinedPeerList = new ArrayList<String> ();
 							for(Peer peer : Core.peers) {
-								//if(peer.externallyVisible())
-								String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
-												+ peer.getConnection().getRemoteAddressTCP().getPort();
-								refinedPeerList.add(Core.aes.encrypt(peerData));
+								if(peer.getExtVis()) {
+									String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
+													+ peer.getConnection().getRemoteAddressTCP().getPort();
+									refinedPeerList.add(Core.aes.encrypt(peerData));
+								}
 							}
 							connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
 							Utilities.log(this, "\tSent peerlist back");
@@ -186,7 +188,7 @@ public class DualListener extends Listener {
 				//TODO: symmetric encryption for peerlist and on
 					
 				case DataTypes.PEERLIST:
-					Utilities.log(this,  "Received peerlist data");
+					Utilities.log(this, "Received peerlist data");
 					//TODO: implement peerlist processing
 					(new Thread(new Runnable() {
 						public void run() {
@@ -202,7 +204,21 @@ public class DualListener extends Listener {
 										finishedList.add(decrypted);
 									}
 								}
-								Utilities.log(this, "\tPeerlist: " + finishedList);
+								if(finishedList.size() == 0) {
+									Utilities.log(this, "No viable peers were received from " + foundPeer.getMutex());
+								} else {
+									for(int i=0; i < finishedList.size(); i++) {
+										//Attempt to split the entry
+										try {
+											String[] split = finishedList.get(i).split(":");
+											String host = split[0];
+											int port = Integer.parseInt(split[1]);
+											Core.netHandler.getClient().connect(8000, InetAddress.getByName(host), port);
+										} catch (Exception ex) {
+											Utilities.log(this, "Peerlist data corrupted");
+										}
+									}
+								}
 							}
 						}
 					})).start();

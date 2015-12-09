@@ -26,6 +26,8 @@ import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import listeners.BlockListener;
 import listeners.DualListener;
+import net.discover.DiscoveryClient;
+import net.discover.DiscoveryServer;
 import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
@@ -36,11 +38,19 @@ import packets.requests.RequestTypes;
  */
 public class NetHandler {
 
-	public static String externalIp;
-	public static boolean extVisible;
+	public static String externalIp;             //External IP, as reported by web API
+	public static boolean extVisible;            //External visibility
+	public static List<InetAddress> foundHosts;  //Hosts discovered by LAN
+	
+	//TODO: hook foundHosts with peerList processing
 
+	//Instance variable for internal server
 	private Server server;
 
+	/**
+	 * Creates instance of NetHandler, and retrieves external IP / visibility, 
+	 * peer, server, client, and discovery data
+	 */
 	public NetHandler() {
 		externalIp = getExtIp();
 		checkExtVisibility();
@@ -51,9 +61,13 @@ public class NetHandler {
 		peerDiscovery(initialClient);
 	}
 
+	/**
+	 * Returns external IP
+	 * @returns string external IP
+	 */
 	private String getExtIp() {
 		try {
-			URL apiUrl = new URL("http://ip.appspot.com");
+			URL apiUrl = new URL("http://checkip.amazonaws.com");
 			HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
 
 			if (conn.getResponseCode() != 200) {
@@ -77,6 +91,9 @@ public class NetHandler {
 		return null;
 	}
 
+	/**
+	 * Checks external visibility, and sets instance variable to result
+	 */
 	private void checkExtVisibility() {
 		if(externalIp != null) {
 			try {
@@ -149,28 +166,41 @@ public class NetHandler {
 		extVisible = false;
 	}
 
+	/**
+	 * Registers listener classes to the server instance
+	 */
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000 * 4, 512000 * 4);
+			server = new Server(512000 * 6, 512000 * 6);
 			registerClasses(server.getKryo());
 
+			Utilities.log(this, "Registering block listener");
+			server.addListener(new BlockListener());
+			
 			Utilities.switchGui(this, "Registering server listeners");
 			server.addListener(new DualListener(1));
-			server.addListener(new BlockListener());
 
 			Utilities.switchGui(this, "Starting server component");
-			server.bind(Core.config.tcpPort, Core.config.udpPort);
+			server.bind(Core.config.tcpPort);
 			server.start();
 
 		} catch (Exception ex) {}
 	}
 
-	private Client getClient() {
+	/**
+	 * Returns a new instance of a Client for forging out-bound connections
+	 * @return new instance of a Client for forging out-bound connections
+	 */
+	public Client getClient() {
 		Client client = new Client(512000 * 4, 512000 * 4);
 		registerClientListeners(client);
 		return client;
 	}
 
+	/**
+	 * Registers listeners for a client instance
+	 * @param client Client instance specified
+	 */
 	public void registerClientListeners(Client client) {
 		try {
 			registerClasses(client.getKryo());
@@ -186,6 +216,10 @@ public class NetHandler {
 		}
 	}
 
+	/**
+	 * Registers classes for serialization
+	 * @param kryo Kryo serializer instance provided
+	 */
 	private void registerClasses(Kryo kryo) {
 		//Shared fields import
 		kryo.register(String[].class);
@@ -202,18 +236,25 @@ public class NetHandler {
 		kryo.register(StreamedBlock.class);
 	}
 
+	/**
+	 * Begins peer discovery routine
+	 * @param client Client instance provided
+	 */
 	private void peerDiscovery(Client client) {
 		try {
-			Utilities.switchGui(this, "Finding peers...");
-			Utilities.log(this, "Discovering hosts");
+			Utilities.switchGui(this, "Locating peers...");
 
-			List<InetAddress> foundHosts = client.discoverHosts(Core.config.udpPort, 4000);
+			foundHosts = new ArrayList<InetAddress> ();
+			(new Thread(new DiscoveryServer())).start();
+			Thread discoverClient = new Thread(new DiscoveryClient());
+			discoverClient.start();
+			discoverClient.join();
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			//foundHosts.add(InetAddress.getByName("136.167.199.57"));
-			foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			//foundHosts.add(InetAddress.getByName("136.167.192.28"));
+			foundHosts.add(InetAddress.getByName("136.167.192.28"));
+			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
@@ -233,11 +274,7 @@ public class NetHandler {
 				Enumeration<InetAddress> addresses =  networkInterface.getInetAddresses();
 				while(addresses.hasMoreElements()) {
 					InetAddress inetAddress = addresses.nextElement();
-					if(inetAddress.isLoopbackAddress()) {
-						while(foundHosts.contains(inetAddress)) {
-							foundHosts.remove(inetAddress);
-						}
-					}
+					foundHosts.remove(inetAddress);
 				}
 			}
 
@@ -284,12 +321,21 @@ public class NetHandler {
 		}
 	}
 
+	/**
+	 * Broadcasts a search request to connected peers
+	 * @param keyword Keyword string provided
+	 */
 	public static void doSearch(String keyword) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 		}
 	}
 
+	/**
+	 * Broadcasts a search request for a block to connected peers
+	 * @param origin BlockedFile pointer name
+	 * @param block BlockedFile block name (auto-hashed)
+	 */
 	public static void requestBlock(String origin, String block) {
 		for(Peer peer : Core.peers) {
 			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));

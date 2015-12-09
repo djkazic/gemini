@@ -6,14 +6,17 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import io.FileUtils;
 
-//TODO: write a ShutdownHook for saving a serialized Config
 public class Config {
 
+	//Instance variables, serialized data
 	public int tcpPort = 35500;
-	public int udpPort = 35501;
+	public int discoverPort = 35501;
 	public boolean cacheEnabled = false;
 	public boolean notifiedPortForwarding = false;
 	
+	/**
+	 * Writes configuration to disk (config.dat)
+	 */
 	public void writeConfig() {
 		//Try saving config data
 		try {

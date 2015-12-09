@@ -1,10 +1,10 @@
 package io;
 
 import java.io.File;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import atrium.Core;
 import atrium.Utilities;
 import io.serialize.BlockdexSerializer;
@@ -49,7 +49,9 @@ public class BlockedFile {
 		}
 		this.complete = finished;
 		progress = "";
-		Core.blockDex.add(this);
+		if(!FileUtils.haveInBlockDex(pointer)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 	
@@ -64,7 +66,9 @@ public class BlockedFile {
 		blackList = new ArrayList<String> ();
 		complete = false;
 		progress = "";
-		Core.blockDex.add(this);
+		if(!FileUtils.haveInBlockDex(this.pointer)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 
@@ -89,7 +93,9 @@ public class BlockedFile {
 		this.progress = progress;
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
-		Core.blockDex.add(this);
+		if(!FileUtils.haveInBlockDex(pointer)) {
+			Core.blockDex.add(this);
+		}
 		BlockdexSerializer.run();
 	}
 
@@ -128,20 +134,6 @@ public class BlockedFile {
 	public String getBlocksFolder() {
 		return FileUtils.getAppDataDir() + "/" + Utilities.base64(pointer.getName());
 	}
-	
-	/**
-	 * Returns the next string block we need
-	 * @return string block that's needed
-	 */
-	public String getNextBlock() {
-		for(int i=0; i < blockList.size(); i++) {
-			String thisBlock = blockList.get(i);
-			if(!blackList.contains(thisBlock)) {
-				return thisBlock;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * Returns pre-calculated checksum
@@ -168,11 +160,39 @@ public class BlockedFile {
 	}
 	
 	/**
+	 * Sets the instance variable for the blockList
+	 * @param in replacement variable provided
+	 */
+	public void setBlockList(ArrayList<String> in) {
+		blockList = in;
+	}
+	
+	/**
 	 * Sets the instance variable for the blacklist
 	 * @param in replacement variable provided
 	 */
-	public void setBlacklist(ArrayList<String> in) {
+	public void setBlackList(ArrayList<String> in) {
 		blackList = in;
+	}
+	
+	/**
+	 * Returns a randomly selected needed block
+	 * @return randomly selected needed block
+	 */
+	public String nextBlockNeeded() {
+		ArrayList<String> qualified = new ArrayList<String> ();
+		for(int i=0; i < blockList.size(); i++) {
+			String thisBlock = blockList.get(i);
+			if(!blackList.contains(thisBlock)) {
+				qualified.add(thisBlock);
+			}
+		}
+		if(qualified.size() == 0) {
+			return null;
+		} else {
+			int ind = new SecureRandom().nextInt(qualified.size());
+			return qualified.get(ind);
+		}
 	}
 	
 	/**
@@ -316,5 +336,14 @@ public class BlockedFile {
 		return pointer.getName() + " | " + 
 			   blockList + " " + blackList + " | " + complete + " | " + progress 
 			   + " | " + blockRate + " | " + lastChecked;
+	}
+	
+	public void reset() {
+		blockList.clear();
+		blackList.clear();
+		progress = "";
+		blockRate = 0;
+		lastChecked = 0;
+		complete = false;
 	}
 }

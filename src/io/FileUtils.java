@@ -9,14 +9,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
-
 import atrium.Core;
 import atrium.Utilities;
 import io.serialize.BlockdexSerializer;
@@ -25,60 +24,72 @@ import io.serialize.SerialBlockedFile;
 public class FileUtils {
 
 	public static void initDirs() {
-		Utilities.log("atrium.FileUtils", "Initializing file worker");
-		File findir = new File(getWorkspaceDir());
-		if(!findir.exists()) {
-			Utilities.log("atrium.FileUtils", "Could not find directory, creating");
-			boolean attempt = false;
-			try {
-				findir.mkdir();
-				attempt = true;
-			} catch (SecurityException se) {
-				se.printStackTrace();
+		try {
+			Utilities.log("atrium.FileUtils", "Initializing file worker");
+			File findir = new File(getWorkspaceDir());
+			if(!findir.exists()) {
+				Utilities.log("atrium.FileUtils", "Could not find directory, creating");
+				boolean attempt = false;
+				try {
+					findir.mkdir();
+					attempt = true;
+				} catch (SecurityException se) {
+					se.printStackTrace();
+				}
+				if(attempt) {
+					Utilities.log("atrium.FileUtils", "Successfully created directory");
+				}
+			} else {
+				Utilities.log("atrium.FileUtils", "Found workspace directory");
 			}
-			if(attempt) {
-				Utilities.log("atrium.FileUtils", "Successfully created directory");
+			File configDir = new File(getConfigDir());
+			if(!configDir.exists()) {
+				Utilities.log("atrium.FileUtils", "Could not find config directory, creating");
+				boolean attempt = false;
+				try {
+					configDir.mkdir();
+					attempt = true;
+				} catch (SecurityException se) {
+					se.printStackTrace();
+				}
+				if(attempt) {
+					Utilities.log("atrium.FileUtils", "Successfully created config directory");
+				}
+			} else {
+				Utilities.log("atrium.FileUtils", "Found config directory");
 			}
-		}
-		File configDir = new File(getConfigDir());
-		if(!configDir.exists()) {
-			Utilities.log("atrium.FileUtils", "Could not find config directory, creating");
-			boolean attempt = false;
-			try {
-				configDir.mkdir();
-				attempt = true;
-			} catch (SecurityException se) {
-				se.printStackTrace();
+			File appDataGen = new File(getAppDataDir());
+			if(!appDataGen.exists()) {
+				Utilities.log("atrium.FileUtils", "Could not find appData directory, creating");
+				boolean attempt = false;
+				try {
+					appDataGen.mkdir();
+					attempt = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if(attempt) {
+					Utilities.log("atrium.FileUtils", "Successfully created appData directory");
+				}
+			} else {
+				Utilities.log("atrium.FileUtils", "Found data directory");
 			}
-			if(attempt) {
-				Utilities.log("atrium.FileUtils", "Successfully created config directory");
-			}
-		}
-		File appDataGen = new File(getAppDataDir());
-		if(!appDataGen.exists()) {
-			Utilities.log("atrium.FileUtils", "Could not find appData directory, creating");
-			boolean attempt = false;
-			try {
-				appDataGen.mkdir();
-				attempt = true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			if(attempt) {
-				Utilities.log("atrium.FileUtils", "Successfully created appData directory");
-			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
 	public static String getWorkspaceDir() {
-		String directory;
-		JFileChooser fr = new JFileChooser();
-		FileSystemView fw = fr.getFileSystemView();
-		directory = fw.getDefaultDirectory().toString();
-		if(Utilities.isMac()) { 
-			directory += "/Documents/Radiator";
-		} else {
-			directory += "/Radiator";
+		String directory = null;
+		try {
+			directory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath().toString();
+			if(Utilities.isMac()) { 
+				directory += "/Documents/Radiator";
+			} else {
+				directory += "/Radiator";
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
 		return directory;
 	}
@@ -118,28 +129,22 @@ public class FileUtils {
 	
 	public static byte[] findBlockFromComplete(BlockedFile bf, int blockIndex) {
 		try {
-			InputStream fis = new FileInputStream(bf.getPointer());
-			byte[] buffer = new byte[Core.blockSize];
-
-			int blockNum = -1;
-			int numRead;
-			do {
-				numRead = fis.read(buffer);
-				if(numRead > 0) {
-					blockNum++;
-				} else {
-					break;
+			int res = 0;
+			try {
+				byte[] rafBuffer = new byte[Core.blockSize];
+				RandomAccessFile raf = new RandomAccessFile(bf.getPointer(), "r");
+				raf.seek(Core.blockSize * (blockIndex));
+				res = raf.read(rafBuffer);
+				raf.close();
+				if(res != rafBuffer.length) {
+					byte[] smallChunk = new byte[res];
+					System.arraycopy(rafBuffer, 0, smallChunk, 0, res);
+					return smallChunk;
 				}
-				if(blockNum == blockIndex) {
-					byte[] res = new byte[numRead];
-					for(int i=0; i < res.length; i++) {
-						res[i] = buffer[i];
-					}
-					fis.close();
-					return res;
-				}
-			} while(numRead != -1);
-			fis.close();
+				return rafBuffer;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -184,8 +189,8 @@ public class FileUtils {
 				physicalBfCount++;
 			}
 		}
-		if(Core.blockDex.size() < physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					      + " but detected " + physicalBfCount);
 			for(int i=0; i < list.length; i++) {
 				if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
@@ -193,8 +198,10 @@ public class FileUtils {
 				}
 			}
 			BlockdexSerializer.run();
-		} else if(Core.blockDex.size() > physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check failed, cached " + Core.blockDex.size() 
+		}
+		
+		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() > physicalBfCount) {
+			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 		      			  + " but detected " + physicalBfCount);
 			for(int i=0; i < Core.blockDex.size(); i++) {
 				BlockedFile curBf = Core.blockDex.get(i);
@@ -212,8 +219,9 @@ public class FileUtils {
 			}
 			BlockdexSerializer.run();
 		}
-		Utilities.log("atrium.FileUtils", "Final validity check: cached " + Core.blockDex.size() 
-	                  + " and detected " + physicalBfCount);
+		String checkPassFail = (Core.blockDex.size() == physicalBfCount) ? "PASS" : "FAIL";
+		Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
+	                + " and detected " + physicalBfCount);
 	}
 	
 	public static boolean haveInBlockDex(File file) {
@@ -359,7 +367,8 @@ public class FileUtils {
 	
 	public static BlockedFile getBlockedFile(ArrayList<String> blockList) {
 		for(BlockedFile block : Core.blockDex) {
-			if(block.getBlockList().containsAll(blockList) && blockList.containsAll(block.getBlockList())) {
+			if(block.getBlockList().containsAll(blockList) && 
+			   blockList.containsAll(block.getBlockList())) {
 				return block;
 			}
 		}
