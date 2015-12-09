@@ -2,10 +2,8 @@ package listeners;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
-
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
-
 import atrium.Peer;
 import atrium.Utilities;
 import io.BlockedFile;
@@ -27,7 +25,7 @@ public class BlockListener extends TcpIdleSender {
 	}
 
 	public void idle(Connection connection) {
-		connection.setIdleThreshold(0.4f);
+		connection.setIdleThreshold(0.3f);
 		super.idle(connection);
 	}
 
@@ -35,49 +33,46 @@ public class BlockListener extends TcpIdleSender {
 		if(object instanceof Request) {
 			final Request request = (Request) object;
 			if(request.getType().equals(RequestTypes.BLOCK)) {
-				(new Thread(new Runnable() {
-					public void run() {
-						Utilities.log(this, "Received request for block:");
-						Peer foundPeer = Peer.findPeer(connection);
-						String[] encryptedBlock = (String[]) request.getPayload();
-						blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
-						blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+				Utilities.log(this, "Received request for block:");
+				Peer foundPeer = Peer.findPeer(connection);
+				String[] encryptedBlock = (String[]) request.getPayload();
+				blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
+				blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 
-						//TODO: search for block
-						BlockedFile foundBlock;
-						if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
-							int blockPosition;
-							if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+				//TODO: search for block
+				BlockedFile foundBlock;
+				if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
+					int blockPosition;
+					if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
 
-								byte[] searchRes = null;
-								if(foundBlock.isComplete()) {
-									//Attempt complete search
-									searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
-								} else {
-									//Attempt incomplete search
-									try {
-										searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
-									} catch (Exception ex) {
-										ex.printStackTrace();
-									}
-								}
-
-								if(searchRes != null) {
-									Utilities.log(this, "\tSending back block, length: " + searchRes.length);
-									sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-									//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-								} else {
-									Utilities.log(this, "\tFailure: could not find block " + blockName);
-								}
-							} else {
-								Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-										+ foundBlock.getBlockList());
-							}
+						byte[] searchRes = null;
+						if(foundBlock.isComplete()) {
+							//Attempt complete search
+							searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
 						} else {
-							Utilities.log(this, "\tFailure: don't have origin BlockedFile");
+							//Attempt incomplete search
+							try {
+								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
 						}
+
+						if(searchRes != null) {
+							Utilities.log(this, "\tSending back block " + blockName);
+							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+						} else {
+							Utilities.log(this, "\tFailure: could not find block " + blockName);
+						}
+					} else {
+						Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
+								+ foundBlock.getBlockList());
 					}
-				})).start();
+				} else {
+					Utilities.log(this, "\tFailure: don't have origin BlockedFile");
+				}
+
 			}
 		}
 	}
