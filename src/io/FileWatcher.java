@@ -39,10 +39,28 @@ public class FileWatcher implements Runnable {
 	public void run() {
 		while(true) {
 			List<WatchEvent<?>> events = watchKey.pollEvents();
-			for(WatchEvent<?> we : events) {
+			for(final WatchEvent<?> we : events) {
 				if(we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 					Utilities.log(this, "Created: " + we.context().toString());
-					new BlockedFile(new File(FileUtils.getWorkspaceDir() + "/" + we.context().toString()), true);
+					(new Thread(new Runnable() {
+						public void run() {
+							while(true) {
+								try {
+									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
+														+ we.context().toString());
+									new BlockedFile(bfs, true);
+									break;
+								} catch (Exception ex) { 
+									Utilities.log(this, "File lock not yet released");
+								}
+								try {
+									Thread.sleep(300);
+								} catch(InterruptedException ex) {
+									ex.printStackTrace();
+								}
+							}
+						}
+					})).start();
 					if(!Core.headless) {
 						Core.mainWindow.updateLibrary();
 					}
