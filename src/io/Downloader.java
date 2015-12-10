@@ -1,12 +1,17 @@
 package io;
 
+import java.util.ArrayList;
+
 import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
 
 public class Downloader implements Runnable {
 
+	public static ArrayList<Downloader> downloaders = new ArrayList<Downloader> ();
+
 	private BlockedFile blockedFile;
+	private boolean download = true;
 
 	public Downloader(BlockedFile bf) {
 		blockedFile = bf;
@@ -15,6 +20,12 @@ public class Downloader implements Runnable {
 
 	public void run() {
 		try {
+			if(downloaders.contains(this)) {
+				return;
+			} else {
+				downloaders.add(this);
+			}
+			Utilities.log(this, "Enumerating block data blacklist");
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
 			//Counter for length of blocks until we reach a quadrant of (~32MB)
@@ -22,9 +33,18 @@ public class Downloader implements Runnable {
 
 			String lastBlock = null;
 			String block = null;
+
+			Utilities.log(this, "Starting download");
+
 			while(Core.peers.size() > 0 || !blockedFile.isComplete()) {
+				if(!download) {
+					Utilities.log(this, "Idling in pause");
+					Thread.sleep(3000);
+					//TODO: switch to CountDownLatch
+				}
+
 				block = blockedFile.nextBlockNeeded();
-				
+
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block);
@@ -56,11 +76,45 @@ public class Downloader implements Runnable {
 					Thread.sleep(defaultWait);
 				}
 			}
+
+
+			download = false;
+			downloaders.remove(this);
 			Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
 			FileUtils.unifyBlocks(blockedFile);
 		} catch (Exception ex) {
+			downloaders.remove(this);
 			Utilities.log(this, "Downloader exception:");
 			ex.printStackTrace();
 		}
-	}	
+	}
+
+	public static void pauseDownloader(String bfPointerStr) {
+		for(Downloader dl : downloaders) {
+			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+				dl.download = false;
+			}
+		}
+	}
+
+	public static void resumeDownloader(String bfPointerStr) {
+		for(Downloader dl : downloaders) {
+			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+				if(!dl.download) {
+					dl.download = true;
+				}
+			}
+		}
+	}
+
+	public static void removeDownloader(String bfPointerStr) {
+		for(Downloader dl : downloaders) {
+			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+				if(!dl.download) {
+					dl.download = false;
+					downloaders.remove(dl);
+				}
+			}
+		}
+	}
 }

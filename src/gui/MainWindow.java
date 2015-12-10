@@ -68,8 +68,10 @@ public class MainWindow extends JFrame {
 	private JLabel lblPeers;
 	private JLabel lblDownloads;
 	private JPopupMenu downloadPopupMenu;
-	private boolean searchMode;
+	private JMenuItem downloadPopupMenuPause;
+	private JMenuItem downloadPopupMenuResume;
 	private JMenuItem downloadPopupMenuRemoveFromList;
+	private boolean searchMode;
 	private JTabbedPane tabbedPane;
 	private JScrollPane libraryScrollPane;
 	private JTable libraryTable;
@@ -150,7 +152,14 @@ public class MainWindow extends JFrame {
 		betterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
 		downloadPopupMenu = new JPopupMenu();
-		downloadPopupMenuRemoveFromList = new JMenuItem("Remove from list");
+		downloadPopupMenuPause = new JMenuItem("Pause download");
+		downloadPopupMenuPause.setEnabled(false);
+		downloadPopupMenuResume = new JMenuItem("Resume download");
+		downloadPopupMenuResume.setEnabled(false);
+		downloadPopupMenuRemoveFromList = new JMenuItem("Remove from downloads");
+		
+		downloadPopupMenu.add(downloadPopupMenuPause);
+		downloadPopupMenu.add(downloadPopupMenuResume);
 		downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{299, 0};
@@ -166,14 +175,6 @@ public class MainWindow extends JFrame {
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 0;
 		contentPane.add(tabbedPane, gbc_tabbedPane);
-		
-		tabbedPane.addChangeListener(new ChangeListener() {
-	        public void stateChanged(ChangeEvent e) {
-	            if(tabbedPane.getSelectedIndex() == 1) {
-	            	updateLibrary();
-	            }
-	        }
-	    });
 		
 		searchPanel = new JPanel();
 		searchPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -373,24 +374,60 @@ public class MainWindow extends JFrame {
 	 * Registers GUI listeners to the instance variables
 	 */
 	public void registerListeners() {
-		downloadPopupMenuRemoveFromList.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		tabbedPane.addChangeListener(new ChangeListener() {
+	        public void stateChanged(ChangeEvent ce) {
+	            if(tabbedPane.getSelectedIndex() == 1) {
+	            	updateLibrary();
+	            }
+	        }
+	    });
+		
+		downloadPopupMenuPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
 				int[] selectedRows = downloadList.getSelectedRows();
 				for(Integer i : selectedRows) {
+					Object firstColumn = downloadModel.getValueAt(i, 0);
+					if(firstColumn instanceof String) {
+						Downloader.pauseDownloader((String) firstColumn);
+					}
+				}
+			}
+		});
+		
+		downloadPopupMenuResume.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				int[] selectedRows = downloadList.getSelectedRows();
+				for(Integer i : selectedRows) {
+					Object firstColumn = downloadModel.getValueAt(i, 0);
+					if(firstColumn instanceof String) {
+						Downloader.resumeDownloader((String) firstColumn);
+					}
+				}
+			}
+		});
+		
+		downloadPopupMenuRemoveFromList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				int[] selectedRows = downloadList.getSelectedRows();
+				for(Integer i : selectedRows) {
+					Object firstColumn = downloadModel.getValueAt(i, 0);
+					if(firstColumn instanceof String) {
+						Downloader.removeDownloader((String) firstColumn);
+					}
 					downloadModel.removeRow(i);
 				}
 			}
 		});
 
 		downloadList.addMouseListener(new MouseAdapter() {
-			public void mouseReleased(MouseEvent arg0) {
-				if(arg0.isPopupTrigger()) {
-					Point clickPoint = arg0.getPoint();
+			public void mouseReleased(MouseEvent ae) {
+				if(ae.isPopupTrigger()) {
+					Point clickPoint = ae.getPoint();
 					int tableRow = downloadList.rowAtPoint(clickPoint);
 					if(!downloadList.isRowSelected(tableRow)) {
 						downloadList.changeSelection(tableRow, 0, false, false);
 					}
-					downloadPopupMenu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
+					downloadPopupMenu.show(ae.getComponent(), ae.getX(), ae.getY());
 				}
 			}
 		});
@@ -418,7 +455,7 @@ public class MainWindow extends JFrame {
 						String fileName = (String) searchModel.getValueAt(tableRow, 0);
 						@SuppressWarnings("rawtypes")
 						Iterator it = Core.index.entrySet().iterator();
-						//Iterate through HashMap until a match by blockListStr is found
+						//Iterate through HashMap until a match by filename is found
 						while(it.hasNext()) {
 							@SuppressWarnings("rawtypes")
 							Map.Entry pairs = (Map.Entry) it.next();
@@ -435,9 +472,8 @@ public class MainWindow extends JFrame {
 									//If not, create a new BlockedFile instance
 									bf = new BlockedFile(fileName, blockList);
 								}
-								int numRows = downloadModel.getRowCount();
 								boolean alreadyDoneInPane = false;
-								for(int i = 0; i < numRows; i++) {
+								for(int i = 0; i < downloadModel.getRowCount(); i++) {
 									if(downloadModel.getValueAt(i, 0).equals(bf.getPointer().getName())) {
 										if(downloadModel.getValueAt(i, 1).equals("100%")) {
 											alreadyDoneInPane = true;
@@ -448,18 +484,17 @@ public class MainWindow extends JFrame {
 								if(!alreadyDoneInPane && !bf.isComplete()) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", "?"});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
+									downloadPopupMenuPause.setEnabled(true);
+									downloadPopupMenuResume.setEnabled(true);
 									(new Thread(new Downloader(bf))).start();
 								} else if(bf.isComplete()) {
 									String bfFileName = bf.getPointer().getName();
 									Utilities.log(this, "This file is already downloaded.");
-									JOptionPane.showMessageDialog(null, bfFileName + 
-												" has already been downloaded.", "",
-		                                    	JOptionPane.INFORMATION_MESSAGE);
-									resetTable();
+									JOptionPane.showMessageDialog(null, bfFileName + " has already been downloaded.", "",
+																  JOptionPane.INFORMATION_MESSAGE);
 								}
-								//resetTable();
 							}
-							it.remove();
+							//it.remove();
 						}
 					}
 				}
@@ -574,8 +609,7 @@ public class MainWindow extends JFrame {
 	 * @param bf
 	 */
 	public void removeDownload(BlockedFile bf) {
-		int numRows = downloadModel.getRowCount();
-		for(int i = 0; i < numRows; i++) {
+		for(int i = 0; i < downloadModel.getRowCount(); i++) {
 			if(downloadModel.getValueAt(i, 0).equals(bf.getPointer().getName())) {
 				downloadModel.removeRow(i);
 			}
@@ -616,13 +650,6 @@ public class MainWindow extends JFrame {
 	 */
 	public void setSearchEditable() {
 		searchInput.setEditable(true);
-	}
-
-	/**
-	 * Resets the output bar to its default output
-	 */
-	public void resetTable() {
-		out("Enter your search query and press Enter.");
 	}
 
 	/**
