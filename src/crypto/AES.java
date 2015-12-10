@@ -47,7 +47,7 @@ public class AES {
 	}
 	
 	/**
-	 * Encrypt a byte array
+	 * Encrypts a byte array
 	 *
 	 * @param in value provided
 	 * @return encrypted byte[]

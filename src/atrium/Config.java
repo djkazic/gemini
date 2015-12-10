@@ -32,6 +32,7 @@ public class Config {
 			FileOutputStream fos = new FileOutputStream(configFile);
 			Output out = new Output(fos);
 			kryo.writeObject(out, this);
+			fos.close();
 			out.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
