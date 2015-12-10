@@ -88,9 +88,9 @@ public class NetHandler {
 			Utilities.log(this, "External IP is: " + finalStr);
 			externalIp = finalStr;
 		} catch(Exception ex) {
+			externalIp = null;
 			ex.printStackTrace();
 		}
-		externalIp = null;
 	}
 
 	/**
