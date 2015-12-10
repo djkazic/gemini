@@ -29,6 +29,7 @@ import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import listeners.BlockListener;
 import listeners.DualListener;
+import listeners.PeerCountListener;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
 import packets.data.Data;
@@ -46,6 +47,8 @@ public class NetHandler {
 	public static List<InetAddress> foundHosts;  //Hosts discovered by LAN
 	
 	//TODO: hook foundHosts with peerList processing
+	//TODO: no more peers hook (independent of GUI) such that operations like index is reset,
+	//searchRes is cleared, and search data is reset to "Ready"
 
 	//Instance variable for internal server
 	private Server server;
@@ -309,6 +312,7 @@ public class NetHandler {
 					}
 				}
 			})).start();
+			(new Thread(new PeerCountListener())).start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

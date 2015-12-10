@@ -504,6 +504,10 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 
+	public void clearSearchData() {
+		clearTable(searchModel);
+	}
+	
 	/**
 	 * Clears a given table of its entries
 	 * @param tableModel tableModel of table to clear
