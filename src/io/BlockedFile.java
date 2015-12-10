@@ -329,7 +329,6 @@ public class BlockedFile {
 	}
 	
 	public void reset() {
-		blockList.clear();
 		blackList.clear();
 		progress = "";
 		blockRate = 0;
