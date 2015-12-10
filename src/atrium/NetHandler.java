@@ -118,44 +118,10 @@ public class NetHandler {
 				if(finalStr != null) {
 					Boolean works = Boolean.parseBoolean(finalStr);
 					extVisible = Core.config.cacheEnabled = works;
+					Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"));
 					if(!Core.config.hubMode) {
 						if(!extVisible && !Core.config.notifiedPortForwarding) {
-							(new Thread(new Runnable() {
-								public void run() {
-									Utilities.log(this, "Not externally visible, caching disabled");
-									Core.config.notifiedPortForwarding = true;
-									Core.config.writeConfig();
-									JLabel label = new JLabel();
-									Font font = label.getFont();
-
-									StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
-									style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
-									style.append("font-size:" + font.getSize() + "pt;");
-									style.append("color: D1D0CE;");
-									JEditorPane ep = new JEditorPane(
-											"text/html", 
-											"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
-											+ " TCP on your network. &nbsp; <br>"
-											+ "Not port forwarding leeches on the network :( <br><br>"
-											+ "<a style=\"color: #FFFFFF\" href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
-											+ "How to Port Forward</a></html>"
-											);
-									ep.addHyperlinkListener(new HyperlinkListener() {
-										@Override
-										public void hyperlinkUpdate(HyperlinkEvent he) {
-											if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-												try {
-													Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
-												} catch(Exception ex) {
-													ex.printStackTrace();
-												}
-											}
-										}
-									});
-									ep.setEditable(false);
-									JOptionPane.showMessageDialog(null, ep);
-								}
-							})).start();
+							displayPortForwardWarning();
 						} else {
 							Utilities.log(this, "Externally visible, caching enabled");
 						}
@@ -166,6 +132,16 @@ public class NetHandler {
 			}
 		}
 		extVisible = false;
+	}
+	
+	/**
+	 * Returns a new instance of a Client for forging out-bound connections
+	 * @return new instance of a Client for forging out-bound connections
+	 */
+	public Client getClient() {
+		Client client = new Client(512000 * 4, 512000 * 4);
+		registerClientListeners(client);
+		return client;
 	}
 
 	/**
@@ -193,16 +169,6 @@ public class NetHandler {
 	}
 
 	/**
-	 * Returns a new instance of a Client for forging out-bound connections
-	 * @return new instance of a Client for forging out-bound connections
-	 */
-	public Client getClient() {
-		Client client = new Client(512000 * 4, 512000 * 4);
-		registerClientListeners(client);
-		return client;
-	}
-
-	/**
 	 * Registers listeners for a client instance
 	 * @param client Client instance specified
 	 */
@@ -222,6 +188,27 @@ public class NetHandler {
 	}
 
 	/**
+	 * Broadcasts a search request to connected peers
+	 * @param keyword Keyword string provided
+	 */
+	public static void doSearch(String keyword) {
+		for(Peer peer : Core.peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
+		}
+	}
+
+	/**
+	 * Broadcasts a search request for a block to connected peers
+	 * @param origin BlockedFile pointer name
+	 * @param block BlockedFile block name (auto-hashed)
+	 */
+	public static void requestBlock(String origin, String block) {
+		for(Peer peer : Core.peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
+		}
+	}
+	
+	/**
 	 * Registers classes for serialization
 	 * @param kryo Kryo serializer instance provided
 	 */
@@ -240,7 +227,7 @@ public class NetHandler {
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
 	}
-
+	
 	/**
 	 * Begins peer discovery routine
 	 * @param client Client instance provided
@@ -257,7 +244,7 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("136.167.192.28"));
+			foundHosts.add(InetAddress.getByName("136.167.252.37"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
@@ -326,25 +313,46 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-
+	
 	/**
-	 * Broadcasts a search request to connected peers
-	 * @param keyword Keyword string provided
+	 * Creates a new thread, and displays a warning on port forwarding
 	 */
-	public static void doSearch(String keyword) {
-		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
-		}
-	}
+	private void displayPortForwardWarning() {
+		(new Thread(new Runnable() {
+			public void run() {
+				Utilities.log(this, "Not externally visible, caching disabled");
+				Core.config.notifiedPortForwarding = true;
+				Core.config.writeConfig();
+				JLabel label = new JLabel();
+				Font font = label.getFont();
 
-	/**
-	 * Broadcasts a search request for a block to connected peers
-	 * @param origin BlockedFile pointer name
-	 * @param block BlockedFile block name (auto-hashed)
-	 */
-	public static void requestBlock(String origin, String block) {
-		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
-		}
+				StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+				style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
+				style.append("font-size:" + font.getSize() + "pt;");
+				style.append("color: D1D0CE;");
+				JEditorPane ep = new JEditorPane(
+						"text/html", 
+						"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
+						+ " TCP on your network. &nbsp; <br>"
+						+ "Not port forwarding leeches on the network :( <br><br>"
+						+ "<a style=\"color: #FFFFFF\" href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
+						+ "How to Port Forward</a></html>"
+						);
+				ep.addHyperlinkListener(new HyperlinkListener() {
+					@Override
+					public void hyperlinkUpdate(HyperlinkEvent he) {
+						if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+							try {
+								Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
+							} catch(Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					}
+				});
+				ep.setEditable(false);
+				JOptionPane.showMessageDialog(null, ep);
+			}
+		})).start();
 	}
 }
