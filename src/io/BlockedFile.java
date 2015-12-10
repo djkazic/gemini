@@ -30,7 +30,7 @@ public class BlockedFile {
 	public BlockedFile(File pointer, boolean finished) {
 		this.pointer = pointer;
 		if(finished) {
-			checksum = FileUtils.generateChecksum(pointer);
+			//checksum = FileUtils.generateChecksum(pointer);
 			blockList = FileUtils.enumerateBlocks(pointer);
 			blackList = blockList;
 		} else {

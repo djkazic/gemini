@@ -11,6 +11,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -51,6 +54,7 @@ import gui.render.TableModelSpec;
 import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
+import net.iharder.dnd.FileDrop;
 
 public class MainWindow extends JFrame {
 
@@ -331,6 +335,21 @@ public class MainWindow extends JFrame {
 		downloadScrollPane.setViewportView(downloadList);
 		
 		libPanel = new JPanel();
+		new FileDrop(libPanel, new FileDrop.Listener() {
+			@Override
+			public void filesDropped(final File[] files) {
+				Utilities.log(this, "Drag-drop latched");
+				for(int i=0; i < files.length; i++) {
+					try {
+						Files.copy(files[i].toPath(), Paths.get(FileUtils.getWorkspaceDir() + "/" + files[i].getName()));
+						//fos.close();
+					} catch (Exception ex) {
+						Utilities.log(this, "Drag-drop listener exception");
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 		libPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		tabbedPane.addTab("Library", null, libPanel, null);
 		

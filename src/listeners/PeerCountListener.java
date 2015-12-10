@@ -8,15 +8,16 @@ public class PeerCountListener implements Runnable {
 		while(true) {
 			try {
 				if(Core.peers.size() == 0) {
-					//No more peers, so reset search results and data
-					Core.index.clear();
 					if(!Core.config.hubMode) {
-						Core.mainWindow.clearSearchData();
-						Core.mainWindow.out("Ready");
+						if(Core.index.size() > 0) {
+							//No more peers, so reset search results and data
+							Core.index.clear();
+							Core.mainWindow.clearSearchData();
+							Core.mainWindow.out("Ready");
+						}
 					}
-				} else {
-					Thread.sleep(450);
 				}
+				Thread.sleep(450);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

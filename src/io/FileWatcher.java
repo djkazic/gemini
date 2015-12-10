@@ -49,8 +49,11 @@ public class FileWatcher implements Runnable {
 								try {
 									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
 														+ we.context().toString());
-									if(FileUtils.getBlockedFile(bfs.getName()) != null) {
+									if(FileUtils.getBlockedFile(bfs.getName()) == null) {
 										Utilities.log(this, "Created BlockedFile: " + we.context().toString());
+										while(!bfs.canRead()) {
+											Thread.sleep(150);
+										}
 										new BlockedFile(bfs, true);
 									}
 									
@@ -62,13 +65,13 @@ public class FileWatcher implements Runnable {
 									Thread.sleep(300);
 								} catch(InterruptedException ex) {
 									ex.printStackTrace();
-								}
+								}	
+							}
+							if(!Core.config.hubMode) {
+								Core.mainWindow.updateLibrary();
 							}
 						}
 					})).start();
-					if(!Core.config.hubMode) {
-						Core.mainWindow.updateLibrary();
-					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 					Utilities.log(this, "Deletion detected : " + we.context().toString());
