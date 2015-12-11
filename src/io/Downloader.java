@@ -74,8 +74,8 @@ public class Downloader implements Runnable {
 					Utilities.log(this, "Sleep for 32nd quadrant initiated");
 					quadrantMark = 0;
 					long defaultWait = 1000;
-					defaultWait *= (0.75D + (blockedFile.getProgressNum() / 100D));
-					Utilities.log(this, "blockSleep: " + defaultWait);
+					defaultWait *= (0.8D + (blockedFile.getProgressNum() / 100D));
+					Utilities.log(this, "Quadrant sleep: " + defaultWait);
 					Thread.sleep(defaultWait);
 				}
 			}

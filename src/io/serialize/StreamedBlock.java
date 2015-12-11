@@ -68,7 +68,7 @@ public class StreamedBlock {
 							FileOutputStream fos = new FileOutputStream(dest);
 							fos.write(decrypted);
 							fos.close();
-							if(FileUtils.generateChecksum(dest).equals(blockName)) {
+							if(FileUtils.generateChecksum(dest).equals(blockDest)) {
 								Utilities.log(this, "Logging block into blacklist");
 								bf.logBlock(blockDest);
 								if(Core.config.hubMode) {
@@ -79,7 +79,7 @@ public class StreamedBlock {
 									sfos.close();
 								}
 							} else {
-								Utilities.log(this, "Checksum error for block " + blockName);
+								Utilities.log(this, "Checksum error for block " + blockDest);
 								dest.delete();
 							}
 						} else {

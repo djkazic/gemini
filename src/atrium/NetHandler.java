@@ -247,7 +247,7 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("136.167.252.37"));
+			foundHosts.add(InetAddress.getByName("136.167.252.73"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 

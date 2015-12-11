@@ -221,6 +221,10 @@ public class MainWindow extends JFrame {
 								removeColumnAndData(searchRes, 0);
 								searchModel.addColumn("Filename");
 								searchModel.addColumn("Size");
+								searchModel.addColumn("Checksum");
+								searchRes.getColumnModel().getColumn(2).setMinWidth(0);
+								searchRes.getColumnModel().getColumn(2).setMaxWidth(0);
+								searchRes.getColumnModel().getColumn(2).setWidth(0);
 								searchMode = true;
 							}
 							NetHandler.doSearch(input);
@@ -262,6 +266,10 @@ public class MainWindow extends JFrame {
 							removeColumnAndData(searchRes, 0);
 							searchModel.addColumn("Filename");
 							searchModel.addColumn("Size");
+							searchModel.addColumn("Checksum");
+							searchRes.getColumnModel().getColumn(2).setMinWidth(0);
+							searchRes.getColumnModel().getColumn(2).setMaxWidth(0);
+							searchRes.getColumnModel().getColumn(2).setWidth(0);
 							searchMode = true;
 						}
 						NetHandler.doSearch(input);
@@ -472,6 +480,7 @@ public class MainWindow extends JFrame {
 					int tableRow = searchRes.rowAtPoint(clickPoint);
 					if(arg0.getClickCount() == 2) {
 						String fileName = (String) searchModel.getValueAt(tableRow, 0);
+						Utilities.log(this, "Seen # of columns: " + searchModel.getColumnCount());
 						String tableChecksum = (String) searchModel.getValueAt(tableRow, 2);
 						@SuppressWarnings("rawtypes")
 						Iterator it = Core.index.entrySet().iterator();
