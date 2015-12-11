@@ -119,13 +119,13 @@ public class DualListener extends Listener {
 							for(BlockedFile bf : Core.blockDex) {
 								if(bf.matchSearch(decrypted)) {
 									boolean add = false;
-									if(bf.isComplete()) {
-										add = true;
-									} else {
+									if(!bf.isComplete() || Core.config.hubMode) {
 										File blocksFolder = new File(bf.getBlocksFolder());
 										if(blocksFolder.listFiles().length > 0) {
 											add = true;
 										}
+									} else if(bf.isComplete()) {
+										add = true;
 									}
 									if(add) {
 										streams.add(bf.toStreamedBlockedFile());

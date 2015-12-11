@@ -25,7 +25,13 @@ public class StreamedBlock {
 		this.origin = Core.aes.encrypt(origin);
 		this.blockName = Core.aes.encrypt(blockName);
 		try {
-			fileBytes = Core.aes.encrypt(searchRes);
+			if(Core.config.hubMode) {
+				//Already encrypted format
+				fileBytes = searchRes;
+			} else {
+				//Encrypt for transmission
+				fileBytes = Core.aes.encrypt(searchRes);
+			}	
 		} catch (Exception ex) {
 			Utilities.log(this, "Could not get file bytes for StreamedBlock");
 		}
@@ -59,11 +65,23 @@ public class StreamedBlock {
 						}
 						if(!dest.exists()) {
 							//Utilities.log(this, "Writing block to " + dest);
-							Utilities.log(this, "Logging block into blacklist");
-							bf.logBlock(blockDest);
 							FileOutputStream fos = new FileOutputStream(dest);
 							fos.write(decrypted);
 							fos.close();
+							if(FileUtils.generateChecksum(dest).equals(blockName)) {
+								Utilities.log(this, "Logging block into blacklist");
+								bf.logBlock(blockDest);
+								if(Core.config.hubMode) {
+									Utilities.log(this, "Hub mode: encrypting received block");
+									dest.delete();
+									FileOutputStream sfos = new FileOutputStream(dest);
+									sfos.write(Core.aes.encrypt(decrypted));
+									sfos.close();
+								}
+							} else {
+								Utilities.log(this, "Checksum error for block " + blockName);
+								dest.delete();
+							}
 						} else {
 							//TODO: remove debugging
 							Utilities.log(this, "Race condition: already have this block");

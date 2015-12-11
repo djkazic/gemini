@@ -80,8 +80,10 @@ public class Downloader implements Runnable {
 
 			download = false;
 			downloaders.remove(this);
-			Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
-			FileUtils.unifyBlocks(blockedFile);
+			if(!Core.config.hubMode) {
+				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
+				FileUtils.unifyBlocks(blockedFile);
+			}
 		} catch (Exception ex) {
 			downloaders.remove(this);
 			Utilities.log(this, "Downloader exception:");
