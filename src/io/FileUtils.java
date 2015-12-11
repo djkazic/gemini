@@ -265,8 +265,9 @@ public class FileUtils {
 		return null;
 	}
 
-	public static ArrayList<String> enumerateBlocks(File file) {
+	public static ArrayList<String> enumerateBlocks(BlockedFile bf, boolean hubMode) {
 		try {
+			File file = bf.getPointer();
 			ArrayList<String> blockList = new ArrayList<String> ();
 			InputStream fis = new FileInputStream(file);
 			byte[] buffer = new byte[Core.blockSize];
@@ -277,15 +278,40 @@ public class FileUtils {
 				numRead = fis.read(buffer);
 				if(numRead > 0) {
 					complete.update(buffer, 0, numRead);
+					if(hubMode) {
+						String result = "";
+						byte[] digest = complete.digest();
+						for(int i=0; i < digest.length; i++) {
+							result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+						}
+						blockList.add(result);
+						File blockFolder = new File(bf.getBlocksFolder());
+						if(!blockFolder.exists()) {
+							blockFolder.mkdir();
+						}
+						File thisBlock = new File(bf.getBlocksFolder() + "/" + result);
+						if(!thisBlock.exists()) {
+							thisBlock.createNewFile();
+							FileOutputStream fos = new FileOutputStream(thisBlock, true);
+							byte[] acc = new byte[numRead];
+							for(int i=0; i < acc.length; i++) {
+								acc[i] = buffer[i];
+							}
+							fos.write(acc);
+							fos.close();
+						}
+					}
 				} else {
 					break;
 				}
-				byte[] digest = complete.digest();
-				String result = "";
-				for(int i=0; i < digest.length; i++) {
-					result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+				if(!Core.config.hubMode) {
+					byte[] digest = complete.digest();
+					String result = "";
+					for(int i=0; i < digest.length; i++) {
+						result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+					}
+					blockList.add(result);
 				}
-				blockList.add(result);
 			} while(numRead > 0);
 			fis.close();
 			return blockList;

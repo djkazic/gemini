@@ -31,7 +31,7 @@ public class BlockedFile {
 		this.pointer = pointer;
 		if(finished) {
 			checksum = FileUtils.generateChecksum(pointer);
-			blockList = FileUtils.enumerateBlocks(pointer);
+			blockList = FileUtils.enumerateBlocks(this, Core.config.hubMode);
 			blackList = blockList;
 		} else {
 			blockList = new ArrayList<String> ();
