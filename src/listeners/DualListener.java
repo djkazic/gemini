@@ -1,5 +1,6 @@
 package listeners;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -117,7 +118,18 @@ public class DualListener extends Listener {
 							ArrayList<StreamedBlockedFile> streams = new ArrayList<StreamedBlockedFile> ();
 							for(BlockedFile bf : Core.blockDex) {
 								if(bf.matchSearch(decrypted)) {
-									streams.add(bf.toStreamedBlockedFile());
+									boolean add = false;
+									if(bf.isComplete()) {
+										add = true;
+									} else {
+										File blocksFolder = new File(bf.getBlocksFolder());
+										if(blocksFolder.listFiles().length > 0) {
+											add = true;
+										}
+									}
+									if(add) {
+										streams.add(bf.toStreamedBlockedFile());
+									}
 								}
 							}
 							connection.sendTCP(new Data(DataTypes.SEARCH, streams));
