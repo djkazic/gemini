@@ -252,8 +252,12 @@ public class DualListener extends Listener {
 										
 										//Store name and blockList in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
+										String checksum = intermediate.getChecksum();
 										ArrayList<String> blockList = intermediate.getBlockList();
-										Core.index.put(name, blockList);
+										ArrayList<String> dualStore = new ArrayList<String> ();
+										dualStore.add(name);
+										dualStore.add(checksum);
+										Core.index.put(dualStore, blockList);
 										
 										String sizeEstimate = "";
 										int estimateKb = (int) ((Core.blockSize * blockList.size()) / 1000);
@@ -264,7 +268,7 @@ public class DualListener extends Listener {
 											sizeEstimate += estimateKb + "KB";
 										}
 										
-										Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate});
+										Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
 									}
 								}
 							}

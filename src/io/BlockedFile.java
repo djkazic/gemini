@@ -30,7 +30,7 @@ public class BlockedFile {
 	public BlockedFile(File pointer, boolean finished) {
 		this.pointer = pointer;
 		if(finished) {
-			//checksum = FileUtils.generateChecksum(pointer);
+			checksum = FileUtils.generateChecksum(pointer);
 			blockList = FileUtils.enumerateBlocks(pointer);
 			blackList = blockList;
 		} else {
@@ -50,8 +50,9 @@ public class BlockedFile {
 	 * @param pointer string pointer for File
 	 * @param blockList ArrayList<String> of block names
 	 */
-	public BlockedFile(String pointer, ArrayList<String> blockList) {
+	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
+		this.checksum = checksum;
 		this.blockList = blockList;
 		blackList = new ArrayList<String> ();
 		complete = false;
@@ -131,6 +132,10 @@ public class BlockedFile {
 	 */
 	public String getChecksum() {
 		return checksum;
+	}
+	
+	public void setChecksum(String in) {
+		checksum = in;
 	}
 
 	/**
@@ -307,7 +312,7 @@ public class BlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
-		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), encryptedList);
+		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList);
 	}
 
 	/**

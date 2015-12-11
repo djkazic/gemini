@@ -30,7 +30,7 @@ public class Core {
 	public static NetHandler netHandler;
 	public static MainWindow mainWindow;
 	public static ArrayList<BlockedFile> blockDex;
-	public static HashMap<String, ArrayList<String>> index;
+	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 	
 	public static int blockSize = 240000;
 	public static Config config;
@@ -102,7 +102,7 @@ public class Core {
 		Utilities.switchGui("atrium.Core", "Generating block index");
 		blockDex = new ArrayList<BlockedFile> ();
 		FileUtils.genBlockIndex();
-		index = new HashMap<String, ArrayList<String>> ();
+		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
 		
 		//Start NetHandling

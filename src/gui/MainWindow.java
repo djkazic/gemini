@@ -472,24 +472,40 @@ public class MainWindow extends JFrame {
 					int tableRow = searchRes.rowAtPoint(clickPoint);
 					if(arg0.getClickCount() == 2) {
 						String fileName = (String) searchModel.getValueAt(tableRow, 0);
+						String tableChecksum = (String) searchModel.getValueAt(tableRow, 2);
 						@SuppressWarnings("rawtypes")
 						Iterator it = Core.index.entrySet().iterator();
+						
 						//Iterate through HashMap until a match by filename is found
 						while(it.hasNext()) {
 							@SuppressWarnings("rawtypes")
 							Map.Entry pairs = (Map.Entry) it.next();
-							String tableFileName = (String) pairs.getKey();
+							//String tableFileName = (String) pairs.getKey();
+							ArrayList<String> indexNameAndChecksum = (ArrayList<String>) pairs.getKey();
+							String indexName = null;
+							String checksum = null;
+							try {
+								if(indexNameAndChecksum.size() == 2) {
+									indexName = indexNameAndChecksum.get(0);
+									checksum = indexNameAndChecksum.get(1);
+								} else {
+									throw new Exception("Corrupt indexNameAndChecksum data for " + fileName);
+								}
+							} catch(Exception ex) {
+								ex.printStackTrace();
+							}
 							ArrayList<String> blockList = (ArrayList<String>) pairs.getValue();
 							//Check to see if the HashMap's matching is accurate
-							if(tableFileName.equals(fileName)) {
+							if((indexName != null && checksum != null) && tableChecksum.equals(checksum)) {
 								BlockedFile bf;
 								//Check if this BlockedFile exists in index by name
-								if(FileUtils.getBlockedFile(tableFileName) != null) {
-									bf = FileUtils.getBlockedFile(tableFileName);
+								if(FileUtils.getBlockedFile(fileName) != null) {
+									bf = FileUtils.getBlockedFile(fileName);
 									bf.setBlockList(blockList);
+									bf.setChecksum(checksum);
 								} else {
 									//If not, create a new BlockedFile instance
-									bf = new BlockedFile(fileName, blockList);
+									bf = new BlockedFile(fileName, checksum, blockList);
 								}
 								boolean alreadyDoneInPane = false;
 								for(int i = 0; i < downloadModel.getRowCount(); i++) {

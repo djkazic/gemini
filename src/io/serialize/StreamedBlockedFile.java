@@ -13,6 +13,7 @@ import io.BlockedFile;
 public class StreamedBlockedFile {
 
 	private String pointerName;
+	private String checksum;
 	private ArrayList<String> blockList;
 	
 	public StreamedBlockedFile() {
@@ -20,9 +21,10 @@ public class StreamedBlockedFile {
 		blockList = null;
 	}
 	
-	public StreamedBlockedFile(String encryptedPointerName, ArrayList<String> encryptedBlockList) {
+	public StreamedBlockedFile(String encryptedPointerName, String encryptedChecksum, ArrayList<String> encryptedBlockList) {
 		pointerName = encryptedPointerName;
-		this.blockList = encryptedBlockList;
+		checksum = encryptedChecksum;
+		blockList = encryptedBlockList;
 	}
 	
 	public BlockedFile toBlockedFile(AES aes) {
@@ -30,6 +32,6 @@ public class StreamedBlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
-		return new BlockedFile(aes.decrypt(pointerName), decrypted);
+		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted);
 	}
 }
