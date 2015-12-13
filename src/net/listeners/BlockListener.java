@@ -2,7 +2,6 @@ package net.listeners;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
