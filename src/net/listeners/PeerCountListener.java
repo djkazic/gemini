@@ -1,4 +1,4 @@
-package listeners;
+package net.listeners;
 
 import atrium.Core;
 

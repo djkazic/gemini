@@ -27,11 +27,11 @@ import com.esotericsoftware.kryonet.Server;
 
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
-import listeners.BlockListener;
-import listeners.DualListener;
-import listeners.PeerCountListener;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
+import net.listeners.BlockListener;
+import net.listeners.DualListener;
+import net.listeners.PeerCountListener;
 import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
