@@ -469,8 +469,15 @@ public class MainWindow extends JFrame {
 				int tableRow = libraryTable.rowAtPoint(clickPoint);
 				if(arg0.getClickCount() == 2) {
 					String fileName = (String) libraryModel.getValueAt(tableRow, 0);
-					BlockedFile bf = FileUtils.getBlockedFile(fileName.substring(1));
-					FileUtils.openBlockedFile(bf);
+					BlockedFile bf = null;
+					for(BlockedFile ibf : Core.blockDex) {
+						if(ibf.getPointer().getName().equals(fileName.substring(1))) {
+							bf = ibf;
+						}
+					}
+					if(bf != null) {
+						FileUtils.openBlockedFile(bf);
+					}
 				}
 			}
 		});
