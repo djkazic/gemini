@@ -13,6 +13,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -196,51 +197,90 @@ public class FileUtils {
 				ex.printStackTrace();
 			}
 		}
-		File baseFolder = new File(getWorkspaceDir());
-		int physicalBfCount = 0;
-		File[] list = baseFolder.listFiles();
-		if(list != null && list.length > 0) {
-			for(int i=0; i < list.length; i++) {
-				if(list[i].isFile() && !list[i].getName().startsWith(".")) {
-					physicalBfCount++;
-				}
-			}
-		}
 		
-		//TODO: hook blockDex size so that only files with a valid cache (assuming hubMode) are counted
-		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
-					      + " but detected " + physicalBfCount);
-			for(int i=0; i < list.length; i++) {
-				if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
-					new BlockedFile(list[i], true);
-				}
-			}
-			BlockdexSerializer.run();
-		}
+		int actualBfCount = 0;
 		
-		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() > physicalBfCount) {
-			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
-		      			  + " but detected " + physicalBfCount);
-			for(int i=0; i < Core.blockDex.size(); i++) {
-				BlockedFile curBf = Core.blockDex.get(i);
-				File curPointer = curBf.getPointer();
-				boolean found = false;
-				for(int j=0; j < list.length; j++) {
-					if(curPointer.equals(list[j])) {
-						found = true;
-						break;
+		if(Core.config.hubMode) {
+			File appData = new File(FileUtils.getAppDataDir());
+			if(appData.exists()) {
+				Utilities.log("atrium.FileUtils", "Examining app data directory");
+				File[] blockedFileFolders = appData.listFiles();
+				Utilities.log("atrium.FileUtils", Arrays.toString(blockedFileFolders));
+				if(blockedFileFolders != null && blockedFileFolders.length > 0) {
+					ArrayList<String> appDataDirectories = new ArrayList<String> ();
+					for(File file : blockedFileFolders) {
+						if(file.isDirectory() && !file.getName().startsWith(".")) {
+							appDataDirectories.add(file.getName());
+						}
+					}
+					actualBfCount = appDataDirectories.size();
+					
+					while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
+						for(BlockedFile bf : Core.blockDex) {
+							if(!appDataDirectories.contains(bf.getChecksum())) {
+								Core.blockDex.remove(bf);	
+							}
+						}
+						BlockdexSerializer.run();
+					}	
+					
+					while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
+						for(String appDataDirEntry : appDataDirectories) {
+							if(FileUtils.getBlockedFile(appDataDirEntry) == null) {
+								new BlockedFile(new File(FileUtils.getAppDataDir() + "/" + appDataDirEntry), true);
+							}
+						}
+						BlockdexSerializer.run();
 					}
 				}
-				if(!found) {
-					Core.blockDex.remove(curBf);
+			}
+		} else {
+			File baseFolder = new File(getWorkspaceDir());
+			File[] list = baseFolder.listFiles();
+			if(list != null && list.length > 0) {
+				for(int i=0; i < list.length; i++) {
+					if(list[i].isFile() && !list[i].getName().startsWith(".")) {
+						actualBfCount++;
+					}
 				}
 			}
-			BlockdexSerializer.run();
+			
+			while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
+				Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+						      + " but detected " + actualBfCount);
+				for(int i=0; i < list.length; i++) {
+					if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
+						new BlockedFile(list[i], true);
+					}
+				}
+				BlockdexSerializer.run();
+			}
+			
+			while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() > actualBfCount) {
+				Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+			      			  + " but detected " + actualBfCount);
+				for(int i=0; i < Core.blockDex.size(); i++) {
+					BlockedFile curBf = Core.blockDex.get(i);
+					File curPointer = curBf.getPointer();
+					boolean found = false;
+					for(int j=0; j < list.length; j++) {
+						if(curPointer.equals(list[j])) {
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
+						Core.blockDex.remove(curBf);
+					}
+				}
+				BlockdexSerializer.run();
+			}
 		}
-		String checkPassFail = (Core.blockDex.size() == physicalBfCount) ? "PASS" : "FAIL";
+		
+		
+		String checkPassFail = (Core.blockDex.size() == actualBfCount) ? "PASS" : "FAIL";
 		Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
-	                + " and detected " + physicalBfCount);
+	                + " and detected " + actualBfCount);
 	}
 	
 	public static boolean haveInBlockDex(File file) {
@@ -326,6 +366,11 @@ public class FileUtils {
 				}
 			} while(numRead > 0);
 			fis.close();
+			
+			//Delete file after physical blocking if running in hubMode
+			if(Core.config.hubMode) {
+				bf.getPointer().delete();
+			}
 			return blockList;
 		} catch (Exception ex) {
 			ex.printStackTrace();

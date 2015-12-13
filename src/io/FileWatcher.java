@@ -85,7 +85,7 @@ public class FileWatcher implements Runnable {
 							bf = ibf;
 						}
 					}
-					if(bf != null) {
+					if(!Core.config.hubMode && bf != null) {
 						Utilities.log(this, "Reset: " + bf.getPointer().getName());
 						bf.reset();
 						BlockdexSerializer.run();
