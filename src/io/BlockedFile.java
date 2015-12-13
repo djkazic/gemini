@@ -244,7 +244,7 @@ public class BlockedFile {
 			progress = Math.round(dProgress) + "%";
 		}
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updateProgress(pointer.getName(), progress);
+			Core.mainWindow.updateProgress(checksum, progress);
 		}
 	}
 	

@@ -529,7 +529,7 @@ public class MainWindow extends JFrame {
 									}
 								}
 								if(!alreadyDoneInPane && !bf.isComplete()) {
-									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", " ... "});
+									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", " ... ", bf.getChecksum()});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									downloadPopupMenuPause.setEnabled(true);
 									downloadPopupMenuResume.setEnabled(true);
