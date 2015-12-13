@@ -625,13 +625,13 @@ public class MainWindow extends JFrame {
 
 	/**
 	 * Updates the time given for a BlockedFile in download
-	 * @param forFile the BlockedFile's filename
+	 * @param checksum the BlockedFile's checksum
 	 * @param time the updated amount of time left
 	 */
-	public void updateTime(String forFile, String time) {
+	public void updateTime(String checksum, String time) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
-			if(downloadModel.getValueAt(i, 0).equals(forFile)) {
+			if(downloadModel.getValueAt(i, 2).equals(checksum)) {
 				downloadModel.setValueAt(" " + time, i, 2);
 			}
 		}
