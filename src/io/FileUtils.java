@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
@@ -111,18 +112,31 @@ public class FileUtils {
 		return getWorkspaceDir() + "/.config";
 	}
 
-	public static File findBlockAppData(String origin, String block) {
-		String base64Name = Utilities.base64(origin);
-		File directory = new File(FileUtils.getAppDataDir() + "/" + base64Name);
+	public static File findBlockAppData(BlockedFile foundBlock, String block) {
+		File directory = new File(foundBlock.getBlocksFolder());
 		if(!directory.exists()) {
+			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock + " does not exist");
 			return null;
+		} else {
+			Utilities.log("atrium.FileUtils", "Examining data directory for origin " + directory);
 		}
 		File[] listOfFiles = directory.listFiles();
+		Utilities.log("atrium.FileUtils", "listOfFiles size: " + listOfFiles.length);
 		if(listOfFiles != null && listOfFiles.length > 0) {
 			for(int i=0; i < listOfFiles.length; i++) {
 				try {
-					if(generateChecksum(listOfFiles[i]).equals(block)) {
-						return listOfFiles[i];
+					//TODO: server-sided check for hubMode cached block (temp files, check)
+					if(!Core.config.hubMode) {
+						if(generateChecksum(listOfFiles[i]).equals(block)) {
+							return listOfFiles[i];
+						} else {
+							Utilities.log("atrium.FileUtils", "Checksum mismatch for block");
+							return null;
+						}
+					} else {
+						if(listOfFiles[i].getName().equals(block)) {
+							return listOfFiles[i];
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -196,6 +210,8 @@ public class FileUtils {
 				}
 			}
 		}
+		
+		//TODO: hook blockDex size so that only files with a valid cache (assuming hubMode) are counted
 		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
 			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					      + " but detected " + physicalBfCount);
@@ -297,7 +313,7 @@ public class FileUtils {
 							for(int i=0; i < acc.length; i++) {
 								acc[i] = buffer[i];
 							}
-							fos.write(acc);
+							fos.write(Core.aes.encrypt(acc));
 							fos.close();
 						}
 					}

@@ -2,10 +2,12 @@ package net.listeners;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
 
+import atrium.Core;
 import atrium.Peer;
 import atrium.Utilities;
 import io.BlockedFile;
@@ -18,7 +20,7 @@ import packets.requests.RequestTypes;
 
 public class BlockListener extends TcpIdleSender {
 
-	private String blockOrigin;
+	private String blockOriginChecksum;
 	private String blockName;
 	private ArrayList<Object> sendQueue;
 
@@ -38,31 +40,33 @@ public class BlockListener extends TcpIdleSender {
 				Utilities.log(this, "Received request for block:");
 				Peer foundPeer = Peer.findPeer(connection);
 				String[] encryptedBlock = (String[]) request.getPayload();
-				blockOrigin = foundPeer.getAES().decrypt(encryptedBlock[0]);
+				blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
 				blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 
 				//TODO: search for block
 				BlockedFile foundBlock;
-				if((foundBlock = FileUtils.getBlockedFile(blockOrigin)) != null) {
+				if((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
 					int blockPosition;
 					if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
 
 						byte[] searchRes = null;
-						if(foundBlock.isComplete()) {
-							//Attempt complete search
-							searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
-						} else {
+						if(!foundBlock.isComplete() || Core.config.hubMode) {
 							//Attempt incomplete search
 							try {
-								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(blockOrigin, blockName).toPath());
+								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
 							} catch (Exception ex) {
 								ex.printStackTrace();
+							}
+						} else {
+							if(foundBlock.isComplete()) {
+								//Attempt complete search
+								searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
 							}
 						}
 
 						if(searchRes != null) {
 							Utilities.log(this, "\tSending back block " + blockName);
-							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
 							Utilities.log(this, "\tFailure: could not find block " + blockName);
@@ -74,7 +78,6 @@ public class BlockListener extends TcpIdleSender {
 				} else {
 					Utilities.log(this, "\tFailure: don't have origin BlockedFile");
 				}
-
 			}
 		}
 	}

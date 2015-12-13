@@ -123,7 +123,7 @@ public class BlockedFile {
 	 * @return string AppData/cache directory for this BlockedFile
 	 */
 	public String getBlocksFolder() {
-		return FileUtils.getAppDataDir() + "/" + Utilities.base64(pointer.getName());
+		return FileUtils.getAppDataDir() + "/" + checksum;
 	}
 
 	/**
