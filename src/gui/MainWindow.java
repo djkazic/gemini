@@ -658,7 +658,7 @@ public class MainWindow extends JFrame {
 	 */
 	public void removeDownload(BlockedFile bf) {
 		for(int i = 0; i < downloadModel.getRowCount(); i++) {
-			if(downloadModel.getValueAt(i, 0).equals(bf.getPointer().getName())) {
+			if(downloadModel.getValueAt(i, 2).equals(bf.getChecksum())) {
 				downloadModel.removeRow(i);
 			}
 		}
