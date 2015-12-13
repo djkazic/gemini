@@ -227,7 +227,7 @@ public class BlockedFile {
 	 */
 	private void updateTime(String time) {
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updateTime(pointer.getName(), time);
+			Core.mainWindow.updateTime(checksum, time);
 		}
 	}
 	
