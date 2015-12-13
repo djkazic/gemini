@@ -138,6 +138,7 @@ public class MainWindow extends JFrame {
 		downloadModel.addColumn("Filename");
 		downloadModel.addColumn("Progress");
 		downloadModel.addColumn("Time Remaining");
+		downloadModel.addColumn("Checksum");
 
 		libraryModel = new TableModelSpec();
 		libraryModel.addColumn("Filename");
@@ -336,6 +337,9 @@ public class MainWindow extends JFrame {
 		searchPanel.add(downloadScrollPane, gbc_downloadScrollPane);
 		
 		downloadList = new JTable(downloadModel);
+		downloadList.getColumnModel().getColumn(3).setMinWidth(0);
+		downloadList.getColumnModel().getColumn(3).setMaxWidth(0);
+		downloadList.getColumnModel().getColumn(3).setWidth(0);
 		downloadList.getColumnModel().getColumn(0).setCellRenderer(betterRenderer);
 		downloadList.getColumnModel().getColumn(1).setCellRenderer(betterRenderer);
 		downloadList.getTableHeader().setReorderingAllowed(false);
@@ -413,7 +417,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				int[] selectedRows = downloadList.getSelectedRows();
 				for(Integer i : selectedRows) {
-					Object firstColumn = downloadModel.getValueAt(i, 0);
+					Object firstColumn = downloadModel.getValueAt(i, 3);
 					if(firstColumn instanceof String) {
 						Downloader.pauseDownloader((String) firstColumn);
 					}
@@ -425,7 +429,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				int[] selectedRows = downloadList.getSelectedRows();
 				for(Integer i : selectedRows) {
-					Object firstColumn = downloadModel.getValueAt(i, 0);
+					Object firstColumn = downloadModel.getValueAt(i, 3);
 					if(firstColumn instanceof String) {
 						Downloader.resumeDownloader((String) firstColumn);
 					}
@@ -437,7 +441,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				int[] selectedRows = downloadList.getSelectedRows();
 				for(Integer i : selectedRows) {
-					Object firstColumn = downloadModel.getValueAt(i, 0);
+					Object firstColumn = downloadModel.getValueAt(i, 3);
 					if(firstColumn instanceof String) {
 						Downloader.removeDownloader((String) firstColumn);
 					}
@@ -517,7 +521,7 @@ public class MainWindow extends JFrame {
 								}
 								boolean alreadyDoneInPane = false;
 								for(int i = 0; i < downloadModel.getRowCount(); i++) {
-									if(downloadModel.getValueAt(i, 2).equals(bf.getChecksum())) {
+									if(downloadModel.getValueAt(i, 3).equals(bf.getChecksum())) {
 										if(downloadModel.getValueAt(i, 1).equals("100%")) {
 											alreadyDoneInPane = true;
 											break;
@@ -525,12 +529,14 @@ public class MainWindow extends JFrame {
 									}
 								}
 								if(!alreadyDoneInPane && !bf.isComplete()) {
-									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", "?"});
+									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", " ... "});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									downloadPopupMenuPause.setEnabled(true);
 									downloadPopupMenuResume.setEnabled(true);
 									(new Thread(new Downloader(bf))).start();
-								} else if(bf.isComplete()) {
+									return;
+								}
+								if(bf.isComplete()) {
 									String bfFileName = bf.getPointer().getName();
 									Utilities.log(this, "This file is already downloaded.");
 									JOptionPane.showMessageDialog(null, bfFileName + " has already been downloaded.", "",
@@ -631,7 +637,7 @@ public class MainWindow extends JFrame {
 	public void updateTime(String checksum, String time) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
-			if(downloadModel.getValueAt(i, 2).equals(checksum)) {
+			if(downloadModel.getValueAt(i, 3).equals(checksum)) {
 				downloadModel.setValueAt(" " + time, i, 2);
 			}
 		}
@@ -639,13 +645,13 @@ public class MainWindow extends JFrame {
 	
 	/**
 	 * Updates the progress percentage for a BlockedFile in download
-	 * @param forFile the BlockedFile's filename
+	 * @param checksum the BlockedFile's checksum
 	 * @param progress the updated level of progress
 	 */
-	public void updateProgress(String forFile, String progress) {
+	public void updateProgress(String checksum, String progress) {
 		int rowCount = downloadModel.getRowCount();
 		for(int i=0; i < rowCount; i++) {
-			if(downloadModel.getValueAt(i, 0).equals(forFile)) {
+			if(downloadModel.getValueAt(i, 3).equals(checksum)) {
 				downloadModel.setValueAt(progress, i, 1);
 			}
 		}
@@ -657,7 +663,7 @@ public class MainWindow extends JFrame {
 	 */
 	public void removeDownload(BlockedFile bf) {
 		for(int i = 0; i < downloadModel.getRowCount(); i++) {
-			if(downloadModel.getValueAt(i, 2).equals(bf.getChecksum())) {
+			if(downloadModel.getValueAt(i, 3).equals(bf.getChecksum())) {
 				downloadModel.removeRow(i);
 			}
 		}
