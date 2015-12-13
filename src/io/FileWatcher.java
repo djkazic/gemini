@@ -50,7 +50,7 @@ public class FileWatcher implements Runnable {
 									//TODO: Extension and name filtering done here
 									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
 														+ we.context().toString());
-									while(!bfs.canRead() || !bfs.canWrite()) {
+									while(!bfs.renameTo(bfs)) {
 										Thread.sleep(200);
 										continue;
 									}
