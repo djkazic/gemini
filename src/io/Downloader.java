@@ -40,9 +40,10 @@ public class Downloader implements Runnable {
 				if(!download) {
 					Utilities.log(this, "Idling in pause");
 					if(!Core.config.hubMode) {
-						Core.mainWindow.updateTime(blockedFile.getPointer().getName(), "Paused");
+						Core.mainWindow.updateTime(blockedFile.getChecksum(), "Paused");
 					}
 					Thread.sleep(3000);
+					continue;
 					//TODO: switch to CountDownLatch
 				}
 
@@ -96,7 +97,7 @@ public class Downloader implements Runnable {
 
 	public static void pauseDownloader(String bfPointerStr) {
 		for(Downloader dl : downloaders) {
-			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+			if(dl.blockedFile.getChecksum().equals(bfPointerStr)) {
 				dl.download = false;
 			}
 		}
@@ -104,10 +105,10 @@ public class Downloader implements Runnable {
 
 	public static void resumeDownloader(String bfPointerStr) {
 		for(Downloader dl : downloaders) {
-			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+			if(dl.blockedFile.getChecksum().equals(bfPointerStr)) {
 				if(!dl.download) {
 					if(!Core.config.hubMode) {
-						Core.mainWindow.updateTime(dl.blockedFile.getPointer().getName(), " ... ");
+						Core.mainWindow.updateTime(dl.blockedFile.getChecksum(), " ... ");
 					}
 					dl.download = true;
 				}
@@ -117,7 +118,7 @@ public class Downloader implements Runnable {
 
 	public static void removeDownloader(String bfPointerStr) {
 		for(Downloader dl : downloaders) {
-			if(dl.blockedFile.getPointer().getName().equals(bfPointerStr)) {
+			if(dl.blockedFile.getChecksum().equals(bfPointerStr)) {
 				if(!dl.download) {
 					dl.download = false;
 					downloaders.remove(dl);
