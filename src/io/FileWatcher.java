@@ -47,6 +47,7 @@ public class FileWatcher implements Runnable {
 						public void run() {
 							while(true) {
 								try {
+									//TODO: Extension and name filtering done here
 									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
 														+ we.context().toString());
 									if(FileUtils.getBlockedFile(bfs.getName()) == null) {
@@ -75,7 +76,12 @@ public class FileWatcher implements Runnable {
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 					Utilities.log(this, "Deletion detected : " + we.context().toString());
-					BlockedFile bf = FileUtils.getBlockedFile(we.context().toString());
+					BlockedFile bf = null;
+					for(BlockedFile ibf : Core.blockDex) {
+						if(ibf.getPointer().getName().equals(we.context().toString())) {
+							bf = ibf;
+						}
+					}
 					if(bf != null) {
 						Utilities.log(this, "Reset: " + bf.getPointer().getName());
 						bf.reset();

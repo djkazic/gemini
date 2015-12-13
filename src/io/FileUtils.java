@@ -111,18 +111,28 @@ public class FileUtils {
 		return getWorkspaceDir() + "/.config";
 	}
 
-	public static File findBlockAppData(String origin, String block) {
-		String base64Name = Utilities.base64(origin);
-		File directory = new File(FileUtils.getAppDataDir() + "/" + base64Name);
+	public static File findBlockAppData(BlockedFile foundBlock, String block) {
+		File directory = new File(foundBlock.getBlocksFolder());
 		if(!directory.exists()) {
+			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock + " does not exist");
 			return null;
 		}
 		File[] listOfFiles = directory.listFiles();
 		if(listOfFiles != null && listOfFiles.length > 0) {
 			for(int i=0; i < listOfFiles.length; i++) {
 				try {
-					if(generateChecksum(listOfFiles[i]).equals(block)) {
-						return listOfFiles[i];
+					//TODO: server-sided check for hubMode cached block (temp files, check)
+					if(!Core.config.hubMode) {
+						if(generateChecksum(listOfFiles[i]).equals(block)) {
+							return listOfFiles[i];
+						} else {
+							Utilities.log("atrium.FileUtils", "Checksum mismatch for block");
+							return null;
+						}
+					} else {
+						if(listOfFiles[i].getName().equals(block)) {
+							return listOfFiles[i];
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -196,6 +206,8 @@ public class FileUtils {
 				}
 			}
 		}
+		
+		//TODO: hook blockDex size so that only files with a valid cache (assuming hubMode) are counted
 		while(Core.blockDex.size() != physicalBfCount && Core.blockDex.size() < physicalBfCount) {
 			Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					      + " but detected " + physicalBfCount);
@@ -265,8 +277,9 @@ public class FileUtils {
 		return null;
 	}
 
-	public static ArrayList<String> enumerateBlocks(File file) {
+	public static ArrayList<String> enumerateBlocks(BlockedFile bf, boolean hubMode) {
 		try {
+			File file = bf.getPointer();
 			ArrayList<String> blockList = new ArrayList<String> ();
 			InputStream fis = new FileInputStream(file);
 			byte[] buffer = new byte[Core.blockSize];
@@ -277,15 +290,40 @@ public class FileUtils {
 				numRead = fis.read(buffer);
 				if(numRead > 0) {
 					complete.update(buffer, 0, numRead);
+					if(hubMode) {
+						String result = "";
+						byte[] digest = complete.digest();
+						for(int i=0; i < digest.length; i++) {
+							result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+						}
+						blockList.add(result);
+						File blockFolder = new File(bf.getBlocksFolder());
+						if(!blockFolder.exists()) {
+							blockFolder.mkdir();
+						}
+						File thisBlock = new File(bf.getBlocksFolder() + "/" + result);
+						if(!thisBlock.exists()) {
+							thisBlock.createNewFile();
+							FileOutputStream fos = new FileOutputStream(thisBlock, true);
+							byte[] acc = new byte[numRead];
+							for(int i=0; i < acc.length; i++) {
+								acc[i] = buffer[i];
+							}
+							fos.write(Core.aes.encrypt(acc));
+							fos.close();
+						}
+					}
 				} else {
 					break;
 				}
-				byte[] digest = complete.digest();
-				String result = "";
-				for(int i=0; i < digest.length; i++) {
-					result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+				if(!Core.config.hubMode) {
+					byte[] digest = complete.digest();
+					String result = "";
+					for(int i=0; i < digest.length; i++) {
+						result += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1);
+					}
+					blockList.add(result);
 				}
-				blockList.add(result);
 			} while(numRead > 0);
 			fis.close();
 			return blockList;
@@ -369,9 +407,9 @@ public class FileUtils {
 		}
 	}
 	
-	public static BlockedFile getBlockedFile(String filename) {
+	public static BlockedFile getBlockedFile(String checksum) {
 		for(BlockedFile block : Core.blockDex) {
-			if(block.getPointer().getName().equals(filename)) {
+			if(block.getChecksum().equals(checksum)) {
 				return block;
 			}
 		}

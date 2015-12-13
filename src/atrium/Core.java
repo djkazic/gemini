@@ -43,34 +43,6 @@ public class Core {
 	 * @throws UnsupportedEncodingException
 	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		if(args.length > 0 && args[0].equals("-daemon")) {
-			Core.config.hubMode = true;
-		}
-		
-		//TODO: remove for production
-		//Set logging
-		Log.set(Log.LEVEL_INFO);
-		
-		//GUI inits
-		try {
-			Utilities.log("atrium.Core", "Initializing front-end");
-			mainWindow = new MainWindow();
-		} catch (Exception ex) {
-			Utilities.log("atrium.Core", "Headless mode engaged");
-		}
-		
-		//Set mutex
-		Utilities.switchGui("atrium.Core", "Calculating mutex");
-		mutex = Utilities.getMutex();
-		
-		//Initialize crypto routines
-		Utilities.switchGui("atrium.Core", "Initializing RSA / AES");
-		rsa = new RSA();
-		aes = new AES(mutex);
-		
-		//File directory checks
-		Utilities.switchGui("atrium.Core", "Checking for file structures");
-		FileUtils.initDirs();
 		
 		//Load config if exists
 		try {
@@ -86,6 +58,35 @@ public class Core {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		
+		if(args.length > 0 && args[0].equals("-daemon")) {
+			Core.config.hubMode = true;
+		}
+		
+		//TODO: remove for production
+		//Set logging
+		Log.set(Log.LEVEL_INFO);
+		
+		//GUI inits
+		if(Core.config.hubMode) {
+			Utilities.log("atrium.Core", "Headless mode engaged");
+		} else {
+			Utilities.log("atrium.Core", "Initializing front-end");
+			mainWindow = new MainWindow();
+		}
+		
+		//Set mutex
+		Utilities.switchGui("atrium.Core", "Calculating mutex");
+		mutex = Utilities.getMutex();
+		
+		//Initialize crypto routines
+		Utilities.switchGui("atrium.Core", "Initializing RSA / AES");
+		rsa = new RSA();
+		aes = new AES(mutex);
+		
+		//File directory checks
+		Utilities.switchGui("atrium.Core", "Checking for file structures");
+		FileUtils.initDirs();
 		
 		//ShutdownHook for config
 		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {

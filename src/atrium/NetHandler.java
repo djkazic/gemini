@@ -27,11 +27,11 @@ import com.esotericsoftware.kryonet.Server;
 
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
-import listeners.BlockListener;
-import listeners.DualListener;
-import listeners.PeerCountListener;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
+import net.listeners.BlockListener;
+import net.listeners.DualListener;
+import net.listeners.PeerCountListener;
 import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
@@ -202,12 +202,12 @@ public class NetHandler {
 
 	/**
 	 * Broadcasts a search request for a block to connected peers
-	 * @param origin BlockedFile pointer name
+	 * @param originChecksum BlockedFile checksum
 	 * @param block BlockedFile block name (auto-hashed)
 	 */
-	public static void requestBlock(String origin, String block) {
+	public static void requestBlock(String originChecksum, String block) {
 		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
 		}
 	}
 	
@@ -247,7 +247,7 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("136.167.252.37"));
+			foundHosts.add(InetAddress.getByName("136.167.252.73"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 

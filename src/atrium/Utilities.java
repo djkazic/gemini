@@ -1,4 +1,5 @@
 package atrium;
+
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
@@ -60,21 +61,23 @@ public class Utilities {
 		try {
 			String firstInterfaceFound = null;        
 			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			StringBuilder sb = new StringBuilder();
 			while(networkInterfaces.hasMoreElements()){
 				NetworkInterface network = networkInterfaces.nextElement();
 				byte[] bmac = network.getHardwareAddress();
-				if(bmac != null){
-					StringBuilder sb = new StringBuilder();
+				
+				if(bmac != null && bmac[0] != 0) {
 					for(int i=0; i < bmac.length; i++) {
 						sb.append(String.format("%02X%s", bmac[i], (i < bmac.length - 1) ? "-" : ""));        
 					}
-					if(!sb.toString().isEmpty() && firstInterfaceFound == null) {
-						return base64(sb.toString());
-					}
 				}
 			}
-			log("atrium.Utilities", "Interfaces are null, falling back to supernode mutex");
-			return base64("0C-64-32-64-SN-3B");
+			if(!sb.toString().isEmpty() && firstInterfaceFound == null) {
+				return base64(sb.toString());
+			} else {
+				log("atrium.Utilities", "Interfaces are null, falling back to supernode mutex");
+				return base64("0C-64-32-64-SN-3B");
+			}			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

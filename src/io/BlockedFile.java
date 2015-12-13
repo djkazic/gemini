@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import atrium.Core;
-import atrium.Utilities;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
@@ -31,7 +30,7 @@ public class BlockedFile {
 		this.pointer = pointer;
 		if(finished) {
 			checksum = FileUtils.generateChecksum(pointer);
-			blockList = FileUtils.enumerateBlocks(pointer);
+			blockList = FileUtils.enumerateBlocks(this, Core.config.hubMode);
 			blackList = blockList;
 		} else {
 			blockList = new ArrayList<String> ();
@@ -123,7 +122,7 @@ public class BlockedFile {
 	 * @return string AppData/cache directory for this BlockedFile
 	 */
 	public String getBlocksFolder() {
-		return FileUtils.getAppDataDir() + "/" + Utilities.base64(pointer.getName());
+		return FileUtils.getAppDataDir() + "/" + checksum;
 	}
 
 	/**
@@ -227,7 +226,7 @@ public class BlockedFile {
 	 */
 	private void updateTime(String time) {
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updateTime(pointer.getName(), time);
+			Core.mainWindow.updateTime(checksum, time);
 		}
 	}
 	
@@ -244,7 +243,7 @@ public class BlockedFile {
 			progress = Math.round(dProgress) + "%";
 		}
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updateProgress(pointer.getName(), progress);
+			Core.mainWindow.updateProgress(checksum, progress);
 		}
 	}
 	
