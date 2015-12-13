@@ -52,7 +52,7 @@ public class Downloader implements Runnable {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block);
 					quadrantMark += Core.blockSize;
-					NetHandler.requestBlock(blockedFile.getPointer().getName(), block);
+					NetHandler.requestBlock(blockedFile.getChecksum(), block);
 					//long defaultWait = 100;
 					//defaultWait *= (1 + ((blockedFile.getProgressNum() / 100D) * 1.5));
 					//Utilities.log(this, "blockSleep: " + defaultWait);

@@ -282,8 +282,8 @@ public class DualListener extends Listener {
 					(new Thread(new Runnable() {
 						public void run() {
 							StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
-							String origin = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
-							Utilities.log(this, "\tBlock origin: " + origin + ", size = " + foundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
+							String originChecksum = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
+							Utilities.log(this, "\tBlock origin: " + originChecksum + ", size = " + foundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
 							streamedBlock.insertSelf(foundPeer.getAES());
 						}
 					})).start();

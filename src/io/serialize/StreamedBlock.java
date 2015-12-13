@@ -11,18 +11,18 @@ import io.FileUtils;
 
 public class StreamedBlock {
 
-	private String origin;
+	private String originChecksum;
 	private String blockName;
 	private byte[] fileBytes;
 	
 	public StreamedBlock() {
-		origin = null;
+		originChecksum = null;
 		blockName = null;
 		fileBytes = null;
 	}
 	
-	public StreamedBlock(String origin, String blockName, byte[] searchRes) {
-		this.origin = Core.aes.encrypt(origin);
+	public StreamedBlock(String originChecksum, String blockName, byte[] searchRes) {
+		this.originChecksum = Core.aes.encrypt(originChecksum);
 		this.blockName = Core.aes.encrypt(blockName);
 		try {
 			if(Core.config.hubMode) {
@@ -38,7 +38,7 @@ public class StreamedBlock {
 	}
 	
 	public String getOrigin() {
-		return origin;
+		return originChecksum;
 	}
 	
 	public byte[] getFileBytes() {
@@ -50,8 +50,9 @@ public class StreamedBlock {
 			public void run() {
 				String blockDest = aes.decrypt(blockName);
 				byte[] decrypted = aes.decrypt(fileBytes);
-				//Utilities.log(this, "Decrypted bytes size: " + decrypted.length);
-				BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(origin));
+				
+				//Match BlockedFile from blockDex by checksum
+				BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(originChecksum));
 				if(bf.isComplete()) {
 					Utilities.log(this, "Discarding block, BlockedFile is done");
 				} else {

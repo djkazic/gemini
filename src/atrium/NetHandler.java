@@ -202,12 +202,12 @@ public class NetHandler {
 
 	/**
 	 * Broadcasts a search request for a block to connected peers
-	 * @param origin BlockedFile pointer name
+	 * @param originChecksum BlockedFile checksum
 	 * @param block BlockedFile block name (auto-hashed)
 	 */
-	public static void requestBlock(String origin, String block) {
+	public static void requestBlock(String originChecksum, String block) {
 		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(origin), Core.aes.encrypt(block)}));
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
 		}
 	}
 	
