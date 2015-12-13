@@ -65,6 +65,7 @@ public class Downloader implements Runnable {
 				} else {
 					if(blockedFile.getProgressNum() == 100) {
 						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete");
+						Utilities.log(this, "Expected: " + blockedFile.getChecksum());
 						blockedFile.setComplete(true);
 						break;
 					}

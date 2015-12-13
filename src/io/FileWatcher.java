@@ -50,11 +50,14 @@ public class FileWatcher implements Runnable {
 									//TODO: Extension and name filtering done here
 									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
 														+ we.context().toString());
-									if(FileUtils.getBlockedFile(bfs.getName()) == null) {
+									while(!bfs.canRead() || !bfs.canWrite()) {
+										Thread.sleep(200);
+										continue;
+									}
+									if(FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
+										Utilities.log(this, "Actual: " + FileUtils.generateChecksum(bfs));
 										Utilities.log(this, "Created BlockedFile: " + we.context().toString());
-										while(!bfs.canRead()) {
-											Thread.sleep(150);
-										}
+										
 										new BlockedFile(bfs, true);
 									}
 									
