@@ -395,9 +395,9 @@ public class FileUtils {
 		}
 	}
 	
-	public static BlockedFile getBlockedFile(String filename) {
+	public static BlockedFile getBlockedFile(String checksum) {
 		for(BlockedFile block : Core.blockDex) {
-			if(block.getPointer().getName().equals(filename)) {
+			if(block.getChecksum().equals(checksum)) {
 				return block;
 			}
 		}

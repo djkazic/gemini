@@ -507,18 +507,17 @@ public class MainWindow extends JFrame {
 							//Check to see if the HashMap's matching is accurate
 							if((indexName != null && checksum != null) && tableChecksum.equals(checksum)) {
 								BlockedFile bf;
-								//Check if this BlockedFile exists in index by name
-								if(FileUtils.getBlockedFile(fileName) != null) {
-									bf = FileUtils.getBlockedFile(fileName);
+								//Check if this BlockedFile exists in index by checksum
+								if(FileUtils.getBlockedFile(checksum) != null) {
+									bf = FileUtils.getBlockedFile(checksum);
 									bf.setBlockList(blockList);
-									bf.setChecksum(checksum);
 								} else {
 									//If not, create a new BlockedFile instance
 									bf = new BlockedFile(fileName, checksum, blockList);
 								}
 								boolean alreadyDoneInPane = false;
 								for(int i = 0; i < downloadModel.getRowCount(); i++) {
-									if(downloadModel.getValueAt(i, 0).equals(bf.getPointer().getName())) {
+									if(downloadModel.getValueAt(i, 2).equals(bf.getChecksum())) {
 										if(downloadModel.getValueAt(i, 1).equals("100%")) {
 											alreadyDoneInPane = true;
 											break;
