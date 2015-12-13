@@ -76,7 +76,12 @@ public class FileWatcher implements Runnable {
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 					Utilities.log(this, "Deletion detected : " + we.context().toString());
-					BlockedFile bf = FileUtils.getBlockedFile(we.context().toString());
+					BlockedFile bf = null;
+					for(BlockedFile ibf : Core.blockDex) {
+						if(ibf.getPointer().getName().equals(we.context().toString())) {
+							bf = ibf;
+						}
+					}
 					if(bf != null) {
 						Utilities.log(this, "Reset: " + bf.getPointer().getName());
 						bf.reset();
