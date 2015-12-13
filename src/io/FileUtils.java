@@ -116,11 +116,8 @@ public class FileUtils {
 		if(!directory.exists()) {
 			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock + " does not exist");
 			return null;
-		} else {
-			Utilities.log("atrium.FileUtils", "Examining data directory for origin " + directory);
 		}
 		File[] listOfFiles = directory.listFiles();
-		Utilities.log("atrium.FileUtils", "listOfFiles size: " + listOfFiles.length);
 		if(listOfFiles != null && listOfFiles.length > 0) {
 			for(int i=0; i < listOfFiles.length; i++) {
 				try {
