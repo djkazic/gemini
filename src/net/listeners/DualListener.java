@@ -32,9 +32,9 @@ public class DualListener extends Listener {
 	//New connection, either incoming or outgoing
 	public void connected(Connection connection) {
 		if(inOut == 1) {
-			Utilities.log(this, "New incoming peer");
+			Utilities.log(this, "New incoming peer", false);
 		} else {
-			Utilities.log(this, "New outgoing peer");
+			Utilities.log(this, "New outgoing peer", false);
 		}
 		try {
 			if(inOut == 1) {
@@ -66,21 +66,21 @@ public class DualListener extends Listener {
 				//Requests below are non-encrypted
 			
 				case RequestTypes.PUBKEY:
-					Utilities.log(this, "Received request for pubkey");
+					Utilities.log(this, "Received request for pubkey", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
-							Utilities.log(this, "\tSent pubkey back");
+							Utilities.log(this, "\tSent pubkey back", false);
 						}
 					})).start();
 					break;
 			
 				case RequestTypes.MUTEX:
-					Utilities.log(this, "Received request for mutex");
+					Utilities.log(this, "Received request for mutex", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.MUTEX, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
-							Utilities.log(this, "\tSent mutex back");
+							Utilities.log(this, "\tSent mutex back", false);
 						}
 					})).start();
 					break;
@@ -88,7 +88,7 @@ public class DualListener extends Listener {
 				//Requests below are symmetrically encrypted
 	
 				case RequestTypes.PEERLIST:
-					Utilities.log(this, "Received request for peerlist");
+					Utilities.log(this, "Received request for peerlist", false);
 					//TODO: more refined peerList filtering
 					(new Thread(new Runnable() {
 						public void run() {
@@ -101,7 +101,7 @@ public class DualListener extends Listener {
 								}
 							}
 							connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
-							Utilities.log(this, "\tSent peerlist back");
+							Utilities.log(this, "\tSent peerlist back", false);
 							if(foundPeer.getInOut() == 0) {
 								foundPeer.getDeferredLatch().countDown();
 							}
@@ -110,7 +110,7 @@ public class DualListener extends Listener {
 					break;
 				
 				case RequestTypes.SEARCH:
-					Utilities.log(this, "Received request for search");
+					Utilities.log(this, "Received request for search", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							String encryptedQuery = (String) request.getPayload();
@@ -135,31 +135,33 @@ public class DualListener extends Listener {
 										String fileName = bf.getPointer().getName();
 										if(FilterUtils.mandatoryFilter(fileName)) {
 											streams.add(bf.toStreamedBlockedFile());
+										} else if(fileName.startsWith(".")) {
+											Utilities.log(this, "Search result rejected by period filter: [" + fileName + "]", false);
 										} else {
-											Utilities.log(this, "Search result rejected by filter: [" + fileName + "]");
+											Utilities.log(this, "Search result rejected by filter: [" + fileName + "]", false);
 										}
 									}
 								}
 							}
 							connection.sendTCP(new Data(DataTypes.SEARCH, streams));
-							Utilities.log(this, "\tSent search results back");
+							Utilities.log(this, "\tSent search results back", false);
 						}
 					})).start();
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
 				case RequestTypes.EXTVIS:
-					Utilities.log(this, "Received request for external visibility");
+					Utilities.log(this, "Received request for external visibility", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.EXTVIS, Core.config.cacheEnabled));
-							Utilities.log(this, "\tSent external visibility data back");
+							Utilities.log(this, "\tSent external visibility data back", false);
 						}
 					})).start();
 					break;
 					
 				case RequestTypes.CACHE:
-					Utilities.log(this, "Received request for cache feed");
+					Utilities.log(this, "Received request for cache feed", false);
 					break;
 					
 			}
@@ -171,7 +173,7 @@ public class DualListener extends Listener {
 				//Data below are encryption keys, mutex is encrypted via RSA
 			
 				case DataTypes.PUBKEY:
-					Utilities.log(this, "Received pubkey data: ");
+					Utilities.log(this, "Received pubkey data: ", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							String pubkeyData = (String) data.getPayload();
@@ -183,7 +185,7 @@ public class DualListener extends Listener {
 					break;
 			
 				case DataTypes.MUTEX:
-					Utilities.log(this, "Received mutex data");
+					Utilities.log(this, "Received mutex data", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							String encryptedMutex = (String) data.getPayload();
@@ -199,7 +201,7 @@ public class DualListener extends Listener {
 									bridgeFoundPeer.getCryptoLatch().countDown();
 								}
 							} catch (Exception ex) {
-								Utilities.log(this, "Failed to set mutex");
+								Utilities.log(this, "Failed to set mutex", false);
 								ex.printStackTrace();
 							}
 						}
@@ -210,7 +212,7 @@ public class DualListener extends Listener {
 				//TODO: symmetric encryption for peerlist and on
 					
 				case DataTypes.PEERLIST:
-					Utilities.log(this, "Received peerlist data");
+					Utilities.log(this, "Received peerlist data", false);
 					//TODO: implement peerlist processing
 					(new Thread(new Runnable() {
 						public void run() {
@@ -227,7 +229,7 @@ public class DualListener extends Listener {
 									}
 								}
 								if(finishedList.size() == 0) {
-									Utilities.log(this, "No viable peers were received from " + foundPeer.getMutex());
+									Utilities.log(this, "No viable peers were received from " + foundPeer.getMutex(), false);
 								} else {
 									for(int i=0; i < finishedList.size(); i++) {
 										//Attempt to split the entry
@@ -237,7 +239,7 @@ public class DualListener extends Listener {
 											int port = Integer.parseInt(split[1]);
 											Core.netHandler.getClient().connect(8000, InetAddress.getByName(host), port);
 										} catch (Exception ex) {
-											Utilities.log(this, "Peerlist data corrupted");
+											Utilities.log(this, "Peerlist data corrupted", false);
 										}
 									}
 								}
@@ -247,7 +249,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.SEARCH:
-					Utilities.log(this,  "Received search reply data");
+					Utilities.log(this,  "Received search reply data", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							Object searchPayload = data.getPayload();
@@ -286,20 +288,18 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.BLOCK:
-					Utilities.log(this, "Received block data");
+					Utilities.log(this, "Received block data", false);
 					//Threaded decryption
 					(new Thread(new Runnable() {
 						public void run() {
 							StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
-							String originChecksum = foundPeer.getAES().decrypt(streamedBlock.getOrigin());
-							Utilities.log(this, "\tBlock origin: " + originChecksum + ", size = " + foundPeer.getAES().decrypt(streamedBlock.getFileBytes()).length);
 							streamedBlock.insertSelf(foundPeer.getAES());
 						}
 					})).start();
 					break;
 					
 				case DataTypes.EXTVIS:
-					Utilities.log(this, "Received external visibility data");
+					Utilities.log(this, "Received external visibility data", false);
 					(new Thread(new Runnable() {
 						public void run() {
 							boolean vis = (boolean) data.getPayload();
@@ -309,9 +309,9 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.CACHE:
-					Utilities.log(this, "Received cache data");
+					Utilities.log(this, "Received cache data", false);
 					if(!Core.config.cacheEnabled) {
-						Utilities.log(this, "Garbage cache data, discarded");
+						Utilities.log(this, "Garbage cache data, discarded", false);
 						break;
 					} else {
 						(new Thread(new Runnable() {

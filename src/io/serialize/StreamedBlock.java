@@ -33,7 +33,7 @@ public class StreamedBlock {
 				fileBytes = Core.aes.encrypt(searchRes);
 			}	
 		} catch (Exception ex) {
-			Utilities.log(this, "Could not get file bytes for StreamedBlock");
+			Utilities.log(this, "Could not get file bytes for StreamedBlock", true);
 		}
 	}
 	
@@ -54,14 +54,14 @@ public class StreamedBlock {
 				//Match BlockedFile from blockDex by checksum
 				BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(originChecksum));
 				if(bf.isComplete()) {
-					Utilities.log(this, "Discarding block, BlockedFile is done");
+					Utilities.log(this, "Discarding block, BlockedFile is done", false);
 				} else {
 					File folder = new File(bf.getBlocksFolder());
 					File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
 
 					try {
 						if(!folder.exists()) {
-							Utilities.log(this, "Creating directory: " + folder);
+							Utilities.log(this, "Creating directory: " + folder, true);
 							folder.mkdirs();
 						}
 						if(!dest.exists()) {
@@ -70,22 +70,23 @@ public class StreamedBlock {
 							fos.write(decrypted);
 							fos.close();
 							if(FileUtils.generateChecksum(dest).equals(blockDest)) {
-								Utilities.log(this, "Logging block into blacklist");
+								Utilities.log(this, "Logging block into blacklist", true);
 								bf.logBlock(blockDest);
 								if(Core.config.hubMode) {
-									Utilities.log(this, "Hub mode: encrypting received block");
+									//TODO: test hubmode block acceptance
+									Utilities.log(this, "Hub mode: encrypting received block", true);
 									dest.delete();
 									FileOutputStream sfos = new FileOutputStream(dest);
 									sfos.write(Core.aes.encrypt(decrypted));
 									sfos.close();
 								}
 							} else {
-								Utilities.log(this, "Checksum error for block " + blockDest);
+								Utilities.log(this, "Checksum error for block " + blockDest, false);
 								dest.delete();
 							}
 						} else {
 							//TODO: remove debugging
-							Utilities.log(this, "Race condition: already have this block");
+							Utilities.log(this, "Race condition: already have this block", true);
 						}
 					} catch (Exception ex) {
 						ex.printStackTrace();

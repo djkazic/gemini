@@ -63,18 +63,18 @@ public class BlockListener extends TcpIdleSender {
 						}
 
 						if(searchRes != null) {
-							Utilities.log(this, "\tSending back block " + blockName);
+							Utilities.log(this, "\tSending back block " + blockName, true);
 							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
-							Utilities.log(this, "\tFailure: could not find block " + blockName);
+							Utilities.log(this, "\tFailure: could not find block " + blockName, false);
 						}
 					} else {
 						Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-								+ foundBlock.getBlockList());
+								      + foundBlock.getBlockList(), false);
 					}
 				} else {
-					Utilities.log(this, "\tFailure: don't have origin BlockedFile");
+					Utilities.log(this, "\tFailure: don't have origin BlockedFile", false);
 				}
 			}
 		}

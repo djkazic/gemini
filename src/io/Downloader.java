@@ -16,7 +16,7 @@ public class Downloader implements Runnable {
 
 	public Downloader(BlockedFile bf) {
 		blockedFile = bf;
-		Utilities.log(this, "Downloader instance created for BlockedFile " + bf.getPointer().getName());
+		Utilities.log(this, "Downloader instance created for BlockedFile " + bf.getPointer().getName(), true);
 	}
 
 	public void run() {
@@ -26,7 +26,7 @@ public class Downloader implements Runnable {
 			} else {
 				downloaders.add(this);
 			}
-			Utilities.log(this, "Enumerating block data blacklist");
+			Utilities.log(this, "Enumerating block data blacklist", true);
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
 			//Counter for length of blocks until we reach a quadrant of (~32MB)
@@ -35,11 +35,11 @@ public class Downloader implements Runnable {
 			String lastBlock = null;
 			String block = null;
 
-			Utilities.log(this, "Starting download");
+			Utilities.log(this, "Starting download for " + blockedFile.getPointer().getName(), false);
 
 			while(Core.peers.size() > 0 || !blockedFile.isComplete()) {
 				if(!download) {
-					Utilities.log(this, "Idling in pause");
+					Utilities.log(this, "Idling in pause", true);
 					if(!Core.config.hubMode) {
 						Core.mainWindow.updateTime(blockedFile.getChecksum(), "Paused");
 					}
@@ -52,7 +52,7 @@ public class Downloader implements Runnable {
 
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
-					Utilities.log(this, "Requesting block " + block);
+					Utilities.log(this, "Requesting block " + block, true);
 					quadrantMark += Core.blockSize;
 					NetHandler.requestBlock(blockedFile.getChecksum(), block);
 					//long defaultWait = 100;
@@ -60,12 +60,12 @@ public class Downloader implements Runnable {
 					//Utilities.log(this, "blockSleep: " + defaultWait);
 					Thread.sleep(100);
 				} else if(block != null && block.equals(lastBlock)) {
-					Utilities.log(this, "Bad randomness, continue loop");
+					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(5);
 					continue;
 				} else {
 					if(blockedFile.getProgressNum() == 100) {
-						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete");
+						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
 						if(!Core.config.hubMode) {
 							Core.mainWindow.updateTime(blockedFile.getChecksum(), "Finished");
 						}
@@ -77,11 +77,11 @@ public class Downloader implements Runnable {
 
 				//If bytes counter is greater or equal to 32MB
 				if(quadrantMark >= (32000 * 1000)) {
-					Utilities.log(this, "Sleep for 32nd quadrant initiated");
+					Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
 					quadrantMark = 0;
 					long defaultWait = 1000;
 					defaultWait *= (0.8D + (blockedFile.getProgressNum() / 100D));
-					Utilities.log(this, "Quadrant sleep: " + defaultWait);
+					Utilities.log(this, "Quadrant sleep: " + defaultWait, true);
 					Thread.sleep(defaultWait);
 				}
 			}
@@ -90,12 +90,12 @@ public class Downloader implements Runnable {
 			download = false;
 			downloaders.remove(this);
 			if(!Core.config.hubMode) {
-				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName());
+				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}
 		} catch (Exception ex) {
 			downloaders.remove(this);
-			Utilities.log(this, "Downloader exception:");
+			Utilities.log(this, "Downloader exception: ", false);
 			ex.printStackTrace();
 		}
 	}

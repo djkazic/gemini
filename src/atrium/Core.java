@@ -49,7 +49,7 @@ public class Core {
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
 			if(configFile.exists()) {
-				Utilities.log("atrium.Core", "Loaded saved configuration");
+				Utilities.log("atrium.Core", "Loaded saved configuration", false);
 				Kryo kryo = new Kryo();
 				Input input = new Input(new FileInputStream(configFile));
 				config = kryo.readObject(input, Config.class);
@@ -70,29 +70,29 @@ public class Core {
 		
 		//GUI inits
 		if(Core.config.hubMode) {
-			Utilities.log("atrium.Core", "Headless mode engaged");
+			Utilities.log("atrium.Core", "Hub/headless mode engaged", false);
 		} else {
-			Utilities.log("atrium.Core", "Initializing front-end");
+			Utilities.log("atrium.Core", "Initializing front-end", false);
 			mainWindow = new MainWindow();
 		}
 		
 		//Set mutex
-		Utilities.switchGui("atrium.Core", "Calculating mutex");
+		Utilities.switchGui("atrium.Core", "Calculating mutex", false);
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
-		Utilities.switchGui("atrium.Core", "Initializing RSA / AES");
+		Utilities.switchGui("atrium.Core", "Initializing RSA / AES", false);
 		rsa = new RSA();
 		aes = new AES(mutex);
 		
 		//File directory checks
-		Utilities.switchGui("atrium.Core", "Checking for file structures");
+		Utilities.switchGui("atrium.Core", "Checking for file structures", false);
 		FileUtils.initDirs();
 		
 		//ShutdownHook for config
 		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {
 			public void run() {
-				Utilities.log(this, "Writing config before shutting down");
+				Utilities.log(this, "Writing config before shutting down", false);
 				config.writeConfig();
 			}
 		})));
@@ -104,7 +104,7 @@ public class Core {
 		(new Thread(new FileWatcher())).start();
 		
 		//Vars initialization
-		Utilities.switchGui("atrium.Core", "Generating block index");
+		Utilities.switchGui("atrium.Core", "Generating block index", false);
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();

@@ -25,7 +25,7 @@ public class FilterUtils {
 			adultFilter = tryToLoadFilter(1);
 			extensionFilter = tryToLoadFilter(2);
 		} catch(Exception ex) {
-			Utilities.log("filter.FilterUtils", "Exception in loading filters");
+			Utilities.log("filter.FilterUtils", "Exception in loading filters: ", false);
 			ex.printStackTrace();
 		}
 	}
@@ -56,7 +56,7 @@ public class FilterUtils {
 			String extension = input.substring(ind + 1);
 			return extensionFilter.contains(extension);
 		} else {
-			Utilities.log("filter.FilterUtils", "Rejected [" + input + "]");
+			Utilities.log("filter.FilterUtils", "Rejected [" + input + "]", true);
 			return false;
 		}
 	}

@@ -3,6 +3,7 @@ package atrium;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+import com.esotericsoftware.minlog.Log;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 /**
@@ -16,8 +17,13 @@ public class Utilities {
 	 * @param someClass origin class of debug
 	 * @param msg debug message
 	 */
-	public static void log(Object someClass, String msg) {
-		System.out.println("<LOG> [" + someClass.getClass().getName() + "]: " + msg);
+	public static void log(Object someClass, String msg, boolean debug) {
+		String output = "[" + someClass.getClass().getName() + "]: " + msg;
+		if(debug) {
+			Log.debug(output);
+		} else {
+			Log.info(output);
+		}
 	}
 	
 	/**
@@ -25,20 +31,26 @@ public class Utilities {
 	 * @param someClass pseudo-class name of debug
 	 * @param msg debug message
 	 */
-	public static void log(String someClass, String msg) {
-		System.out.println("<LOG> [" + someClass + "]: " + msg);
+	public static void log(String someClass, String msg, boolean debug) {
+		String output = "[" + someClass + "]: " + msg;
+		if(debug) {
+			Log.debug(output);
+		} else {
+			Log.info(output);
+		}
 	}
 	
 	/**
 	 * Primary dynamic switching method for debug; if headless, no GUI out
 	 * @param someClass origin class of debug
 	 * @param msg debug message
+	 * @param debug 
 	 */
-	public static void switchGui(Object someClass, String msg) {
+	public static void switchGui(Object someClass, String msg, boolean debug) {
 		if(Core.mainWindow != null) {
 			Core.mainWindow.out(msg);
 		}
-		log(someClass, msg);
+		log(someClass, msg, debug);
 	}
 	
 	/**
@@ -46,11 +58,11 @@ public class Utilities {
 	 * @param someClass origin class of debug
 	 * @param msg debug message
 	 */
-	public static void switchGui(String someClass, String msg) {
+	public static void switchGui(String someClass, String msg, boolean debug) {
 		if(Core.mainWindow != null) {
 			Core.mainWindow.out(msg);
 		}
-		log(someClass, msg);
+		log(someClass, msg, debug);
 	}
 	
 	/**
@@ -75,7 +87,7 @@ public class Utilities {
 			if(!sb.toString().isEmpty() && firstInterfaceFound == null) {
 				return base64(sb.toString());
 			} else {
-				log("atrium.Utilities", "Interfaces are null, falling back to supernode mutex");
+				log("atrium.Utilities", "Interfaces are null, falling back to supernode mutex", false);
 				return base64("0C-64-32-64-SN-3B");
 			}			
 		} catch (Exception ex) {

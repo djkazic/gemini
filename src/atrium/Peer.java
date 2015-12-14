@@ -67,32 +67,32 @@ public class Peer {
 				try {
 					if(inOut == 1) {
 						//Pro-active request approach to this (in)peer
-						Utilities.log(this, "Sending our pubkey first");
+						Utilities.log(this, "Sending our pubkey first", true);
 						connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
-						Utilities.log(this, "Requesting peer's pubkey");
+						Utilities.log(this, "Requesting peer's pubkey", true);
 						connection.sendTCP(new Request(RequestTypes.PUBKEY, null));
-						Utilities.log(this, "Awaiting peer's pubkey");
+						Utilities.log(this, "Awaiting peer's pubkey", true);
 						pubkeyDone.await();
-						Utilities.log(this, "Requesting peer's mutex");
+						Utilities.log(this, "Requesting peer's mutex", true);
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
-						Utilities.log(this, "Requesting peer's peerlist");
+						Utilities.log(this, "Requesting peer's peerlist", true);
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
-						Utilities.log(this, "Requesting extVisible data");
+						Utilities.log(this, "Requesting extVisible data", true);
 						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
 					} else {
 						//When we've received both a pubkey and sent our peerlist out,
 						//Start sending requests to this (out)peer
 						pubkeyDone.await();
 						deferredRequesting.await();
-						Utilities.log(this, "Requesting peer's mutex");
+						Utilities.log(this, "Requesting peer's mutex", true);
 						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
-						Utilities.log(this, "Requesting peer's peerlist");
+						Utilities.log(this, "Requesting peer's peerlist", true);
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
-						Utilities.log(this, "Requesting extVisible data");
+						Utilities.log(this, "Requesting extVisible data", true);
 						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
 					}
 				} catch (Exception ex) {
@@ -123,9 +123,9 @@ public class Peer {
 	 */
 	public void disconnect() {
 		if(mutex != null) {
-			Utilities.log(this, "Peer " + mutex + " disconnected");
+			Utilities.log(this, "Peer " + mutex + " disconnected", false);
 		} else {
-			Utilities.log(this, "Peer disconnected (mutex was null on disconnect");
+			Utilities.log(this, "Peer disconnected (mutex was null on disconnect)", false);
 		}
 		Core.peers.remove(this);
 		if(!Core.config.hubMode) {

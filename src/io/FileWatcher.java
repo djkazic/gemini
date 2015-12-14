@@ -32,7 +32,7 @@ public class FileWatcher implements Runnable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		Utilities.log(this, "FileWatcher registered to normal directory");
+		Utilities.log(this, "FileWatcher registered to normal directory", false);
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class FileWatcher implements Runnable {
 			List<WatchEvent<?>> events = watchKey.pollEvents();
 			for(final WatchEvent<?> we : events) {
 				if(we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-					Utilities.log(this, "Creation detected");
+					Utilities.log(this, "Creation detected in workspace", false);
 					final String relevantFileName = we.context().toString();
 					if(FilterUtils.mandatoryFilter(relevantFileName)) {
 						(new Thread(new Runnable() {
@@ -57,13 +57,13 @@ public class FileWatcher implements Runnable {
 											continue;
 										}
 										if(FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
-											Utilities.log(this, "Created BlockedFile: " + relevantFileName);
+											Utilities.log(this, "Created BlockedFile: " + relevantFileName, true);
 											new BlockedFile(bfs, true);
 										}
 										
 										break;
 									} catch (Exception ex) { 
-										Utilities.log(this, "File lock not yet released");
+										Utilities.log(this, "File lock not yet released", true);
 									}
 									try {
 										Thread.sleep(300);
@@ -77,11 +77,11 @@ public class FileWatcher implements Runnable {
 							}
 						})).start();
 					} else {
-						Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]");
+						Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]", false);
 					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-					Utilities.log(this, "Deletion detected : " + we.context().toString());
+					Utilities.log(this, "Deletion detected in workspace: " + we.context().toString(), false);
 					BlockedFile bf = null;
 					for(BlockedFile ibf : Core.blockDex) {
 						if(ibf.getPointer().getName().equals(we.context().toString())) {
@@ -89,7 +89,7 @@ public class FileWatcher implements Runnable {
 						}
 					}
 					if(!Core.config.hubMode && bf != null) {
-						Utilities.log(this, "Reset: " + bf.getPointer().getName());
+						Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
 						bf.reset();
 						BlockdexSerializer.run();
 						if(!Core.config.hubMode) {

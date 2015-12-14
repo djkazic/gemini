@@ -109,7 +109,7 @@ public class MainWindow extends JFrame {
 	 */
 	public MainWindow() {
 		
-		Utilities.log("atrium.Core", "Setting graphical preferences");
+		Utilities.log("atrium.Core", "Setting graphical preferences", true);
 		try {
 			UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
 		} catch(Exception ex) {
@@ -216,7 +216,9 @@ public class MainWindow extends JFrame {
 						String input = searchInput.getText();
 						if(input.equals("")) {
 							out("You cannot search for a blank query.");
-						} else if(input.length() < 3) {
+						} else if(input.startsWith(".")) {
+							out("You cannot search for a query that starts with a period");
+						} else if (input.length() < 3) {
 							out("You cannot search for a query shorter than 3 characters.");
 						} else {
 							if(!searchMode) {
@@ -351,7 +353,7 @@ public class MainWindow extends JFrame {
 		new FileDrop(libPanel, new FileDrop.Listener() {
 			@Override
 			public void filesDropped(final File[] files) {
-				Utilities.log(this, "Drag-drop latched");
+				Utilities.log(this, "Drag-drop latched", true);
 				for(int i=0; i < files.length; i++) {
 					try {
 						String fileName = files[i].getName();
@@ -360,7 +362,7 @@ public class MainWindow extends JFrame {
 						}
 						//fos.close();
 					} catch (Exception ex) {
-						Utilities.log(this, "Drag-drop listener exception");
+						Utilities.log(this, "Drag-drop listener exception: ", false);
 						ex.printStackTrace();
 					}
 				}
@@ -495,7 +497,6 @@ public class MainWindow extends JFrame {
 					int tableRow = searchRes.rowAtPoint(clickPoint);
 					if(arg0.getClickCount() == 2) {
 						String fileName = (String) searchModel.getValueAt(tableRow, 0);
-						Utilities.log(this, "Seen # of columns: " + searchModel.getColumnCount());
 						String tableChecksum = (String) searchModel.getValueAt(tableRow, 2);
 						@SuppressWarnings("rawtypes")
 						Iterator it = Core.index.entrySet().iterator();
@@ -549,7 +550,7 @@ public class MainWindow extends JFrame {
 								}
 								if(bf.isComplete()) {
 									String bfFileName = bf.getPointer().getName();
-									Utilities.log(this, "This file is already downloaded.");
+									Utilities.log(this, "File is already downloaded: [" + bfFileName + "]", false);
 									JOptionPane.showMessageDialog(null, bfFileName + " has already been downloaded.", "",
 																  JOptionPane.INFORMATION_MESSAGE);
 								}
