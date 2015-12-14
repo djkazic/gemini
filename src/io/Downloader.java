@@ -69,9 +69,6 @@ public class Downloader implements Runnable {
 				} else {
 					if(blockedFile.getProgressNum() == 100) {
 						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
-						if(!Core.config.hubMode) {
-							Core.mainWindow.updateTime(blockedFile.getChecksum(), "Finished");
-						}
 						blockedFile.setComplete(true);
 						BlockdexSerializer.run();
 						break;
