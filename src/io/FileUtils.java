@@ -205,7 +205,6 @@ public class FileUtils {
 			if(appData.exists()) {
 				Utilities.log("atrium.FileUtils", "Examining app data directory");
 				File[] blockedFileFolders = appData.listFiles();
-				Utilities.log("atrium.FileUtils", Arrays.toString(blockedFileFolders));
 				if(blockedFileFolders != null && blockedFileFolders.length > 0) {
 					ArrayList<String> appDataDirectories = new ArrayList<String> ();
 					for(File file : blockedFileFolders) {
@@ -218,19 +217,28 @@ public class FileUtils {
 					while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
 						for(BlockedFile bf : Core.blockDex) {
 							if(!appDataDirectories.contains(bf.getChecksum())) {
-								Core.blockDex.remove(bf);	
+								Core.blockDex.remove(bf);
 							}
 						}
 						BlockdexSerializer.run();
 					}	
 					
-					while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
-						for(String appDataDirEntry : appDataDirectories) {
-							if(FileUtils.getBlockedFile(appDataDirEntry) == null) {
-								new BlockedFile(new File(FileUtils.getAppDataDir() + "/" + appDataDirEntry), true);
+					while(appDataDirectories.size() != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
+						//No cache, dump everything not in the blockDex
+						for(File file : blockedFileFolders) {
+							boolean foundInDex = false;
+							for(BlockedFile bf : Core.blockDex) {
+								if(bf.getChecksum().equals(file.getName())) {
+									foundInDex = true;
+									break;
+								}
+							}
+							if(!foundInDex) {
+								FileUtils.deleteRecursive(file);
+								appDataDirectories.remove(file.getName());
 							}
 						}
-						BlockdexSerializer.run();
+						actualBfCount = appDataDirectories.size();
 					}
 				}
 			}
@@ -477,5 +485,23 @@ public class FileUtils {
 		while((i=is.read(b))!=-1) {
 			os.write(b, 0, i);
 		}
+	}
+	
+	public static boolean deleteRecursive(File path) {
+		try {
+			Utilities.log("atrium.FileUtils", "Recursively deleting " + path.getName());
+			boolean ret = true;
+			if(path.isDirectory()) {
+				if(path.listFiles().length > 0) {
+					for(File file : path.listFiles()) {
+						ret = ret && FileUtils.deleteRecursive(file);
+					}
+				}
+			}
+			return ret && path.delete();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 }

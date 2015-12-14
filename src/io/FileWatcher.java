@@ -55,9 +55,7 @@ public class FileWatcher implements Runnable {
 										continue;
 									}
 									if(FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
-										Utilities.log(this, "Actual: " + FileUtils.generateChecksum(bfs));
 										Utilities.log(this, "Created BlockedFile: " + we.context().toString());
-										
 										new BlockedFile(bfs, true);
 									}
 									

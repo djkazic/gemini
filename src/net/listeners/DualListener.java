@@ -107,7 +107,7 @@ public class DualListener extends Listener {
 						}
 					})).start();
 					break;
-					
+				
 				case RequestTypes.SEARCH:
 					Utilities.log(this, "Received request for search");
 					(new Thread(new Runnable() {
@@ -121,7 +121,7 @@ public class DualListener extends Listener {
 									boolean add = false;
 									if(!bf.isComplete() || Core.config.hubMode) {
 										File blocksFolder = new File(bf.getBlocksFolder());
-										if(blocksFolder.listFiles().length > 0) {
+										if(blocksFolder != null && blocksFolder.listFiles().length > 0) {
 											add = true;
 										}
 									} else if(bf.isComplete()) {
