@@ -742,6 +742,15 @@ public class MainWindow extends JFrame {
 			}
 		}
 	}
+	
+	public boolean haveSearchAlready(String checksum) { 
+		for(int i = 0; i < searchRes.getRowCount(); i++) {
+			if(searchRes.getValueAt(i, 2).equals(checksum)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Returns the value of the correct peer count icon

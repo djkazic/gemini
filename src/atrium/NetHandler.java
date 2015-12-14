@@ -239,6 +239,7 @@ public class NetHandler {
 			Utilities.switchGui(this, "Locating peers...", true);
 
 			foundHosts = new ArrayList<InetAddress> ();
+			
 			(new Thread(new DiscoveryServer())).start();
 			DiscoveryClient discoveryClient = new DiscoveryClient();
 			Thread discoverClientThread = new Thread(discoveryClient);
@@ -249,7 +250,8 @@ public class NetHandler {
 				continue;
 			}
 			discoveryClient.terminate();
-			discoverClientThread.join();
+			discoverClientThread.interrupt();
+			Thread.sleep(150);
 
 			//TODO: remove this debug section
 			foundHosts.clear();

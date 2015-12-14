@@ -263,23 +263,27 @@ public class DualListener extends Listener {
 										
 										//Store name and blockList in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
-										String checksum = intermediate.getChecksum();
-										ArrayList<String> blockList = intermediate.getBlockList();
-										ArrayList<String> dualStore = new ArrayList<String> ();
-										dualStore.add(name);
-										dualStore.add(checksum);
-										Core.index.put(dualStore, blockList);
-										
-										String sizeEstimate = "";
-										int estimateKb = (int) ((Core.blockSize * blockList.size()) / 1000);
-										if(estimateKb > 1000) {
-											int estimateMb = (int) (estimateKb / 1000D);
-											sizeEstimate += estimateMb + "MB";
-										} else {
-											sizeEstimate += estimateKb + "KB";
+										if(FilterUtils.mandatoryFilter(name)) {
+											String checksum = intermediate.getChecksum();
+											
+											if(!Core.mainWindow.haveSearchAlready(checksum)) {
+												ArrayList<String> blockList = intermediate.getBlockList();
+												ArrayList<String> dualStore = new ArrayList<String> ();
+												dualStore.add(name);
+												dualStore.add(checksum);
+												Core.index.put(dualStore, blockList);
+												
+												String sizeEstimate = "";
+												int estimateKb = (int) ((Core.blockSize * blockList.size()) / 1000);
+												if(estimateKb > 1000) {
+													int estimateMb = (int) (estimateKb / 1000D);
+													sizeEstimate += estimateMb + "MB";
+												} else {
+													sizeEstimate += estimateKb + "KB";
+												}
+												Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
+											}
 										}
-										
-										Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
 									}
 								}
 							}

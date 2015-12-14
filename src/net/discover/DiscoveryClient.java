@@ -39,7 +39,7 @@ public class DiscoveryClient implements Runnable {
 					}
 					for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
 						InetAddress broadcast = interfaceAddress.getBroadcast();
-						if (broadcast == null) {
+						if(broadcast == null) {
 							continue;
 						}
 						try {
@@ -68,7 +68,7 @@ public class DiscoveryClient implements Runnable {
 				searchSocket.close();
 				Thread.sleep(100);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				//ex.printStackTrace();
 			}
 		}
 	}
