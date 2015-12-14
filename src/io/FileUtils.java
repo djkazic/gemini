@@ -13,7 +13,6 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -249,7 +248,9 @@ public class FileUtils {
 			if(list != null && list.length > 0) {
 				for(int i=0; i < list.length; i++) {
 					if(list[i].isFile() && !list[i].getName().startsWith(".")) {
-						actualBfCount++;
+						if(FilterUtils.mandatoryFilter(list[i].getName())) {
+							actualBfCount++;
+						}
 					}
 				}
 			}
@@ -290,11 +291,10 @@ public class FileUtils {
 				BlockdexSerializer.run();
 			}
 		}
-		
-		
+			
 		String checkPassFail = (Core.blockDex.size() == actualBfCount) ? "PASS" : "FAIL";
 		Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
-	                + " and detected " + actualBfCount);
+	                  + " and detected " + actualBfCount);
 	}
 	
 	public static boolean haveInBlockDex(File file) {

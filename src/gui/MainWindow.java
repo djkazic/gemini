@@ -48,6 +48,7 @@ import atrium.Core;
 import atrium.NetHandler;
 import atrium.Peer;
 import atrium.Utilities;
+import filter.FilterUtils;
 import gui.render.ProgressCellRenderer;
 import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
@@ -353,7 +354,10 @@ public class MainWindow extends JFrame {
 				Utilities.log(this, "Drag-drop latched");
 				for(int i=0; i < files.length; i++) {
 					try {
-						Files.copy(files[i].toPath(), Paths.get(FileUtils.getWorkspaceDir() + "/" + files[i].getName()));
+						String fileName = files[i].getName();
+						if(FilterUtils.mandatoryFilter(fileName)) {
+							Files.copy(files[i].toPath(), Paths.get(FileUtils.getWorkspaceDir() + "/" + fileName));
+						}
 						//fos.close();
 					} catch (Exception ex) {
 						Utilities.log(this, "Drag-drop listener exception");
