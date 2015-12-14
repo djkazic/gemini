@@ -199,8 +199,21 @@ public class FileUtils {
 		}
 		
 		int actualBfCount = 0;
+		File baseFolder = new File(getWorkspaceDir());
 		
 		if(Core.config.hubMode) {
+			if(baseFolder != null && baseFolder.listFiles().length > 0) {
+				int counter = 0;
+				for(File file : baseFolder.listFiles()) {
+					if(file.isFile()) {
+						file.delete();
+						counter++;
+					}
+				}
+				if(counter > 0) {
+					Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
+				}
+			}
 			File appData = new File(FileUtils.getAppDataDir());
 			if(appData.exists()) {
 				Utilities.log("atrium.FileUtils", "Examining app data directory", false);
@@ -243,7 +256,6 @@ public class FileUtils {
 				}
 			}
 		} else {
-			File baseFolder = new File(getWorkspaceDir());
 			File[] list = baseFolder.listFiles();
 			if(list != null && list.length > 0) {
 				for(int i=0; i < list.length; i++) {
