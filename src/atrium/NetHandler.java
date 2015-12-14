@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -88,7 +89,7 @@ public class NetHandler {
 			rd.close();
 			conn.disconnect();
 			String finalStr = sb.toString();
-			Utilities.log(this, "External IP is: " + finalStr);
+			Utilities.log(this, "External IP is: " + finalStr, true);
 			externalIp = finalStr;
 		} catch(Exception ex) {
 			externalIp = null;
@@ -121,12 +122,10 @@ public class NetHandler {
 				if(finalStr != null) {
 					Boolean works = Boolean.parseBoolean(finalStr);
 					extVisible = Core.config.cacheEnabled = works;
-					Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"));
+					Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"), false);
 					if(!Core.config.hubMode) {
 						if(!extVisible && !Core.config.notifiedPortForwarding) {
 							displayPortForwardWarning();
-						} else {
-							Utilities.log(this, "Externally visible, caching enabled");
 						}
 					}
 				}
@@ -155,18 +154,18 @@ public class NetHandler {
 			server = new Server(512000 * 6, 512000 * 6);
 			registerClasses(server.getKryo());
 
-			Utilities.log(this, "Registering block listener");
+			Utilities.log(this, "Registering block listener", false);
 			server.addListener(new BlockListener());
 			
-			Utilities.switchGui(this, "Registering server listeners");
+			Utilities.switchGui(this, "Registering server listeners", false);
 			server.addListener(new DualListener(1));
 
-			Utilities.switchGui(this, "Starting server component");
+			Utilities.switchGui(this, "Starting server component", false);
 			server.bind(Core.config.tcpPort);
 			server.start();
 
 		} catch (Exception ex) {
-			Utilities.log(this, "Exception in registering server listeners:");
+			Utilities.log(this, "Exception in registering server listeners: ", false);
 			ex.printStackTrace();
 		}
 	}
@@ -178,12 +177,12 @@ public class NetHandler {
 	public void registerClientListeners(Client client) {
 		try {
 			registerClasses(client.getKryo());
-			Utilities.log(this, "Registered client listeners");
+			Utilities.log(this, "Registered client listeners", false);
 
 			//Use listeners, not arbitrary code
 			client.addListener(new DualListener(0));
 
-			Utilities.log(this, "Starting client component");
+			Utilities.log(this, "Starting client component", false);
 			client.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -206,9 +205,9 @@ public class NetHandler {
 	 * @param block BlockedFile block name (auto-hashed)
 	 */
 	public static void requestBlock(String originChecksum, String block) {
-		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
-		}
+		int ind = new SecureRandom().nextInt(Core.peers.size());
+		Peer chosenPeer = Core.peers.get(ind);
+		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
 	}
 	
 	/**
@@ -237,17 +236,25 @@ public class NetHandler {
 	 */
 	private void peerDiscovery(Client client) {
 		try {
-			Utilities.switchGui(this, "Locating peers...");
+			Utilities.switchGui(this, "Locating peers...", true);
 
 			foundHosts = new ArrayList<InetAddress> ();
 			(new Thread(new DiscoveryServer())).start();
-			Thread discoverClient = new Thread(new DiscoveryClient());
-			discoverClient.start();
-			discoverClient.join();
+			DiscoveryClient discoveryClient = new DiscoveryClient();
+			Thread discoverClientThread = new Thread(discoveryClient);
+			discoverClientThread.start();
+			long startTime = System.currentTimeMillis();
+			while(System.currentTimeMillis() < startTime + 3000L) {
+				Thread.sleep(100);
+				continue;
+			}
+			discoveryClient.terminate();
+			discoverClientThread.join();
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("136.167.252.73"));
+			foundHosts.add(InetAddress.getByName("136.167.66.138"));
+			foundHosts.add(InetAddress.getByName("192.3.165.112"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
@@ -256,7 +263,7 @@ public class NetHandler {
 			foundHosts.remove(localhost);
 			InetAddress[] allLocalIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
 			if(allLocalIps != null && allLocalIps.length > 1) {
-				Utilities.log(this, "Multiple local IPs detected");
+				Utilities.log(this, "Multiple local IPs detected", false);
 				for(int i=0; i < allLocalIps.length; i++) {
 					foundHosts.remove(allLocalIps[i]);
 				}
@@ -274,9 +281,9 @@ public class NetHandler {
 			}
 
 			if(foundHosts.size() == 0) {
-				Utilities.log(this, "No hosts found on LAN");
+				Utilities.log(this, "No hosts found on LAN", false);
 			} else {
-				Utilities.log(this, "Found hosts: " + foundHosts);
+				Utilities.log(this, "Found hosts: " + foundHosts, true);
 			}
 
 			//DEBUG
@@ -284,15 +291,15 @@ public class NetHandler {
 			//TODO: port randomization
 			for(InetAddress ia : foundHosts) {
 				try {
-					Utilities.log(this, "Attempting connect to " + ia.getHostAddress());
+					Utilities.log(this, "Attempting connect to " + ia.getHostAddress(), false);
 					Client newConnection = getClient();
 					newConnection.connect(8000, ia, Core.config.tcpPort);
 				} catch (Exception ex) {
-					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed");
+					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed", false);
 				}
 			}
 
-			Utilities.log(this, "Terminated peer discovery");
+			Utilities.log(this, "Terminated peer connections loop", false);
 			(new Thread(new Runnable() {
 				public void run() {
 					while(true) {
@@ -324,7 +331,7 @@ public class NetHandler {
 	private void displayPortForwardWarning() {
 		(new Thread(new Runnable() {
 			public void run() {
-				Utilities.log(this, "Not externally visible, caching disabled");
+				Utilities.log(this, "Not externally visible, caching disabled", true);
 				Core.config.notifiedPortForwarding = true;
 				Core.config.writeConfig();
 				JLabel label = new JLabel();
