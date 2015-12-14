@@ -11,6 +11,7 @@ import atrium.Core;
 import atrium.Peer;
 import atrium.Utilities;
 import crypto.RSA;
+import filter.FilterUtils;
 import io.BlockedFile;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
@@ -121,14 +122,22 @@ public class DualListener extends Listener {
 									boolean add = false;
 									if(!bf.isComplete() || Core.config.hubMode) {
 										File blocksFolder = new File(bf.getBlocksFolder());
-										if(blocksFolder != null && blocksFolder.listFiles().length > 0) {
-											add = true;
+										if(blocksFolder != null) {
+											File[] files = null;
+											if((files = blocksFolder.listFiles()) != null && files.length > 0) {
+												add = true;
+											}
 										}
 									} else if(bf.isComplete()) {
 										add = true;
 									}
 									if(add) {
-										streams.add(bf.toStreamedBlockedFile());
+										String fileName = bf.getPointer().getName();
+										if(FilterUtils.mandatoryFilter(fileName)) {
+											streams.add(bf.toStreamedBlockedFile());
+										} else {
+											Utilities.log(this, "Search result rejected by filter: [" + fileName + "]");
+										}
 									}
 								}
 							}

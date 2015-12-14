@@ -489,16 +489,18 @@ public class FileUtils {
 	
 	public static boolean deleteRecursive(File path) {
 		try {
-			Utilities.log("atrium.FileUtils", "Recursively deleting " + path.getName());
 			boolean ret = true;
-			if(path.isDirectory()) {
-				if(path.listFiles().length > 0) {
-					for(File file : path.listFiles()) {
-						ret = ret && FileUtils.deleteRecursive(file);
+			if(path != null) {
+				if(path.isDirectory()) {
+					File[] files = null;
+					if((files = path.listFiles()) != null && files.length > 0) {
+						for(File file : files) {
+							ret = ret && FileUtils.deleteRecursive(file);
+						}
 					}
 				}
+				return ret && path.delete();
 			}
-			return ret && path.delete();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
