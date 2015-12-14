@@ -11,6 +11,7 @@ import java.util.List;
 
 import atrium.Core;
 import atrium.Utilities;
+import filter.FilterUtils;
 import io.serialize.BlockdexSerializer;
 
 /**
@@ -45,32 +46,34 @@ public class FileWatcher implements Runnable {
 					Utilities.log(this, "Creation detected");
 					(new Thread(new Runnable() {
 						public void run() {
-							while(true) {
-								try {
-									//TODO: Extension and name filtering done here
-									File bfs = new File(FileUtils.getWorkspaceDir() + "/" 
-														+ we.context().toString());
-									while(!bfs.renameTo(bfs)) {
-										Thread.sleep(200);
-										continue;
+							String relevantFileName = we.context().toString();
+							if(FilterUtils.mandatoryFilter(relevantFileName)) {
+								while(true) {
+									try {
+										//TODO: Extension and name filtering done here
+										File bfs = new File(FileUtils.getWorkspaceDir() + "/" + relevantFileName);
+										while(!bfs.renameTo(bfs)) {
+											Thread.sleep(200);
+											continue;
+										}
+										if(FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
+											Utilities.log(this, "Created BlockedFile: " + relevantFileName);
+											new BlockedFile(bfs, true);
+										}
+										
+										break;
+									} catch (Exception ex) { 
+										Utilities.log(this, "File lock not yet released");
 									}
-									if(FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
-										Utilities.log(this, "Created BlockedFile: " + we.context().toString());
-										new BlockedFile(bfs, true);
-									}
-									
-									break;
-								} catch (Exception ex) { 
-									Utilities.log(this, "File lock not yet released");
+									try {
+										Thread.sleep(300);
+									} catch(InterruptedException ex) {
+										ex.printStackTrace();
+									}	
 								}
-								try {
-									Thread.sleep(300);
-								} catch(InterruptedException ex) {
-									ex.printStackTrace();
-								}	
-							}
-							if(!Core.config.hubMode) {
-								Core.mainWindow.updateLibrary();
+								if(!Core.config.hubMode) {
+									Core.mainWindow.updateLibrary();
+								}
 							}
 						}
 					})).start();

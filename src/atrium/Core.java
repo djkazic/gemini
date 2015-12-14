@@ -13,6 +13,7 @@ import com.esotericsoftware.minlog.Log;
 
 import crypto.AES;
 import crypto.RSA;
+import filter.FilterUtils;
 import gui.MainWindow;
 import io.BlockedFile;
 import io.FileUtils;
@@ -96,15 +97,20 @@ public class Core {
 			}
 		})));
 		
+		//Filter loading
+		FilterUtils.init();
+		
 		//FileWatcher initialization
 		(new Thread(new FileWatcher())).start();
 		
 		//Vars initialization
 		Utilities.switchGui("atrium.Core", "Generating block index");
 		blockDex = new ArrayList<BlockedFile> ();
-		FileUtils.genBlockIndex();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
+		
+		//Generate block index
+		FileUtils.genBlockIndex();
 		
 		//Start NetHandling
 		netHandler = new NetHandler();
