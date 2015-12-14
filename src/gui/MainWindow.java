@@ -216,9 +216,11 @@ public class MainWindow extends JFrame {
 						String input = searchInput.getText();
 						if(input.equals("")) {
 							out("You cannot search for a blank query.");
-						} else if(input.startsWith(".")) {
-							out("You cannot search for a query that starts with a period");
-						} else if (input.length() < 3) {
+						} else if(input.startsWith(".") 
+							      || FilterUtils.extensionOnly(input) 
+								  || FilterUtils.extensionOnly(input.substring(1))) {
+							out("You cannot search for a query that starts with an extension.");
+						} else if(input.length() < 3) {
 							out("You cannot search for a query shorter than 3 characters.");
 						} else {
 							if(!searchMode) {
@@ -263,6 +265,8 @@ public class MainWindow extends JFrame {
 					String input = searchInput.getText();
 					if(input.equals("")) {
 						out("You cannot search for a blank query.");
+					} else if(input.startsWith(".")) {
+						out("You cannot search for a query that starts with an extension.");
 					} else if(input.length() < 3) {
 						out("You cannot search for a query shorter than 3 characters.");
 					} else {
@@ -622,6 +626,7 @@ public class MainWindow extends JFrame {
 			e.printStackTrace();
 		}
 		if(searchMode) {
+			removeColumnAndData(searchRes, 2);
 			removeColumnAndData(searchRes, 1);
 			removeColumnAndData(searchRes, 0);
 			searchModel.addColumn("Status");
