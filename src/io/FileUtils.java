@@ -22,6 +22,7 @@ import com.esotericsoftware.kryo.io.Input;
 
 import atrium.Core;
 import atrium.Utilities;
+import filter.FilterUtils;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 
@@ -258,7 +259,12 @@ public class FileUtils {
 						      + " but detected " + actualBfCount);
 				for(int i=0; i < list.length; i++) {
 					if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
-						new BlockedFile(list[i], true);
+						if(FilterUtils.mandatoryFilter(list[i].getName())) {
+							new BlockedFile(list[i], true);
+						} else {
+							Utilities.log("atrium.FileUtils", "Rejected file by filter: [" + list[i].getName() + "]");
+							actualBfCount--;
+						}
 					}
 				}
 				BlockdexSerializer.run();

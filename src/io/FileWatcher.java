@@ -76,6 +76,8 @@ public class FileWatcher implements Runnable {
 								}
 							}
 						})).start();
+					} else {
+						Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]");
 					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
