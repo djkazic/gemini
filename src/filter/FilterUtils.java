@@ -54,7 +54,7 @@ public class FilterUtils {
 		int ind = input.lastIndexOf(".");
 		if(ind > 0) {
 			String extension = input.substring(ind + 1);
-			return extensionFilter.contains(extension);
+			return extensionFilter.contains(extension.toLowerCase());
 		} else {
 			Utilities.log("filter.FilterUtils", "Rejected [" + input + "]", true);
 			return false;
