@@ -53,12 +53,15 @@ public class Downloader implements Runnable {
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);
-					quadrantMark += Core.blockSize;
+					if(Core.peers.size() == 0) {
+						quadrantMark += Core.blockSize;
+					}
 					NetHandler.requestBlock(blockedFile.getChecksum(), block);
 					//long defaultWait = 100;
 					//defaultWait *= (1 + ((blockedFile.getProgressNum() / 100D) * 1.5));
 					//Utilities.log(this, "blockSleep: " + defaultWait);
-					Thread.sleep(100);
+					//Thread.sleep(100);
+					Thread.sleep(100 / Core.peers.size());
 				} else if(block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(5);
@@ -75,14 +78,16 @@ public class Downloader implements Runnable {
 					}
 				}
 
-				//If bytes counter is greater or equal to 32MB
-				if(quadrantMark >= (32000 * 1000)) {
-					Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
-					quadrantMark = 0;
-					long defaultWait = 1000;
-					defaultWait *= (0.8D + (blockedFile.getProgressNum() / 100D));
-					Utilities.log(this, "Quadrant sleep: " + defaultWait, true);
-					Thread.sleep(defaultWait);
+				if(Core.peers.size() == 1) {
+					//If bytes counter is greater or equal to 32MB
+					if(quadrantMark >= (32000 * 1000)) {
+						Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
+						quadrantMark = 0;
+						long defaultWait = 750;
+						defaultWait *= (0.45D + (blockedFile.getProgressNum() / 100D));
+						Utilities.log(this, "Quadrant sleep: " + defaultWait, true);
+						Thread.sleep(defaultWait);
+					}
 				}
 			}
 
