@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
+import io.serialize.BlockdexSerializer;
 
 public class Downloader implements Runnable {
 
@@ -65,8 +66,11 @@ public class Downloader implements Runnable {
 				} else {
 					if(blockedFile.getProgressNum() == 100) {
 						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete");
-						Utilities.log(this, "Expected: " + blockedFile.getChecksum());
+						if(!Core.config.hubMode) {
+							Core.mainWindow.updateTime(blockedFile.getChecksum(), "Finished");
+						}
 						blockedFile.setComplete(true);
+						BlockdexSerializer.run();
 						break;
 					}
 				}
