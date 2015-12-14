@@ -1,8 +1,8 @@
 package filter;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -62,24 +62,24 @@ public class FilterUtils {
 	}
 	
 	private static ArrayList<String> tryToLoadFilter(int switchInt) throws URISyntaxException {
-		File filterToLoad = null;
+		InputStream filterToLoad = null;
 		switch(switchInt) {
 			case 0:
-				filterToLoad = new File(FilterUtils.class.getResource("/res/filterres/badfilter.dat").toURI());
+				filterToLoad = FilterUtils.class.getResourceAsStream("/res/filterres/badfilter.dat");
 				break;
 			
 			case 1:
-				filterToLoad = new File(FilterUtils.class.getResource("/res/filterres/adultfilter.dat").toURI());
+				filterToLoad = FilterUtils.class.getResourceAsStream("/res/filterres/adultfilter.dat");
 				break;
 				
 			case 2:
-				filterToLoad = new File(FilterUtils.class.getResource("/res/filterres/extfilter.dat").toURI());
+				filterToLoad = FilterUtils.class.getResourceAsStream("/res/filterres/extfilter.dat");
 				break;
 		}
-		if(filterToLoad != null && filterToLoad.exists()) {
+		if(filterToLoad != null) {
 			try {
 				ArrayList<String> output = new ArrayList<String> ();
-				BufferedReader br = new BufferedReader(new FileReader(filterToLoad));
+				BufferedReader br = new BufferedReader(new InputStreamReader(filterToLoad));
 				String line;
 				while((line = br.readLine()) != null && !line.equals("")) {
 					output.add(fromHexString(line));
@@ -99,5 +99,9 @@ public class FilterUtils {
 	        str.append((char) Integer.parseInt(hex.substring(i, i + 2), 16));
 	    }
 	    return str.toString();
+	}
+
+	public static boolean extensionOnly(String input) {
+		return extensionFilter.contains(input.toLowerCase());
 	}
 }
