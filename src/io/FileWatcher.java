@@ -44,10 +44,10 @@ public class FileWatcher implements Runnable {
 			for(final WatchEvent<?> we : events) {
 				if(we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 					Utilities.log(this, "Creation detected");
-					(new Thread(new Runnable() {
-						public void run() {
-							String relevantFileName = we.context().toString();
-							if(FilterUtils.mandatoryFilter(relevantFileName)) {
+					final String relevantFileName = we.context().toString();
+					if(FilterUtils.mandatoryFilter(relevantFileName)) {
+						(new Thread(new Runnable() {
+							public void run() {
 								while(true) {
 									try {
 										//TODO: Extension and name filtering done here
@@ -75,8 +75,8 @@ public class FileWatcher implements Runnable {
 									Core.mainWindow.updateLibrary();
 								}
 							}
-						}
-					})).start();
+						})).start();
+					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 					Utilities.log(this, "Deletion detected : " + we.context().toString());
