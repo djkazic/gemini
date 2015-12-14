@@ -9,14 +9,15 @@ import java.util.Enumeration;
 
 import atrium.Core;
 import atrium.NetHandler;
+import atrium.Utilities;
 
 public class DiscoveryClient implements Runnable {
 
 	private DatagramSocket searchSocket;
+	private volatile boolean keepRunning = true;
 
 	public void run() {
-		long start = System.currentTimeMillis();
-		while(System.currentTimeMillis() < (start + 4000L)) {
+		while(keepRunning) {
 			try {
 				searchSocket = new DatagramSocket();
 				searchSocket.setBroadcast(true);
@@ -70,5 +71,10 @@ public class DiscoveryClient implements Runnable {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	public void terminate() {
+		Utilities.log(this, "Terminating peer discovery", false);
+		keepRunning = false;
 	}
 }
