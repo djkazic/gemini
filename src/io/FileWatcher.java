@@ -43,7 +43,7 @@ public class FileWatcher implements Runnable {
 			List<WatchEvent<?>> events = watchKey.pollEvents();
 			for(final WatchEvent<?> we : events) {
 				if(we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-					Utilities.log(this, "Creation detected in workspace", false);
+					Utilities.log(this, "Creation detected in workspace: " + we.context().toString(), false);
 					final String relevantFileName = we.context().toString();
 					if(FilterUtils.mandatoryFilter(relevantFileName)) {
 						(new Thread(new Runnable() {
@@ -81,7 +81,9 @@ public class FileWatcher implements Runnable {
 					}
 				}
 				if(we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-					Utilities.log(this, "Deletion detected in workspace: " + we.context().toString(), false);
+					if(!Core.config.hubMode) {
+						Utilities.log(this, "Deletion detected in workspace: " + we.context().toString(), false);
+					}
 					BlockedFile bf = null;
 					for(BlockedFile ibf : Core.blockDex) {
 						if(ibf.getPointer().getName().equals(we.context().toString())) {
