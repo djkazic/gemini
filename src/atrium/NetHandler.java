@@ -60,10 +60,10 @@ public class NetHandler {
 	 */
 	public NetHandler() {
 		getExtIp();
-		checkExtVisibility();
 		registerServerListeners();
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
+		checkExtVisibility();
 		peerDiscovery(initialClient);
 	}
 

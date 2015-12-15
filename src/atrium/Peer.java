@@ -11,6 +11,7 @@ import com.esotericsoftware.kryonet.Connection;
 
 import crypto.AES;
 import crypto.RSA;
+import net.poll.CachePoller;
 import packets.data.Data;
 import packets.data.DataTypes;
 import packets.requests.Request;
@@ -103,18 +104,8 @@ public class Peer {
 		
 		//If we are a cacher, also send cache requests every minute
 		if(Core.config.cacheEnabled) {
-			(new Thread(new Runnable() {
-				public void run() {
-					try {
-						while(connection.isConnected()) {
-							connection.sendTCP(new Request(RequestTypes.CACHE, null));
-							Thread.sleep(60000);
-						}
-					} catch(Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			})).start();
+			Utilities.log(this, "Starting polling thread for peer", true);
+			new Thread(new CachePoller(this)).start();
 		}
 	}
 	
