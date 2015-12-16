@@ -13,6 +13,7 @@ import atrium.Utilities;
 import crypto.RSA;
 import filter.FilterUtils;
 import io.BlockedFile;
+import io.serialize.CacheBlockedFile;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import packets.data.Data;
@@ -162,6 +163,44 @@ public class DualListener extends Listener {
 					
 				case RequestTypes.CACHE:
 					Utilities.log(this, "Received request for cache feed", false);
+					(new Thread(new Runnable() {
+						public void run() {
+							//String encryptedQuery = (String) request.getPayload();
+							//String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
+							//For all known BlockedFiles, check if relevant
+							
+							//TODO: if the request has no payload, then return the list
+							//TODO: if the request has a payload, do not return those blockedfiles matching that checksum
+							ArrayList<CacheBlockedFile> streams = new ArrayList<CacheBlockedFile> ();
+							for(BlockedFile bf : Core.blockDex) {
+								boolean add = false;
+								if(!bf.isComplete() || Core.config.hubMode) {
+									File blocksFolder = new File(bf.getBlocksFolder());
+									if(blocksFolder != null) {
+										File[] files = null;
+										if((files = blocksFolder.listFiles()) != null && files.length > 0) {
+											add = true;
+										}
+									}
+								} else if(bf.isComplete()) {
+									add = true;
+								}
+								if(add) {
+									String fileName = bf.getPointer().getName();
+									if(FilterUtils.mandatoryFilter(fileName)) {
+										streams.add(bf.toStreamedCachedBlockedFile());
+									} else if(fileName.startsWith(".")) {
+										Utilities.log(this, "Search result rejected by period filter: [" + fileName + "]", false);
+									} else {
+										Utilities.log(this, "Search result rejected by filter: [" + fileName + "]", false);
+									}
+								}
+							
+								connection.sendTCP(new Data(DataTypes.SEARCH, streams));
+								Utilities.log(this, "\tSent cache results back", false);
+							}
+						}
+					})).start();
 					break;
 					
 			}
