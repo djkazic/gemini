@@ -16,7 +16,6 @@ public class Downloader implements Runnable {
 
 	public Downloader(BlockedFile bf) {
 		blockedFile = bf;
-		Utilities.log(this, "Downloader instance created for BlockedFile " + bf.getPointer().getName(), true);
 	}
 
 	public void run() {
@@ -25,6 +24,7 @@ public class Downloader implements Runnable {
 				return;
 			} else {
 				downloaders.add(this);
+				Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
 			}
 			Utilities.log(this, "Enumerating block data blacklist", true);
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
@@ -49,7 +49,7 @@ public class Downloader implements Runnable {
 				}
 
 				block = blockedFile.nextBlockNeeded();
-
+				
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);

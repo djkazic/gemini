@@ -10,7 +10,6 @@ import atrium.Core;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
-import io.serialize.CacheBlockedFile;
 
 public class BlockedFile {
 
@@ -302,6 +301,15 @@ public class BlockedFile {
 		} 
 		return null;
 	}
+
+	/**
+	 * Converts this BlockedFile to SerialBlockedFile for serialization
+	 * @return SerialBlockedFile conversion
+	 */
+	public SerialBlockedFile toSerialBlockedFile() {
+		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
+								   complete, progress, blockRate, lastChecked);
+	}
 	
 	/**
 	 * Converts this BlockedFile to SerialBlockedFile for network transmission
@@ -313,19 +321,6 @@ public class BlockedFile {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList);
-	}
-	
-	public CacheBlockedFile toStreamedCachedBlockedFile() {
-		return new CacheBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum));
-	}
-
-	/**
-	 * Converts this BlockedFile to SerialBlockedFile for serialization
-	 * @return SerialBlockedFile conversion
-	 */
-	public SerialBlockedFile toSerialBlockedFile() {
-		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
-								   complete, progress, blockRate, lastChecked);
 	}
 	
 	/**

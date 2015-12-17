@@ -9,5 +9,6 @@ public class DataTypes {
 	public static final String BLOCK    = "DATA_BLOCK";
 	public static final String CACHE    = "DATA_CACHE";
 	public static final String EXTVIS   = "DATA_EXTVIS";
+	public static final String CACHEPULL = "DATA_CACHE_PULL";
 	
 }
