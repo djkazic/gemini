@@ -180,7 +180,7 @@ public class DualListener extends Listener {
 							}
 
 							if(searchRes != null) {
-								Utilities.log(this, "\tSending back block " + blockName, false);
+								Utilities.log(this, "\tSending back block " + blockName, true);
 								foundPeer.getConnection().sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
 								//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 							} else {
@@ -407,7 +407,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.BLOCK:
-					Utilities.log(this, "Received block data", false);
+					Utilities.log(this, "Received block data", true);
 					//Threaded decryption
 					(new Thread(new Runnable() {
 						public void run() {
