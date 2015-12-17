@@ -197,25 +197,27 @@ public class BlockedFile {
 		if(!blackList.contains(str)) {
 			blackList.add(str);
 		}
-		if(blackList.size() % 8 == 0) {
-			if(lastChecked == 0) {
+		if(!Core.config.hubMode) {
+			if(blackList.size() % 8 == 0) {
+				if(lastChecked == 0) {
+					lastChecked = System.currentTimeMillis();
+				}
+				blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
+				int blocksLeft = blockList.size() - blackList.size();
+				float res = (blocksLeft / blockRate);
+				String units = " sec";
+				if(res > 60 && res < 360) {
+					res /= 60;
+					units = " min";
+				}
+				if(res > 60) {
+					res /= 60;
+					units = " hr";
+				}
+				int ires = (int) res;
+				updateTime(ires + units);
 				lastChecked = System.currentTimeMillis();
 			}
-			blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
-			int blocksLeft = blockList.size() - blackList.size();
-			float res = (blocksLeft / blockRate);
-			String units = " sec";
-			if(res > 60 && res < 360) {
-				res /= 60;
-				units = " min";
-			}
-			if(res > 60) {
-				res /= 60;
-				units = " hr";
-			}
-			int ires = (int) res;
-			updateTime(ires + units);
-			lastChecked = System.currentTimeMillis();
 		}
 		updateProgress();
 	}
@@ -225,9 +227,7 @@ public class BlockedFile {
 	 * @param time value provided
 	 */
 	private void updateTime(String time) {
-		if(!Core.config.hubMode) {
-			Core.mainWindow.updateTime(checksum, time);
-		}
+		Core.mainWindow.updateTime(checksum, time);
 	}
 	
 	/**
