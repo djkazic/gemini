@@ -205,16 +205,19 @@ public class BlockedFile {
 				blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
 				int blocksLeft = blockList.size() - blackList.size();
 				float res = (blocksLeft / blockRate);
+				float finalRes = 0f + res;
 				String units = " sec";
-				if(res > 60 && res < 360) {
-					res /= 60;
+				if(res > 60 && res < 3600) {
+					finalRes = res / 60f;
 					units = " min";
-				}
-				if(res > 60) {
-					res /= 60;
+				} else if(res >= 3600 && res < 86400) {
+					finalRes = res / 3600f;
 					units = " hr";
+				} else if(res >= 86400) {
+					finalRes = res / 84600f;
+					units = " days";
 				}
-				int ires = (int) res;
+				int ires = (int) finalRes;
 				updateTime(ires + units);
 				lastChecked = System.currentTimeMillis();
 			}
