@@ -30,7 +30,6 @@ import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
-import net.listeners.BlockListener;
 import net.listeners.DualListener;
 import net.listeners.PeerCountListener;
 import packets.data.Data;
@@ -153,9 +152,6 @@ public class NetHandler {
 		try {
 			server = new Server(512000 * 6, 512000 * 6);
 			registerClasses(server.getKryo());
-
-			Utilities.log(this, "Registering block listener", false);
-			server.addListener(new BlockListener());
 			
 			Utilities.switchGui(this, "Registering server listeners", false);
 			server.addListener(new DualListener(1));

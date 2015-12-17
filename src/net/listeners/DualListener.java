@@ -2,6 +2,7 @@ package net.listeners;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 import com.esotericsoftware.kryonet.Connection;
@@ -13,7 +14,8 @@ import atrium.Utilities;
 import crypto.RSA;
 import filter.FilterUtils;
 import io.BlockedFile;
-import io.serialize.CacheBlockedFile;
+import io.Downloader;
+import io.FileUtils;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import packets.data.Data;
@@ -151,6 +153,48 @@ public class DualListener extends Listener {
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
+				case RequestTypes.BLOCK:
+					String[] encryptedBlock = (String[]) request.getPayload();
+					String blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
+					String blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
+
+					//TODO: search for block
+					BlockedFile foundBlock;
+					if((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
+						int blockPosition;
+						if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+
+							byte[] searchRes = null;
+							if(!foundBlock.isComplete() || Core.config.hubMode) {
+								//Attempt incomplete search
+								try {
+									searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							} else {
+								if(foundBlock.isComplete()) {
+									//Attempt complete search
+									searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
+								}
+							}
+
+							if(searchRes != null) {
+								Utilities.log(this, "\tSending back block " + blockName, false);
+								foundPeer.getConnection().sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
+								//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+							} else {
+								Utilities.log(this, "\tFailure: could not find block " + blockName, false);
+							}
+						} else {
+							Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
+									      + foundBlock.getBlockList(), false);
+						}
+					} else {
+						Utilities.log(this, "\tFailure: don't have origin BlockedFile", false);
+					}
+					break;
+					
 				case RequestTypes.EXTVIS:
 					Utilities.log(this, "Received request for external visibility", false);
 					(new Thread(new Runnable() {
@@ -171,7 +215,7 @@ public class DualListener extends Listener {
 							
 							//TODO: if the request has no payload, then return the list
 							//TODO: if the request has a payload, do not return those blockedfiles matching that checksum
-							ArrayList<CacheBlockedFile> streams = new ArrayList<CacheBlockedFile> ();
+							ArrayList<String> cacheStreams = new ArrayList<String> ();
 							for(BlockedFile bf : Core.blockDex) {
 								boolean add = false;
 								if(!bf.isComplete() || Core.config.hubMode) {
@@ -188,16 +232,48 @@ public class DualListener extends Listener {
 								if(add) {
 									String fileName = bf.getPointer().getName();
 									if(FilterUtils.mandatoryFilter(fileName)) {
-										streams.add(bf.toStreamedCachedBlockedFile());
+										cacheStreams.add(Core.aes.encrypt(bf.getChecksum()));
 									} else if(fileName.startsWith(".")) {
 										Utilities.log(this, "Search result rejected by period filter: [" + fileName + "]", false);
 									} else {
 										Utilities.log(this, "Search result rejected by filter: [" + fileName + "]", false);
 									}
 								}
-							
-								connection.sendTCP(new Data(DataTypes.SEARCH, streams));
-								Utilities.log(this, "\tSent cache results back", false);
+							}
+							connection.sendTCP(new Data(DataTypes.CACHE, cacheStreams));
+							Utilities.log(this, "\tSent cache search results back", false);
+						}
+					})).start();
+					break;
+					
+				case RequestTypes.CACHEPULL:
+					Utilities.log(this, "Received request for cache pull", false);
+					(new Thread(new Runnable() {
+						public void run() {
+							Object oCachePull = request.getPayload();
+							ArrayList<String> cacheNeeded = new ArrayList<String> ();
+							if(oCachePull instanceof ArrayList<?>) {
+								ArrayList<?> potentialCacheToSend = (ArrayList<?>) oCachePull;
+								for(int i=0; i < potentialCacheToSend.size(); i++) {
+									Object o = potentialCacheToSend.get(i);
+									if(o instanceof String) {
+										cacheNeeded.add(foundPeer.getAES().decrypt((String) o));
+									}
+								}
+								
+								if(cacheNeeded.size() > 0) {
+									ArrayList<StreamedBlockedFile> streamsToSend = new ArrayList<StreamedBlockedFile> ();
+									for(BlockedFile bf : Core.blockDex) {
+										String checksum = bf.getChecksum();
+										if(cacheNeeded.contains(checksum)) {
+											streamsToSend.add(bf.toStreamedBlockedFile());
+										}
+									}
+									Utilities.log(this, "Sending back data for cache pull, package size " + streamsToSend.size(), false);
+									foundPeer.getConnection().sendTCP(new Data(DataTypes.CACHEPULL, streamsToSend));
+								} else {
+									Utilities.log(this, "No cache available to send", false);
+								}
 							}
 						}
 					})).start();
@@ -357,11 +433,73 @@ public class DualListener extends Listener {
 						Utilities.log(this, "Garbage cache data, discarded", false);
 						break;
 					} else {
+						final Object oPayload = data.getPayload();
 						(new Thread(new Runnable() {
 							public void run() {
+								ArrayList<String> cacheDataRes = new ArrayList<String> ();
+								if(oPayload instanceof ArrayList<?>) {
+									ArrayList<?> potentialCache = (ArrayList<?>) oPayload;
+									for(int i=0; i < potentialCache.size(); i++) {
+										Object o = potentialCache.get(i);
+										String thisCache = (String) o;
+										cacheDataRes.add(foundPeer.getAES().decrypt(thisCache));
+									}
+								}
+								
+								//Filter out response for any BlockedFiles that we have
+								for(BlockedFile bf : Core.blockDex) {
+									String curChecksum = bf.getChecksum();
+									if(cacheDataRes.contains(curChecksum)) {
+										cacheDataRes.remove(curChecksum);
+									}
+								}
+								
+								//Re-encrypt all entries for the cache data
+								for(int i=0; i < cacheDataRes.size(); i++) {
+									cacheDataRes.set(i, Core.aes.encrypt(cacheDataRes.get(i)));
+								}
+								
+								if(cacheDataRes.size() > 0) {
+									Utilities.log(this, "Requesting " + cacheDataRes.size() + " BlockedFiles from peer " + foundPeer.getMutex(), false);
+									foundPeer.getConnection().sendTCP(new Request(RequestTypes.CACHEPULL, cacheDataRes));
+								} else {
+									Utilities.log(this, "No new data found from peer " + foundPeer.getMutex(), false);
+								}
 								//TODO: implement cache
 							}
 						})).start();
+					}
+					break;
+					
+				case DataTypes.CACHEPULL:
+					Utilities.log(this, "Received cache pull data", false);
+					Object cachePullPayload = data.getPayload();
+					if(cachePullPayload instanceof ArrayList<?>) {
+						ArrayList<?> potentialStreams = (ArrayList<?>) cachePullPayload;
+						for(int i=0; i < potentialStreams.size(); i++) {
+							Object o = potentialStreams.get(i);
+							if(o instanceof StreamedBlockedFile) {
+								StreamedBlockedFile sbl = (StreamedBlockedFile) o;
+								BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
+								
+								if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
+									BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
+									if(testBf != null) {
+										if(testBf.isComplete()) {
+											Utilities.log(this, "Already own a complete copy of BlockedFile " + intermediate.getChecksum(), false);
+										} else {
+											//Silently download this BlockedFile
+											Utilities.log(this, "Beginning request for cache sync [II] on BlockedFile " + intermediate.getChecksum(), false);
+											(new Thread(new Downloader(intermediate))).start();
+										}
+									} else {
+										//Silently download this BlockedFile
+										Utilities.log(this, "Beginning request for cache sync [NI] on BlockedFile " + intermediate.getChecksum(), false);
+										(new Thread(new Downloader(intermediate))).start();
+									}
+								}
+							}
+						}
 					}
 					break;
 			}
