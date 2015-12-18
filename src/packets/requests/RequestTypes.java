@@ -9,5 +9,6 @@ public class RequestTypes {
 	public static final String BLOCK    = "REQ_BLOCK";
 	public static final String CACHE    = "REQ_CACHE";
 	public static final String EXTVIS   = "REQ_EXTVIS";
+	public static final String CACHEPULL = "REQ_CACHE_PULL";
 	
 }

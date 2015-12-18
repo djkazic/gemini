@@ -197,25 +197,30 @@ public class BlockedFile {
 		if(!blackList.contains(str)) {
 			blackList.add(str);
 		}
-		if(blackList.size() % 8 == 0) {
-			if(lastChecked == 0) {
+		if(!Core.config.hubMode) {
+			if(blackList.size() % 8 == 0) {
+				if(lastChecked == 0) {
+					lastChecked = System.currentTimeMillis();
+				}
+				blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
+				int blocksLeft = blockList.size() - blackList.size();
+				float res = (blocksLeft / blockRate);
+				float finalRes = 0f + res;
+				String units = " sec";
+				if(res > 60 && res < 3600) {
+					finalRes = res / 60f;
+					units = " min";
+				} else if(res >= 3600 && res < 86400) {
+					finalRes = res / 3600f;
+					units = " hr";
+				} else if(res >= 86400) {
+					finalRes = res / 84600f;
+					units = " days";
+				}
+				int ires = (int) finalRes;
+				updateTime(ires + units);
 				lastChecked = System.currentTimeMillis();
 			}
-			blockRate = (8 / ((System.currentTimeMillis() - lastChecked) / 1000f));
-			int blocksLeft = blockList.size() - blackList.size();
-			float res = (blocksLeft / blockRate);
-			String units = " sec";
-			if(res > 60 && res < 360) {
-				res /= 60;
-				units = " min";
-			}
-			if(res > 60) {
-				res /= 60;
-				units = " hr";
-			}
-			int ires = (int) res;
-			updateTime(ires + units);
-			lastChecked = System.currentTimeMillis();
 		}
 		updateProgress();
 	}
@@ -225,9 +230,7 @@ public class BlockedFile {
 	 * @param time value provided
 	 */
 	private void updateTime(String time) {
-		if(!Core.config.hubMode) {
-			Core.mainWindow.updateTime(checksum, time);
-		}
+		Core.mainWindow.updateTime(checksum, time);
 	}
 	
 	/**
@@ -301,6 +304,15 @@ public class BlockedFile {
 		} 
 		return null;
 	}
+
+	/**
+	 * Converts this BlockedFile to SerialBlockedFile for serialization
+	 * @return SerialBlockedFile conversion
+	 */
+	public SerialBlockedFile toSerialBlockedFile() {
+		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
+								   complete, progress, blockRate, lastChecked);
+	}
 	
 	/**
 	 * Converts this BlockedFile to SerialBlockedFile for network transmission
@@ -312,15 +324,6 @@ public class BlockedFile {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList);
-	}
-
-	/**
-	 * Converts this BlockedFile to SerialBlockedFile for serialization
-	 * @return SerialBlockedFile conversion
-	 */
-	public SerialBlockedFile toSerialBlockedFile() {
-		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
-								   complete, progress, blockRate, lastChecked);
 	}
 	
 	/**
