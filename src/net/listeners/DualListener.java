@@ -488,14 +488,12 @@ public class DualListener extends Listener {
 										if(testBf.isComplete()) {
 											Utilities.log(this, "Already own a complete copy of BlockedFile " + intermediate.getChecksum(), false);
 										} else {
-											//Silently download this BlockedFile
-											Utilities.log(this, "Beginning request for cache sync [II] on BlockedFile " + intermediate.getChecksum(), false);
-											(new Thread(new Downloader(intermediate))).start();
+											//Silently download this BlockedFile (partial)
+											fetchCache(intermediate, false);
 										}
 									} else {
-										//Silently download this BlockedFile
-										Utilities.log(this, "Beginning request for cache sync [NI] on BlockedFile " + intermediate.getChecksum(), false);
-										(new Thread(new Downloader(intermediate))).start();
+										//Silently download this BlockedFile (complete)
+										fetchCache(intermediate, true);
 									}
 								}
 							}
@@ -503,6 +501,16 @@ public class DualListener extends Listener {
 					}
 					break;
 			}
+		}
+	}
+	
+	private void fetchCache(BlockedFile intermediate, boolean complete) {
+		if(complete) {	
+			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), false);
+			(new Thread(new Downloader(intermediate))).start();
+		} else {
+			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), false);
+			(new Thread(new Downloader(intermediate))).start();
 		}
 	}
 }
