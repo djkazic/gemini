@@ -386,9 +386,9 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.CACHE:
-					Utilities.log(this, "Received cache data", false);
+					Utilities.log(this, "Received cache data", true);
 					if(!Core.config.cacheEnabled) {
-						Utilities.log(this, "Garbage cache data, discarded", false);
+						Utilities.log(this, "Garbage cache data received, discarded", false);
 						break;
 					} else {
 						final Object oPayload = data.getPayload();

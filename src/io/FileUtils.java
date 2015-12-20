@@ -262,6 +262,8 @@ public class FileUtils {
 					if(list[i].isFile() && !list[i].getName().startsWith(".")) {
 						if(FilterUtils.mandatoryFilter(list[i].getName())) {
 							actualBfCount++;
+						} else {
+							list[i].delete();
 						}
 					}
 				}
@@ -274,8 +276,6 @@ public class FileUtils {
 					if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
 						if(FilterUtils.mandatoryFilter(list[i].getName())) {
 							new BlockedFile(list[i], true);
-						} else {
-							Utilities.log("atrium.FileUtils", "Rejected file by filter: [" + list[i].getName() + "]", true);
 						}
 					}
 				}
