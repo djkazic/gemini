@@ -276,7 +276,6 @@ public class FileUtils {
 							new BlockedFile(list[i], true);
 						} else {
 							Utilities.log("atrium.FileUtils", "Rejected file by filter: [" + list[i].getName() + "]", true);
-							actualBfCount--;
 						}
 					}
 				}
