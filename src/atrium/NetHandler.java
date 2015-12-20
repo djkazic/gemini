@@ -30,6 +30,7 @@ import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
+import net.listeners.BlockListener;
 import net.listeners.DualListener;
 import net.listeners.PeerCountListener;
 import packets.data.Data;
@@ -140,7 +141,7 @@ public class NetHandler {
 	 * @return new instance of a Client for forging out-bound connections
 	 */
 	public Client getClient() {
-		Client client = new Client(512000 * 4, 512000 * 4);
+		Client client = new Client(512000 * 5, 512000 * 5);
 		registerClientListeners(client);
 		return client;
 	}
@@ -152,6 +153,9 @@ public class NetHandler {
 		try {
 			server = new Server(512000 * 6, 512000 * 6);
 			registerClasses(server.getKryo());
+			
+			Utilities.log(this, "Registering block listener", false);
+			server.addListener(new BlockListener());
 			
 			Utilities.switchGui(this, "Registering server listeners", false);
 			server.addListener(new DualListener(1));
@@ -174,8 +178,10 @@ public class NetHandler {
 		try {
 			registerClasses(client.getKryo());
 			Utilities.log(this, "Registered client listeners", false);
+			
+			Utilities.log(this, "Registering block listener", false);
+			client.addListener(new BlockListener());
 
-			//Use listeners, not arbitrary code
 			client.addListener(new DualListener(0));
 
 			Utilities.log(this, "Starting client component", false);
@@ -252,7 +258,7 @@ public class NetHandler {
 			//TODO: remove this debug section
 			foundHosts.clear();
 			foundHosts.add(InetAddress.getByName("136.167.66.138"));
-			foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 

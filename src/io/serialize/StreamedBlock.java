@@ -54,7 +54,7 @@ public class StreamedBlock {
 				//Match BlockedFile from blockDex by checksum
 				BlockedFile bf = FileUtils.getBlockedFile(aes.decrypt(originChecksum));
 				if(bf.isComplete()) {
-					Utilities.log(this, "Discarding block, BlockedFile is done", false);
+					Utilities.log(this, "Discarding block, BlockedFile is done", true);
 				} else {
 					File folder = new File(bf.getBlocksFolder());
 					File dest = new File(bf.getBlocksFolder() + "/" + blockDest);

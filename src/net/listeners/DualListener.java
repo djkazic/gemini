@@ -2,7 +2,6 @@ package net.listeners;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 import com.esotericsoftware.kryonet.Connection;
@@ -39,6 +38,7 @@ public class DualListener extends Listener {
 		} else {
 			Utilities.log(this, "New outgoing peer", false);
 		}
+		connection.setIdleThreshold(0.4f);
 		try {
 			if(inOut == 1) {
 				new Peer(connection, inOut);
@@ -151,48 +151,6 @@ public class DualListener extends Listener {
 						}
 					})).start();
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
-					break;
-					
-				case RequestTypes.BLOCK:
-					String[] encryptedBlock = (String[]) request.getPayload();
-					String blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
-					String blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
-
-					//TODO: search for block
-					BlockedFile foundBlock;
-					if((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
-						int blockPosition;
-						if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
-
-							byte[] searchRes = null;
-							if(!foundBlock.isComplete() || Core.config.hubMode) {
-								//Attempt incomplete search
-								try {
-									searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							} else {
-								if(foundBlock.isComplete()) {
-									//Attempt complete search
-									searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
-								}
-							}
-
-							if(searchRes != null) {
-								Utilities.log(this, "\tSending back block " + blockName, true);
-								foundPeer.getConnection().sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
-								//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
-							} else {
-								Utilities.log(this, "\tFailure: could not find block " + blockName, false);
-							}
-						} else {
-							Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-									      + foundBlock.getBlockList(), false);
-						}
-					} else {
-						Utilities.log(this, "\tFailure: don't have origin BlockedFile", false);
-					}
 					break;
 					
 				case RequestTypes.EXTVIS:
