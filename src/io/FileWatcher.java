@@ -17,9 +17,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.List;
-
 import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
@@ -96,7 +94,17 @@ public class FileWatcher implements Runnable {
 					return FileVisitResult.CONTINUE;
 				}
 			};
-
+			
+			//Wait for folder lock
+			long initialFileBytesCount = -1;
+			while(initialFileBytesCount != fileBytesCount(bfs)) {
+				long fileBytesCountNow = fileBytesCount(bfs);
+				Utilities.log(this, initialFileBytesCount + " vs. " + fileBytesCountNow, true);
+				initialFileBytesCount = fileBytesCountNow;
+				Thread.sleep(5000);
+				continue;
+			}
+			
 			try {
 				Files.walkFileTree(bfs.toPath(), fv);
 			} catch (IOException e) {
@@ -161,9 +169,16 @@ public class FileWatcher implements Runnable {
 			}
 		} else {
 			for(BlockedFile bf : Core.blockDex) {
-				if(!bf.getPointer().exists()) {
-					Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
-					bf.reset();
+				if(Core.config.hubMode) {
+					if(!(new File(bf.getBlocksFolder())).exists()) {
+						Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+						bf.reset();
+					}
+				} else {
+					if(!bf.getPointer().exists()) {
+						Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+						bf.reset();
+					}
 				}
 				BlockdexSerializer.run();
 				if(!Core.config.hubMode) {
@@ -172,5 +187,20 @@ public class FileWatcher implements Runnable {
 				}
 			}
 		}
+	}
+	
+	private int fileBytesCount(File start) {
+		int output = 0;
+		if(start.isDirectory()) {
+			File[] files = start.listFiles();
+			if(files != null) {
+				for(File file : files) {
+					output += fileBytesCount(file);
+				}
+			}
+		} else {
+			output = (int) start.length();
+		}
+		return output;
 	}
 }
