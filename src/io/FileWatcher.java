@@ -159,6 +159,18 @@ public class FileWatcher implements Runnable {
 					Core.mainWindow.updateLibrary();
 				}
 			}
+		} else {
+			for(BlockedFile bf : Core.blockDex) {
+				if(!bf.getPointer().exists()) {
+					Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+					bf.reset();
+				}
+				BlockdexSerializer.run();
+				if(!Core.config.hubMode) {
+					Core.mainWindow.removeDownload(bf);
+					Core.mainWindow.updateLibrary();
+				}
+			}
 		}
 	}
 }
