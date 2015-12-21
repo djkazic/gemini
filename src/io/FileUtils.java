@@ -10,7 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
@@ -107,7 +113,7 @@ public class FileUtils {
 		}
 		return scratchDirectory;
 	}
-	
+
 	public static String getConfigDir() {
 		return getWorkspaceDir() + "/.config";
 	}
@@ -142,7 +148,7 @@ public class FileUtils {
 		}
 		return null;
 	}
-	
+
 	public static byte[] findBlockFromComplete(BlockedFile bf, int blockIndex) {
 		try {
 			int res = 0;
@@ -168,146 +174,162 @@ public class FileUtils {
 	}
 
 	public static void genBlockIndex() {
-		File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
-		File cacheFile = new File(getConfigDir() + "/blockdex.dat");
-		if(encCacheFile.exists()) {
-			Utilities.log("atrium.FileUtils", "Attempting to read blockdex cache", false);
-			try {
-				byte[] encFileBytes = Files.readAllBytes(encCacheFile.toPath());
-				byte[] decryptedBytes = Core.aes.decrypt(encFileBytes);
-				FileOutputStream fos = new FileOutputStream(cacheFile);
-				fos.write(decryptedBytes);
-				fos.close();
-				encCacheFile.delete();
-				Kryo kryo = new Kryo();
-				Input input = new Input(new FileInputStream(cacheFile));
-
+		try {
+			File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
+			File cacheFile = new File(getConfigDir() + "/blockdex.dat");
+			if(encCacheFile.exists()) {
+				Utilities.log("atrium.FileUtils", "Attempting to read blockdex cache", false);
 				try {
-					ArrayList<?> uKbf = kryo.readObject(input, ArrayList.class);
-					Utilities.log("atrium.FileUtils", "Read " + uKbf.size() + " entries from cache", true);
-					for(int i=0; i < uKbf.size(); i++) {
-						((SerialBlockedFile) uKbf.get(i)).toBlockedFile();
+					byte[] encFileBytes = Files.readAllBytes(encCacheFile.toPath());
+					byte[] decryptedBytes = Core.aes.decrypt(encFileBytes);
+					FileOutputStream fos = new FileOutputStream(cacheFile);
+					fos.write(decryptedBytes);
+					fos.close();
+					encCacheFile.delete();
+					Kryo kryo = new Kryo();
+					Input input = new Input(new FileInputStream(cacheFile));
+
+					try {
+						ArrayList<?> uKbf = kryo.readObject(input, ArrayList.class);
+						Utilities.log("atrium.FileUtils", "Read " + uKbf.size() + " entries from cache", true);
+						for(int i=0; i < uKbf.size(); i++) {
+							((SerialBlockedFile) uKbf.get(i)).toBlockedFile();
+						}
+					} catch(Exception ex) {
+						ex.printStackTrace();
 					}
-				} catch(Exception ex) {
+					input.close();
+					cacheFile.delete();
+				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				input.close();
-				cacheFile.delete();
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
-		}
-		
-		int actualBfCount = 0;
-		File baseFolder = new File(getWorkspaceDir());
-		
-		if(Core.config.hubMode) {
-			if(baseFolder != null && baseFolder.listFiles().length > 0) {
-				int counter = 0;
-				for(File file : baseFolder.listFiles()) {
-					if(file.isFile()) {
-						file.delete();
-						counter++;
-					}
-				}
-				if(counter > 0) {
-					Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
-				}
-			}
-			File appData = new File(FileUtils.getAppDataDir());
-			if(appData.exists()) {
-				Utilities.log("atrium.FileUtils", "Examining app data directory", false);
-				File[] blockedFileFolders = appData.listFiles();
-				if(blockedFileFolders != null && blockedFileFolders.length > 0) {
-					ArrayList<String> appDataDirectories = new ArrayList<String> ();
-					for(File file : blockedFileFolders) {
-						if(file.isDirectory() && !file.getName().startsWith(".")) {
-							appDataDirectories.add(file.getName());
+
+			int actualBfCount = 0;
+			File baseFolder = new File(getWorkspaceDir());
+
+			if(Core.config.hubMode) {
+				if(baseFolder != null && baseFolder.listFiles().length > 0) {
+					int counter = 0;
+					for(File file : baseFolder.listFiles()) {
+						if(file.isFile()) {
+							file.delete();
+							counter++;
 						}
 					}
-					actualBfCount = appDataDirectories.size();
-					
-					while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
-						for(BlockedFile bf : Core.blockDex) {
-							if(!appDataDirectories.contains(bf.getChecksum())) {
-								Core.blockDex.remove(bf);
-							}
-						}
-						BlockdexSerializer.run();
-					}	
-					
-					while(appDataDirectories.size() != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
-						//No cache, dump everything not in the blockDex
+					if(counter > 0) {
+						Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
+					}
+				}
+				File appData = new File(FileUtils.getAppDataDir());
+				if(appData.exists()) {
+					Utilities.log("atrium.FileUtils", "Examining app data directory", false);
+					File[] blockedFileFolders = appData.listFiles();
+					if(blockedFileFolders != null && blockedFileFolders.length > 0) {
+						ArrayList<String> appDataDirectories = new ArrayList<String> ();
 						for(File file : blockedFileFolders) {
-							boolean foundInDex = false;
-							for(BlockedFile bf : Core.blockDex) {
-								if(bf.getChecksum().equals(file.getName())) {
-									foundInDex = true;
-									break;
-								}
-							}
-							if(!foundInDex) {
-								FileUtils.deleteRecursive(file);
-								appDataDirectories.remove(file.getName());
+							if(file.isDirectory() && !file.getName().startsWith(".")) {
+								appDataDirectories.add(file.getName());
 							}
 						}
 						actualBfCount = appDataDirectories.size();
-					}
-				}
-			}
-		} else {
-			File[] list = baseFolder.listFiles();
-			if(list != null && list.length > 0) {
-				for(int i=0; i < list.length; i++) {
-					if(list[i].isFile() && !list[i].getName().startsWith(".")) {
-						if(FilterUtils.mandatoryFilter(list[i].getName())) {
-							actualBfCount++;
-						} else {
-							list[i].delete();
+
+						while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
+							for(BlockedFile bf : Core.blockDex) {
+								if(!appDataDirectories.contains(bf.getChecksum())) {
+									Core.blockDex.remove(bf);
+								}
+							}
+							BlockdexSerializer.run();
+						}	
+
+						while(appDataDirectories.size() != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
+							//No cache, dump everything not in the blockDex
+							for(File file : blockedFileFolders) {
+								boolean foundInDex = false;
+								for(BlockedFile bf : Core.blockDex) {
+									if(bf.getChecksum().equals(file.getName())) {
+										foundInDex = true;
+										break;
+									}
+								}
+								if(!foundInDex) {
+									FileUtils.deleteRecursive(file);
+									appDataDirectories.remove(file.getName());
+								}
+							}
+							actualBfCount = appDataDirectories.size();
 						}
 					}
 				}
-			}
-			
-			while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
-				Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
-						      + " but detected " + actualBfCount, false);
-				for(int i=0; i < list.length; i++) {
-					if(list[i].isFile() && !list[i].getName().startsWith(".") && !haveInBlockDex(list[i])) {
-						if(FilterUtils.mandatoryFilter(list[i].getName())) {
-							new BlockedFile(list[i], true);
+			} else {
+				final ArrayList<File> filterPassed = new ArrayList<File> ();
+
+				FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
+						if(!file.getParent().getFileName().toString().startsWith(".")) {
+							Utilities.log(this, "Visiting file " + file.getFileName(), false);
+							
+							File visitedFile = file.toFile();
+							
+							if(FilterUtils.mandatoryFilter(visitedFile.getName())) {
+								filterPassed.add(visitedFile);
+							} else {
+								FileUtils.deleteRecursive(visitedFile);
+								FileUtils.removeFileAndParentsIfEmpty(visitedFile.toPath());
+							}
+						}
+						return FileVisitResult.CONTINUE;
+					}
+				};
+				
+				Files.walkFileTree(baseFolder.toPath(), fv);
+				actualBfCount = filterPassed.size();
+
+				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
+					Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+					+ " but detected " + actualBfCount, false);
+					for(int i=0; i < filterPassed.size(); i++) {
+						if(!filterPassed.get(i).getName().startsWith(".") 
+						   && (getBlockedFile(generateChecksum(filterPassed.get(i))) == null)) {
+							if(FilterUtils.mandatoryFilter(filterPassed.get(i).getName())) {
+								new BlockedFile(filterPassed.get(i), true);
+							}
 						}
 					}
+					BlockdexSerializer.run();
 				}
-				BlockdexSerializer.run();
-			}
-			
-			while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() > actualBfCount) {
-				Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
-			      			  + " but detected " + actualBfCount, false);
-				for(int i=0; i < Core.blockDex.size(); i++) {
-					BlockedFile curBf = Core.blockDex.get(i);
-					File curPointer = curBf.getPointer();
-					boolean found = false;
-					for(int j=0; j < list.length; j++) {
-						if(curPointer.equals(list[j])) {
-							found = true;
-							break;
+
+				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() > actualBfCount) {
+					Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+					+ " but detected " + actualBfCount, false);
+					for(int i=0; i < Core.blockDex.size(); i++) {
+						BlockedFile curBf = Core.blockDex.get(i);
+						File curPointer = curBf.getPointer();
+						boolean found = false;
+						for(int j=0; j < filterPassed.size(); j++) {
+							if(curPointer.equals(filterPassed.get(j))) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							Core.blockDex.remove(curBf);
 						}
 					}
-					if(!found) {
-						Core.blockDex.remove(curBf);
-					}
+					BlockdexSerializer.run();
 				}
-				BlockdexSerializer.run();
 			}
+
+			String checkPassFail = (Core.blockDex.size() == actualBfCount) ? "PASS" : "FAIL";
+			Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
+			+ " and detected " + actualBfCount, false);
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
-			
-		String checkPassFail = (Core.blockDex.size() == actualBfCount) ? "PASS" : "FAIL";
-		Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
-	                  + " and detected " + actualBfCount, false);
 	}
-	
+
 	public static boolean haveInBlockDex(File file) {
 		for(BlockedFile bf : Core.blockDex) {
 			if(bf.getPointer().equals(file)) {
@@ -316,7 +338,7 @@ public class FileUtils {
 		}
 		return false;
 	}
-	
+
 	public static String generateChecksum(File file) {
 		try {
 			InputStream fis = new FileInputStream(file);
@@ -391,7 +413,7 @@ public class FileUtils {
 				}
 			} while(numRead > 0);
 			fis.close();
-			
+
 			//Delete file after physical blocking if running in hubMode
 			if(Core.config.hubMode) {
 				bf.getPointer().delete();
@@ -402,7 +424,7 @@ public class FileUtils {
 		}
 		return null;
 	}
-	
+
 	public static ArrayList<String> enumerateIncompleteBlackList(BlockedFile bf) {
 		try {
 			ArrayList<String> output = new ArrayList<String> ();
@@ -465,7 +487,7 @@ public class FileUtils {
 		//Set complete flag
 		bf.setComplete(true);
 	}
-	
+
 	public static void openBlockedFile(BlockedFile bf) {
 		if(bf.isComplete()) {
 			Desktop thisDesktop = Desktop.getDesktop();
@@ -476,7 +498,7 @@ public class FileUtils {
 			}
 		}
 	}
-	
+
 	public static BlockedFile getBlockedFile(String checksum) {
 		for(BlockedFile block : Core.blockDex) {
 			if(block.getChecksum().equals(checksum)) {
@@ -485,17 +507,17 @@ public class FileUtils {
 		}
 		return null;
 	}
-	
+
 	public static BlockedFile getBlockedFile(ArrayList<String> blockList) {
 		for(BlockedFile block : Core.blockDex) {
 			if(block.getBlockList().containsAll(blockList) && 
-			   blockList.containsAll(block.getBlockList())) {
+					blockList.containsAll(block.getBlockList())) {
 				return block;
 			}
 		}
 		return null;
 	}
-	
+
 	public static void copyStream(InputStream is, OutputStream os) throws IOException {
 		int i;
 		byte[] b = new byte[1024];
@@ -503,7 +525,7 @@ public class FileUtils {
 			os.write(b, 0, i);
 		}
 	}
-	
+
 	public static boolean deleteRecursive(File path) {
 		try {
 			boolean ret = true;
@@ -522,5 +544,24 @@ public class FileUtils {
 			ex.printStackTrace();
 		}
 		return false;
+	}
+
+	public static void removeFileAndParentsIfEmpty(Path path)
+			throws IOException {
+		if(path == null || path.equals(new File(FileUtils.getWorkspaceDir()).toPath())) {
+			return;
+		}
+
+		if(Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) {
+			Files.deleteIfExists(path);
+		} else if(Files.isDirectory(path)) {
+			try {
+				Files.delete(path);
+			} catch(Exception ex) {
+				FileUtils.deleteRecursive(path.toFile());
+				return;
+			}
+		}
+		removeFileAndParentsIfEmpty(path.getParent());
 	}
 }
