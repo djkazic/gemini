@@ -451,7 +451,8 @@ public class FileUtils {
 
 			//Delete file after physical blocking if running in hubMode
 			if(Core.config.hubMode) {
-				bf.getPointer().delete();
+				FileUtils.deleteRecursive(bf.getPointer());
+				FileUtils.removeFileAndParentsIfEmpty(bf.getPointer().toPath());
 			}
 			return blockList;
 		} catch (Exception ex) {
