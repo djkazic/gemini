@@ -32,6 +32,8 @@ import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 
 public class FileUtils {
+	
+	private static ArrayList<File> filterPassed;
 
 	public static void initDirs() {
 		try {
@@ -263,28 +265,29 @@ public class FileUtils {
 					}
 				}
 			} else {
-				final ArrayList<File> filterPassed = new ArrayList<File> ();
+				filterPassed = new ArrayList<File> ();
 
-				FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
-					@Override
-					public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
-						if(!file.getParent().getFileName().toString().startsWith(".")) {
-							Utilities.log(this, "Visiting file " + file.getFileName(), false);
-							
-							File visitedFile = file.toFile();
-							
-							if(FilterUtils.mandatoryFilter(visitedFile.getName())) {
-								filterPassed.add(visitedFile);
+				File[] list = baseFolder.listFiles();
+				if(list != null && list.length > 0) {
+					for(int i=0; i < list.length; i++) {
+						if(!list[i].getName().startsWith(".")) {
+							if(list[i].isFile()) {
+								if(FilterUtils.mandatoryFilter(list[i].getName())) {
+									filterPassed.add(list[i]);
+								} else {
+									list[i].delete();
+								}
 							} else {
-								FileUtils.deleteRecursive(visitedFile);
-								FileUtils.removeFileAndParentsIfEmpty(visitedFile.toPath());
+								try {
+									processDir(list[i]);
+								} catch(Exception ex) {
+									ex.printStackTrace();
+								}
 							}
 						}
-						return FileVisitResult.CONTINUE;
 					}
-				};
+				}
 				
-				Files.walkFileTree(baseFolder.toPath(), fv);
 				actualBfCount = filterPassed.size();
 
 				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
@@ -327,6 +330,38 @@ public class FileUtils {
 			+ " and detected " + actualBfCount, false);
 		} catch(Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	private static void processDir(File preDef) throws InterruptedException, IOException {
+		final File bfs = preDef;
+		
+		if(bfs.isDirectory()) {
+			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
+					Utilities.log(this, "Visiting file " + file.getFileName(), false);
+					try {
+						processDir(file.toFile());
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
+					return FileVisitResult.CONTINUE;
+				}
+			};
+
+			try {
+				Files.walkFileTree(bfs.toPath(), fv);
+			} catch (IOException e) {
+				//Second to last exception
+			}	
+		} else {
+			if(FilterUtils.mandatoryFilter(bfs.getName())) {
+				filterPassed.add(bfs);
+			} else {
+				FileUtils.deleteRecursive(bfs);
+				FileUtils.removeFileAndParentsIfEmpty(bfs.toPath());
+			}
 		}
 	}
 
