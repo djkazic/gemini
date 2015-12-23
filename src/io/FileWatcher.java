@@ -138,9 +138,13 @@ public class FileWatcher implements Runnable {
 					Core.mainWindow.updateLibrary();
 				}
 			} else {
-				Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]", false);
-				FileUtils.deleteRecursive(bfs);
-				FileUtils.removeFileAndParentsIfEmpty(bfs.toPath());
+				if(!bfs.getName().endsWith(".filepart")) {
+					Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]", false);
+					FileUtils.deleteRecursive(bfs);
+					FileUtils.removeFileAndParentsIfEmpty(bfs.toPath());
+				} else {
+					Utilities.log(this, "Detected filepart upload: [" + relevantFileName + "]", false);
+				}
 			}
 		}
 	}
