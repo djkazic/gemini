@@ -27,6 +27,7 @@ public class DiscoveryServer implements Runnable {
 					DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
 					discoverySocket.send(sendPacket);
 				}
+				Thread.sleep(300);
 			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
