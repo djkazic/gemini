@@ -91,6 +91,7 @@ public class Utilities {
 				log("atrium.Utilities", "Interfaces are null, falling back to config mutex", false);
 				if(Core.config.generatedMAC == null) {
 					Core.config.generatedMAC = randomMACAddress();
+					Utilities.log("atrium.Utilities", "\t" + Core.config.generatedMAC, false);
 				}
 				return base64(Core.config.generatedMAC);
 			}			
@@ -126,13 +127,10 @@ public class Utilities {
 	    Random rand = new Random();
 	    byte[] macAddr = new byte[6];
 	    rand.nextBytes(macAddr);
-	    macAddr[0] = (byte)(macAddr[0] & (byte)254);
+	    macAddr[0] = (byte)(macAddr[0] & (byte) 254);
 	    StringBuilder sb = new StringBuilder(18);
-	    for(byte b : macAddr){
-	        if(sb.length() > 0) {
-	            sb.append(":");
-	        }
-	        sb.append(String.format("%02x", b));
+	    for(int i=0; i < macAddr.length; i++){
+	        sb.append(String.format("%02X%s", macAddr[i], (i < macAddr.length - 1) ? "-" : ""));
 	    }
 	    return sb.toString();
 	}
