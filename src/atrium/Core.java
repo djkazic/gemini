@@ -62,11 +62,13 @@ public class Core {
 		
 		if(args.length > 0 && args[0].equals("-daemon")) {
 			Core.config.hubMode = true;
+			Log.set(Log.LEVEL_INFO);
+			if(args.length == 2) {
+				if(args[1].equals("-debug")) {
+					Log.set(Log.LEVEL_DEBUG);
+				}
+			}
 		}
-		
-		//TODO: remove for production
-		//Set logging
-		Log.set(Log.LEVEL_INFO);
 		
 		//GUI inits
 		if(Core.config.hubMode) {

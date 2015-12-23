@@ -319,6 +319,8 @@ public class NetHandler {
 								Core.mainWindow.ready();
 								break;
 							}
+						} else {
+							return;
 						}
 					}
 				}
