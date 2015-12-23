@@ -46,6 +46,7 @@ public class Core {
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		//Load config if exists
+		Utilities.log("atrium.Core", "Attempting to load configuration from file...", false);
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
 			if(configFile.exists()) {

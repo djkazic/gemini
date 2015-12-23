@@ -16,6 +16,7 @@ public class Config {
 	public boolean cacheEnabled = false;
 	public boolean notifiedPortForwarding = false;
 	public boolean hubMode = false;
+	public String generatedMAC = null;
 	
 	/**
 	 * Writes configuration to disk (config.dat)

@@ -2,6 +2,7 @@ package atrium;
 
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.Random;
 
 import com.esotericsoftware.minlog.Log;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
@@ -87,8 +88,11 @@ public class Utilities {
 			if(!sb.toString().isEmpty() && firstInterfaceFound == null) {
 				return base64(sb.toString());
 			} else {
-				log("atrium.Utilities", "Interfaces are null, falling back to supernode mutex", false);
-				return base64("0C-64-32-64-SN-3B");
+				log("atrium.Utilities", "Interfaces are null, falling back to config mutex", false);
+				if(Core.config.generatedMAC == null) {
+					Core.config.generatedMAC = randomMACAddress();
+				}
+				return base64(Core.config.generatedMAC);
 			}			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -116,5 +120,20 @@ public class Utilities {
 	
 	public static boolean isMac() {
 		return (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0);
+	}
+	
+	public static String randomMACAddress(){
+	    Random rand = new Random();
+	    byte[] macAddr = new byte[6];
+	    rand.nextBytes(macAddr);
+	    macAddr[0] = (byte)(macAddr[0] & (byte)254);
+	    StringBuilder sb = new StringBuilder(18);
+	    for(byte b : macAddr){
+	        if(sb.length() > 0) {
+	            sb.append(":");
+	        }
+	        sb.append(String.format("%02x", b));
+	    }
+	    return sb.toString();
 	}
 }
