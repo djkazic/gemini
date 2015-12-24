@@ -342,7 +342,11 @@ public class DualListener extends Listener {
 												chosenMeta = meta;
 											}
 										}
-										Utilities.log("debug.DualListener", chosenMeta.toString(), false);
+										if(chosenMeta != null) {
+											Utilities.log("debug.DualListener", chosenMeta.toString(), false);
+										} else {
+											Utilities.log("debug.DualListener", "chosenMeta = null", false);
+										}
 										
 										//Store name and blockList in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();

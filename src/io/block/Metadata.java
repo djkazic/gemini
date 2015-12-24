@@ -28,6 +28,7 @@ public class Metadata {
 	
 	public Metadata(String bfChecksum) {
 		this.bfChecksum = bfChecksum;
+		comments = new HashMap<String, Object[]> ();
 	}
 	
 	public boolean matchBf(String checksum) {
@@ -36,9 +37,6 @@ public class Metadata {
 	
 	public void addComment(String comment) {
 		String signKey = Core.rsa.sign(comment);
-		if(comments == null) {
-			comments = new HashMap<String, Object[]> ();
-		}
 		comments.put(comment, new Object[] {Core.rsa.rawPublicKey(), signKey});
 		timestamp = System.currentTimeMillis();
 	}

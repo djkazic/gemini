@@ -215,11 +215,15 @@ public class FileUtils {
 			if(Core.config.hubMode) {
 				if(baseFolder != null && baseFolder.listFiles().length > 0) {
 					File[] files = baseFolder.listFiles();
+					int counter = 0;
 					if(files != null) {
 						for(File file : files) {
-							FileUtils.deleteRecursive(file);
+							if(!file.getName().startsWith(".")) {
+								FileUtils.deleteRecursive(file);
+								counter++;
+							}
 						}
-						if(files.length > 0) {
+						if(counter > 0) {
 							Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
 						}
 					}

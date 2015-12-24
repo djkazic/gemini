@@ -26,6 +26,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 
+import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import net.discover.DiscoveryClient;
@@ -230,6 +231,7 @@ public class NetHandler {
 		kryo.register(Inet4Address.class);
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
+		kryo.register(Metadata.class);	
 	}
 	
 	/**
@@ -257,11 +259,9 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			foundHosts.add(InetAddress.getByName("136.167.66.138"));
+			//foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			
-			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP

@@ -114,6 +114,7 @@ public class Core {
 		
 		//Vars initialization
 		Utilities.switchGui("atrium.Core", "Generating block index", false);
+		metaDex = new ArrayList<Metadata> ();
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
