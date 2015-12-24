@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 
+import crypto.RSA;
 import io.FileUtils;
 
 public class Config {
@@ -17,6 +18,7 @@ public class Config {
 	public boolean notifiedPortForwarding = false;
 	public boolean hubMode = false;
 	public String generatedMAC = null;
+	public RSA rsa;
 	
 	/**
 	 * Writes configuration to disk (config.dat)
@@ -29,6 +31,7 @@ public class Config {
 				configFile.delete();
 			}
 			configFile.createNewFile();
+			rsa = Core.rsa;
 			Kryo kryo = new Kryo();
 			FileOutputStream fos = new FileOutputStream(configFile);
 			Output out = new Output(fos);

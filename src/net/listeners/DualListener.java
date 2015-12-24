@@ -423,7 +423,6 @@ public class DualListener extends Listener {
 								} else {
 									Utilities.log(this, "No new data found from peer " + foundPeer.getMutex(), false);
 								}
-								//TODO: implement cache
 							}
 						})).start();
 					}

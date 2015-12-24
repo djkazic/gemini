@@ -4,9 +4,12 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.Signature;
 
 import javax.crypto.Cipher;
 import javax.xml.bind.DatatypeConverter;
+
+import atrium.Utilities;
 
 /**
  * RSA cryptography helper class
@@ -17,7 +20,7 @@ public class RSA {
 	private KeyPairGenerator kpg;
 	public static String pubKey;
 	public KeyPair myPair;
-	
+
 	/**
 	 * Initializes a KeyPairGenerator, then stores it
 	 * @throws NoSuchAlgorithmException
@@ -61,5 +64,32 @@ public class RSA {
 			ex.printStackTrace();
 		}
 		return null;
+	}
+	
+	public String sign(String in) {
+		try {
+			byte[] data = in.getBytes("UTF8");
+
+	        Signature sig = Signature.getInstance("SHA1WithRSA");
+	        sig.initSign(myPair.getPrivate());
+	        sig.update(data);
+	        byte[] signatureBytes = sig.sign();
+	        return new String(signatureBytes, "ISO-8859-1");
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
+	public boolean verify(String in, String signature) {
+		try {
+			Signature sig = Signature.getInstance("SHA1WithRSA");
+			sig.initVerify(myPair.getPublic());
+			sig.update(in.getBytes("UTF8"));
+			return sig.verify(signature.getBytes("ISO-8859-1"));
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 }

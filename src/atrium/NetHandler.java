@@ -257,8 +257,10 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
+			foundHosts.add(InetAddress.getByName("192.3.165.112"));
 			foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			
 			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
@@ -301,6 +303,7 @@ public class NetHandler {
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed", false);
 				}
+				Thread.sleep(500);
 			}
 
 			Utilities.log(this, "Terminated peer connections loop", false);
