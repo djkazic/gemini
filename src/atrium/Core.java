@@ -85,10 +85,10 @@ public class Core {
 		
 		//Initialize crypto routines
 		Utilities.switchGui("atrium.Core", "Initializing RSA / AES", false);
-		if(Core.config.rsa == null) {
-			rsa = new RSA();
+		if(Core.config.rsaPub != null && Core.config.rsaPriv != null) {
+			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
 		} else {
-			rsa = Core.config.rsa;
+			rsa = new RSA();
 		}
 		aes = new AES(mutex);
 		
