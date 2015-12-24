@@ -212,15 +212,14 @@ public class FileUtils {
 
 			if(Core.config.hubMode) {
 				if(baseFolder != null && baseFolder.listFiles().length > 0) {
-					int counter = 0;
-					for(File file : baseFolder.listFiles()) {
-						if(file.isFile()) {
-							file.delete();
-							counter++;
+					File[] files = baseFolder.listFiles();
+					if(files != null) {
+						for(File file : files) {
+							FileUtils.deleteRecursive(file);
 						}
-					}
-					if(counter > 0) {
-						Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
+						if(files.length > 0) {
+							Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
+						}
 					}
 				}
 				File appData = new File(FileUtils.getAppDataDir());
