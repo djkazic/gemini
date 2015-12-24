@@ -66,13 +66,13 @@ public class Downloader implements Runnable {
 					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(5);
 					continue;
-				} else {
-					if(blockedFile.getProgressNum() == 100) {
-						Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
-						blockedFile.setComplete(true);
-						BlockdexSerializer.run();
-						break;
-					}
+				}
+				
+				if(blockedFile.getProgressNum() == 100) {
+					Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
+					blockedFile.setComplete(true);
+					BlockdexSerializer.run();
+					break;
 				}
 
 				if(Core.peers.size() == 1) {
