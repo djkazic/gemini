@@ -13,8 +13,6 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 import javax.xml.bind.DatatypeConverter;
 
-import atrium.Utilities;
-
 /**
  * RSA cryptography helper class
  * @author Kevin Cai

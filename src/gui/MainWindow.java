@@ -52,9 +52,9 @@ import filter.FilterUtils;
 import gui.render.ProgressCellRenderer;
 import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
-import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
+import io.block.BlockedFile;
 import net.iharder.dnd.FileDrop;
 
 public class MainWindow extends JFrame {

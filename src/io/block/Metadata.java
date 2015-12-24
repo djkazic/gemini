@@ -1,4 +1,4 @@
-package io;
+package io.block;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -24,6 +24,14 @@ public class Metadata {
 		comments = null;
 		voted = false;
 		timestamp = 0;
+	}
+	
+	public Metadata(String bfChecksum) {
+		this.bfChecksum = bfChecksum;
+	}
+	
+	public boolean matchBf(String checksum) {
+		return bfChecksum.equals(checksum);
 	}
 	
 	public void addComment(String comment) {
@@ -65,5 +73,9 @@ public class Metadata {
 				downs++;
 			}
 		}
+	}
+	
+	public String toString() {
+		return "Checksum: " + bfChecksum + " | Score: " + getScore() + " | Comments: " + comments;
 	}
 }

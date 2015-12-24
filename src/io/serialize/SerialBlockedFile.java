@@ -3,7 +3,7 @@ package io.serialize;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.BlockedFile;
+import io.block.BlockedFile;
 
 public class SerialBlockedFile {
 	

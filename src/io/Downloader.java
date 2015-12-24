@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
+import io.block.BlockedFile;
 import io.serialize.BlockdexSerializer;
 
 public class Downloader implements Runnable {

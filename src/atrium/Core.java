@@ -15,9 +15,10 @@ import crypto.AES;
 import crypto.RSA;
 import filter.FilterUtils;
 import gui.MainWindow;
-import io.BlockedFile;
 import io.FileUtils;
 import io.FileWatcher;
+import io.block.BlockedFile;
+import io.block.Metadata;
 
 /**
  * Holds centralized data (variables and instances)
@@ -31,6 +32,7 @@ public class Core {
 	public static NetHandler netHandler;
 	public static MainWindow mainWindow;
 	public static ArrayList<BlockedFile> blockDex;
+	public static ArrayList<Metadata> metaDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 	
 	public static int blockSize = 240000;
@@ -115,6 +117,9 @@ public class Core {
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
+		
+		//Load meta index
+		FileUtils.loadMetaIndex();
 		
 		//Generate block index
 		FileUtils.genBlockIndex();

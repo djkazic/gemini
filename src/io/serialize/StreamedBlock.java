@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import atrium.Core;
 import atrium.Utilities;
 import crypto.AES;
-import io.BlockedFile;
 import io.FileUtils;
+import io.block.BlockedFile;
 
 public class StreamedBlock {
 

@@ -28,6 +28,8 @@ import com.esotericsoftware.kryo.io.Input;
 import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
+import io.block.BlockedFile;
+import io.block.Metadata;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 
@@ -174,7 +176,7 @@ public class FileUtils {
 		}
 		return null;
 	}
-
+	
 	public static void genBlockIndex() {
 		try {
 			File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
@@ -329,6 +331,28 @@ public class FileUtils {
 			+ " and detected " + actualBfCount, false);
 		} catch(Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public static void loadMetaIndex() {
+		File metaFile = new File(getConfigDir() + "/metadex.dat");
+		if(metaFile.exists()) {
+			try {
+				Utilities.log("atrium.FileUtils", "Attempting to read metadex cache", false);
+				Kryo kryo = new Kryo();
+				Input input = new Input(new FileInputStream(metaFile));
+				ArrayList<?> uMeta = kryo.readObject(input, ArrayList.class);
+				ArrayList<Metadata> finalList = new ArrayList<Metadata> ();
+				for(int i=0; i < uMeta.size(); i++) {
+					Object o = uMeta.get(i);
+					if(o instanceof Metadata) {
+						finalList.add((Metadata) o);
+					}
+				}
+				Core.metaDex = finalList;
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	

@@ -12,9 +12,10 @@ import atrium.Peer;
 import atrium.Utilities;
 import crypto.RSA;
 import filter.FilterUtils;
-import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
+import io.block.BlockedFile;
+import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import packets.data.Data;
@@ -331,8 +332,17 @@ public class DualListener extends Listener {
 								for(int i=0; i < potentialStreams.size(); i++) {
 									Object o = potentialStreams.get(i);
 									if(o instanceof StreamedBlockedFile) {
-										StreamedBlockedFile sbl = (StreamedBlockedFile) o;
+										StreamedBlockedFile sbl = (StreamedBlockedFile) o;										
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
+										
+										//TODO: remove sbl debugging
+										Metadata chosenMeta = null;
+										for(Metadata meta : Core.metaDex) {
+											if(meta.matchBf(intermediate.getChecksum())) {
+												chosenMeta = meta;
+											}
+										}
+										Utilities.log("debug.DualListener", chosenMeta.toString(), false);
 										
 										//Store name and blockList in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
@@ -354,6 +364,7 @@ public class DualListener extends Listener {
 												} else {
 													sizeEstimate += estimateKb + "KB";
 												}
+												//TODO: GUI implementation of metadata
 												Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
 											}
 										}
