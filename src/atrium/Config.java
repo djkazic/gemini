@@ -18,7 +18,8 @@ public class Config {
 	public boolean notifiedPortForwarding = false;
 	public boolean hubMode = false;
 	public String generatedMAC = null;
-	public RSA rsa;
+	public byte[] rsaPub;
+	public byte[] rsaPriv;
 	
 	/**
 	 * Writes configuration to disk (config.dat)
@@ -31,7 +32,8 @@ public class Config {
 				configFile.delete();
 			}
 			configFile.createNewFile();
-			rsa = Core.rsa;
+			rsaPub = Core.rsa.publicKeyBytes();
+			rsaPriv = Core.rsa.privateKeyBytes();
 			Kryo kryo = new Kryo();
 			FileOutputStream fos = new FileOutputStream(configFile);
 			Output out = new Output(fos);
