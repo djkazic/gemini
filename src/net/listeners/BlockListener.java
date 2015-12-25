@@ -55,7 +55,7 @@ public class BlockListener extends TcpIdleSender {
 							try {
 								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
 							} catch (Exception ex) {
-								ex.printStackTrace();
+								Utilities.log(this, "Received request for block we do not yet have", true);
 							}
 						} else {
 							if(foundBlock.isComplete()) {
@@ -69,7 +69,7 @@ public class BlockListener extends TcpIdleSender {
 							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
-							Utilities.log(this, "\tFailure: could not find block " + blockName, false);
+							Utilities.log(this, "\tFailure: could not find block " + blockName, true);
 						}
 					} else {
 						Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
