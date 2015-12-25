@@ -108,6 +108,7 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
+		Core.loadWindow.setProgress(100);
 		
 		Utilities.log("atrium.Core", "Setting graphical preferences", true);
 		try {
@@ -407,7 +408,6 @@ public class MainWindow extends JFrame {
 		lblPeers.setToolTipText("[0|0]");
 		lblPeers.setOpaque(false);
 		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
-		
 		registerListeners();
 	}
 	
@@ -566,6 +566,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		resLatch.countDown();
+		Core.loadWindow.setVisible(false);
 		setVisible(true);
 	}
 

@@ -14,6 +14,7 @@ import com.esotericsoftware.minlog.Log;
 import crypto.AES;
 import crypto.RSA;
 import filter.FilterUtils;
+import gui.LoadWindow;
 import gui.MainWindow;
 import io.FileUtils;
 import io.FileWatcher;
@@ -30,6 +31,7 @@ public class Core {
 	public static AES aes;
 	public static ArrayList<Peer> peers;
 	public static NetHandler netHandler;
+	public static LoadWindow loadWindow;
 	public static MainWindow mainWindow;
 	public static ArrayList<BlockedFile> blockDex;
 	public static ArrayList<Metadata> metaDex;
@@ -78,27 +80,41 @@ public class Core {
 			Utilities.log("atrium.Core", "Hub/headless mode engaged", false);
 		} else {
 			Utilities.log("atrium.Core", "Initializing front-end", false);
-			mainWindow = new MainWindow();
+			loadWindow = new LoadWindow();
+			//mainWindow = new MainWindow();
 		}
 		
 		//Set mutex
 		Utilities.switchGui("atrium.Core", "Calculating mutex", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(10);
+		}
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
 		Utilities.switchGui("atrium.Core", "Initializing RSA / AES", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(20);
+		}
 		if(Core.config.rsaPub != null && Core.config.rsaPriv != null) {
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
 		} else {
 			rsa = new RSA();
 		}
 		aes = new AES(mutex);
+		loadWindow.setProgress(30);
 		
 		//File directory checks
 		Utilities.switchGui("atrium.Core", "Checking for file structures", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(40);
+		}
 		FileUtils.initDirs();
 		
 		//ShutdownHook for config
+		if(loadWindow != null) {
+			loadWindow.setProgress(50);
+		}
 		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {
 			public void run() {
 				Utilities.log(this, "Writing config before shutting down", false);
@@ -107,25 +123,43 @@ public class Core {
 		})));
 		
 		//Filter loading
+		if(loadWindow != null) {
+			loadWindow.setProgress(60);
+		}
 		FilterUtils.init();
 		
 		//FileWatcher initialization
+		Utilities.switchGui("atrium.Core", "Registering file watcher", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(65);
+		}
 		(new Thread(new FileWatcher())).start();
 		
 		//Vars initialization
-		Utilities.switchGui("atrium.Core", "Generating block index", false);
 		metaDex = new ArrayList<Metadata> ();
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
 		
 		//Load meta index
+		Utilities.switchGui("atrium.Core", "Loading metadata index", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(70);
+		}
 		FileUtils.loadMetaIndex();
 		
 		//Generate block index
+		Utilities.switchGui("atrium.Core", "Generating block index", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(75);
+		}
 		FileUtils.genBlockIndex();
 		
 		//Start NetHandling
+		Utilities.switchGui("atrium.Core", "Initializing networking", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(85);
+		}
 		netHandler = new NetHandler();
 	}
 }

@@ -60,8 +60,8 @@ public class Utilities {
 	 * @param msg debug message
 	 */
 	public static void switchGui(String someClass, String msg, boolean debug) {
-		if(Core.mainWindow != null) {
-			Core.mainWindow.out(msg);
+		if(Core.loadWindow != null) {
+			Core.loadWindow.out(msg);
 		}
 		log(someClass, msg, debug);
 	}

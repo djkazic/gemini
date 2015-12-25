@@ -26,6 +26,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 
+import gui.MainWindow;
 import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
@@ -65,6 +66,9 @@ public class NetHandler {
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
 		checkExtVisibility();
+		if(!Core.config.hubMode) {
+			Core.mainWindow = new MainWindow();
+		}
 		peerDiscovery(initialClient);
 	}
 
