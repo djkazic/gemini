@@ -267,12 +267,16 @@ public class DualListener extends Listener {
 								String mutexData = Core.rsa.decrypt(encryptedMutex);
 								//Update foundPeer
 								Peer bridgeFoundPeer = foundPeer;
-								while(bridgeFoundPeer == null) {
+								int attemptsToFindPeer = 0;
+								while(bridgeFoundPeer == null && attemptsToFindPeer <= 5) {
 									bridgeFoundPeer = Peer.findPeer(connection);
 									Thread.sleep(100);
+									attemptsToFindPeer++;
 								}
-								if(bridgeFoundPeer.mutexCheck(mutexData)) {
-									bridgeFoundPeer.getCryptoLatch().countDown();
+								if(bridgeFoundPeer != null) {
+									if(bridgeFoundPeer.mutexCheck(mutexData)) {
+										bridgeFoundPeer.getCryptoLatch().countDown();
+									}
 								}
 							} catch (Exception ex) {
 								Utilities.log(this, "Failed to set mutex", false);
@@ -421,11 +425,9 @@ public class DualListener extends Listener {
 								
 								//Filter out response for any BlockedFiles that we have
 								for(BlockedFile bf : Core.blockDex) {
-									if(bf.isComplete()) {
-										String curChecksum = bf.getChecksum();
-										if(cacheDataRes.contains(curChecksum)) {
-											cacheDataRes.remove(curChecksum);
-										}
+									String curChecksum = bf.getChecksum();
+									if(cacheDataRes.contains(curChecksum)) {
+										cacheDataRes.remove(curChecksum);
 									}
 								}
 								
@@ -480,10 +482,10 @@ public class DualListener extends Listener {
 	
 	private void fetchCache(BlockedFile intermediate, boolean complete) {
 		if(complete) {	
-			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), false);
+			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
 			(new Thread(new Downloader(intermediate))).start();
 		} else {
-			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), false);
+			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
 			(new Thread(new Downloader(intermediate))).start();
 		}
 	}
