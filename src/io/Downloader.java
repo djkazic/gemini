@@ -21,12 +21,15 @@ public class Downloader implements Runnable {
 
 	public void run() {
 		try {
-			if(downloaders.contains(this)) {
-				return;
-			} else {
-				downloaders.add(this);
-				Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
+			for(Downloader downloader : downloaders) {
+				if(downloader != this && downloader.blockedFile.equals(blockedFile)) {
+					return;
+				}
 			}
+
+			downloaders.add(this);
+			Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
+		
 			Utilities.log(this, "Enumerating block data blacklist", true);
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
