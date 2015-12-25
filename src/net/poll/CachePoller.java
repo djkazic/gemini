@@ -15,6 +15,7 @@ public class CachePoller implements Runnable {
 
 	public void run() {
 		try {
+			Thread.sleep(3000);
 			while(peer.getConnection().isConnected()) {
 				if(peer.getAES() == null) {
 					Thread.sleep(1000);
@@ -22,7 +23,7 @@ public class CachePoller implements Runnable {
 				}
 				Utilities.log(this, "Polling peer " + peer.getMutex() + " for cache", false);
 				peer.getConnection().sendTCP(new Request(RequestTypes.CACHE, null));
-				Thread.sleep(60000);
+				Thread.sleep(90000);
 			}
 			Utilities.log(this, "Terminating cache poller thread for peer " + peer.getMutex(), false);
 		} catch(Exception ex) {
