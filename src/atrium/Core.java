@@ -102,7 +102,9 @@ public class Core {
 			rsa = new RSA();
 		}
 		aes = new AES(mutex);
-		loadWindow.setProgress(15);
+		if(loadWindow != null) {
+			loadWindow.setProgress(15);
+		}
 		
 		//File directory checks
 		Utilities.switchGui("atrium.Core", "Checking for file structures", false);
