@@ -290,7 +290,9 @@ public class BlockedFile {
 	 * @param str value provided
 	 */
 	public void setProgress(String str) {
-		progress = str;
+		if(!progress.equals("Done")) {
+			progress = str;
+		}
 	}
 	
 	/**

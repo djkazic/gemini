@@ -22,12 +22,12 @@ public class Downloader implements Runnable {
 	public void run() {
 		try {
 			for(Downloader downloader : downloaders) {
-				if(downloader != this && downloader.blockedFile.equals(blockedFile)) {
+				if(downloader != this && downloader.blockedFile.getChecksum().equals(blockedFile.getChecksum())) {
 					return;
 				}
 			}
 			
-			while(downloaders.size() >= 2) {
+			while(downloaders.size() > 0) {
 				Thread.sleep(1000);
 				continue;
 			}
@@ -58,7 +58,6 @@ public class Downloader implements Runnable {
 				}
 
 				block = blockedFile.nextBlockNeeded();
-				
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);
@@ -73,13 +72,14 @@ public class Downloader implements Runnable {
 					Thread.sleep(100 / Core.peers.size());
 				} else if(block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);
-					Thread.sleep(5);
+					Thread.sleep(25);
 					continue;
 				}
 				
 				if(blockedFile.getProgressNum() == 100) {
 					Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
 					blockedFile.setComplete(true);
+					blockedFile.setProgress("Done");
 					BlockdexSerializer.run();
 					break;
 				}
@@ -98,15 +98,16 @@ public class Downloader implements Runnable {
 			}
 
 			download = false;
-			downloaders.remove(this);
+			
 			if(!Core.config.hubMode) {
 				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}
-		} catch (Exception ex) {
 			downloaders.remove(this);
+		} catch (Exception ex) {
 			Utilities.log(this, "Downloader exception: ", false);
 			ex.printStackTrace();
+			downloaders.remove(this);
 		}
 	}
 
