@@ -421,9 +421,11 @@ public class DualListener extends Listener {
 								
 								//Filter out response for any BlockedFiles that we have
 								for(BlockedFile bf : Core.blockDex) {
-									String curChecksum = bf.getChecksum();
-									if(cacheDataRes.contains(curChecksum)) {
-										cacheDataRes.remove(curChecksum);
+									if(bf.isComplete()) {
+										String curChecksum = bf.getChecksum();
+										if(cacheDataRes.contains(curChecksum)) {
+											cacheDataRes.remove(curChecksum);
+										}
 									}
 								}
 								
