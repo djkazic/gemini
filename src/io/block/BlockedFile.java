@@ -242,7 +242,7 @@ public class BlockedFile {
 			progress = "100%";
 			updateTime("0 sec");
 		} else {
-			double dProgress = ((double) blackList.size()) / blockList.size();
+			float dProgress = ((float) blackList.size()) / blockList.size();
 			dProgress *= 100;
 			progress = Math.round(dProgress) + "%";
 		}
@@ -271,8 +271,8 @@ public class BlockedFile {
 	 * Returns numerical representation of progress
 	 * @return numerical representation of progress
 	 */
-	public double getProgressNum() {
-		double dProgress = ((double) blackList.size()) / blockList.size();
+	public float getProgressNum() {
+		float dProgress = ((float) blackList.size()) / blockList.size();
 		dProgress *= 100;
 		return dProgress;
 	}
