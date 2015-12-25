@@ -212,9 +212,14 @@ public class NetHandler {
 	 * @param block BlockedFile block name (auto-hashed)
 	 */
 	public static void requestBlock(String originChecksum, String block) {
+		/**
 		int ind = new SecureRandom().nextInt(Core.peers.size());
 		Peer chosenPeer = Core.peers.get(ind);
 		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		**/
+		for(Peer peer : Core.peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		}
 	}
 	
 	/**
