@@ -87,14 +87,14 @@ public class Core {
 		//Set mutex
 		Utilities.switchGui("atrium.Core", "Calculating mutex", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(10);
+			loadWindow.setProgress(5);
 		}
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
 		Utilities.switchGui("atrium.Core", "Initializing RSA / AES", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(20);
+			loadWindow.setProgress(10);
 		}
 		if(Core.config.rsaPub != null && Core.config.rsaPriv != null) {
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
@@ -102,18 +102,18 @@ public class Core {
 			rsa = new RSA();
 		}
 		aes = new AES(mutex);
-		loadWindow.setProgress(30);
+		loadWindow.setProgress(15);
 		
 		//File directory checks
 		Utilities.switchGui("atrium.Core", "Checking for file structures", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(40);
+			loadWindow.setProgress(30);
 		}
 		FileUtils.initDirs();
 		
 		//ShutdownHook for config
 		if(loadWindow != null) {
-			loadWindow.setProgress(50);
+			loadWindow.setProgress(35);
 		}
 		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {
 			public void run() {
@@ -124,18 +124,21 @@ public class Core {
 		
 		//Filter loading
 		if(loadWindow != null) {
-			loadWindow.setProgress(60);
+			loadWindow.setProgress(40);
 		}
 		FilterUtils.init();
 		
 		//FileWatcher initialization
 		Utilities.switchGui("atrium.Core", "Registering file watcher", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(65);
+			loadWindow.setProgress(50);
 		}
 		(new Thread(new FileWatcher())).start();
 		
 		//Vars initialization
+		if(loadWindow != null) {
+			loadWindow.setProgress(60);
+		}
 		metaDex = new ArrayList<Metadata> ();
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
