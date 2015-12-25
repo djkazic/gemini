@@ -567,6 +567,7 @@ public class MainWindow extends JFrame {
 		});
 		resLatch.countDown();
 		Core.loadWindow.setVisible(false);
+		Core.loadWindow.dispose();
 		setVisible(true);
 	}
 

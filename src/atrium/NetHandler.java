@@ -304,13 +304,15 @@ public class NetHandler {
 			//DEBUG
 			//TODO: make this not just an IP, but also port
 			//TODO: port randomization
+			Client newConnection = null;
 			for(InetAddress ia : foundHosts) {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress(), false);
-					Client newConnection = getClient();
+					newConnection = getClient();
 					newConnection.connect(8000, ia, Core.config.tcpPort);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed", false);
+					newConnection.stop();
 				}
 				Thread.sleep(500);
 			}

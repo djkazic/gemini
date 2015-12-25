@@ -37,7 +37,7 @@ public class BlockListener extends TcpIdleSender {
 		if(object instanceof Request) {
 			final Request request = (Request) object;
 			
-			if(request.getType().equals(RequestTypes.BLOCK)) {
+			if(request.getType() == (RequestTypes.BLOCK)) {
 				Peer foundPeer = Peer.findPeer(connection);
 				String[] encryptedBlock = (String[]) request.getPayload();
 				blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
