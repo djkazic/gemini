@@ -91,7 +91,6 @@ public class Utilities {
 				log("atrium.Utilities", "Interfaces are null, falling back to config mutex", false);
 				if(Core.config.generatedMAC == null) {
 					Core.config.generatedMAC = randomMACAddress();
-					Utilities.log("atrium.Utilities", "\t" + Core.config.generatedMAC, false);
 				}
 				return base64(Core.config.generatedMAC);
 			}			
