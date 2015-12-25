@@ -37,7 +37,7 @@ public class Core {
 	public static ArrayList<Metadata> metaDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 	
-	public static int blockSize = 240000;
+	public static int blockSize = 256000;
 	public static Config config;
 	public static String mutex;
 	
