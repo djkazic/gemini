@@ -155,7 +155,7 @@ public class NetHandler {
 	 */
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000 * 6, 512000 * 6);
+			server = new Server(512000 * 5, 512000 * 5);
 			registerClasses(server.getKryo());
 			
 			Utilities.log(this, "Registering block listener", false);
