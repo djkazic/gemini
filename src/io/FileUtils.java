@@ -125,7 +125,7 @@ public class FileUtils {
 	public static File findBlockAppData(BlockedFile foundBlock, String block) {
 		File directory = new File(foundBlock.getBlocksFolder());
 		if(!directory.exists()) {
-			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock + " does not exist", false);
+			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock.getPointer().getName() + " is not initialized", true);
 			return null;
 		}
 		File[] listOfFiles = directory.listFiles();

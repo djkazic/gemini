@@ -76,7 +76,7 @@ public class BlockListener extends TcpIdleSender {
 								      + foundBlock.getBlockList(), false);
 					}
 				} else {
-					Utilities.log(this, "\tFailure: don't have origin BlockedFile", false);
+					Utilities.log(this, "\tFailure: don't have origin BlockedFile", true);
 				}
 			}
 		}
