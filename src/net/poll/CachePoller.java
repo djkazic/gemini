@@ -24,6 +24,7 @@ public class CachePoller implements Runnable {
 				peer.getConnection().sendTCP(new Request(RequestTypes.CACHE, null));
 				Thread.sleep(60000);
 			}
+			Utilities.log(this, "Terminating cache poller thread for peer " + peer.getMutex(), false);
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
