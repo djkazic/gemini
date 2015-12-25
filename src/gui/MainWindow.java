@@ -120,7 +120,7 @@ public class MainWindow extends JFrame {
 		searchMode = false;
 		setTitle("Radiator Beta");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 625, 535);
+		setBounds(100, 100, 645, 535);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 0, 5));
 		setContentPane(contentPane);
