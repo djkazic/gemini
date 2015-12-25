@@ -242,9 +242,11 @@ public class FileUtils {
 						actualBfCount = appDataDirectories.size();
 
 						while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
-							for(BlockedFile bf : Core.blockDex) {
+							for(int i=0; i < Core.blockDex.size(); i++) {
+								BlockedFile bf = Core.blockDex.get(i);
 								if(!appDataDirectories.contains(bf.getChecksum())) {
 									Core.blockDex.remove(bf);
+									i--;
 								}
 							}
 							BlockdexSerializer.run();
