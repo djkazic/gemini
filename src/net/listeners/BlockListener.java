@@ -66,7 +66,24 @@ public class BlockListener extends TcpIdleSender {
 
 						if(searchRes != null) {
 							Utilities.log(this, "\tSending back block " + blockName, true);
-							sendQueue.add(new Data(DataTypes.BLOCK, new StreamedBlock(blockOriginChecksum, blockName, searchRes)));
+							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
+							boolean dupe = false;
+							//TODO: replace with equals() impl
+							for(Object odata : sendQueue) {
+								if(odata instanceof Data) {
+									Data data = (Data) odata;
+									Object opayload = data.getPayload();
+									if(opayload instanceof StreamedBlock) {
+										StreamedBlock payload = (StreamedBlock) opayload;
+										if(payload.getOrigin().equals(sb.getOrigin())) {
+											dupe = true;
+										}
+									}
+								}
+							}
+							if(!dupe) {
+								sendQueue.add(new Data(DataTypes.BLOCK, sb));
+							}
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
 							Utilities.log(this, "\tFailure: could not find block " + blockName, true);
