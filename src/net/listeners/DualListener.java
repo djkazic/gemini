@@ -39,7 +39,7 @@ public class DualListener extends Listener {
 		} else {
 			Utilities.log(this, "New outgoing peer", false);
 		}
-		connection.setIdleThreshold(0.4f);
+		connection.setIdleThreshold(0.35f);
 		try {
 			if(inOut == 1) {
 				new Peer(connection, inOut);
