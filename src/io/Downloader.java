@@ -26,6 +26,11 @@ public class Downloader implements Runnable {
 					return;
 				}
 			}
+			
+			while(downloaders.size() >= 2) {
+				Thread.sleep(1000);
+				continue;
+			}
 
 			downloaders.add(this);
 			Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
@@ -79,7 +84,7 @@ public class Downloader implements Runnable {
 					break;
 				}
 
-				if(Core.peers.size() == 1) {
+				if(Core.peers.size() >= 3) {
 					//If bytes counter is greater or equal to 32MB
 					if(quadrantMark >= (32000 * 1000)) {
 						Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
@@ -91,7 +96,6 @@ public class Downloader implements Runnable {
 					}
 				}
 			}
-
 
 			download = false;
 			downloaders.remove(this);
