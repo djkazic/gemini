@@ -342,23 +342,20 @@ public class DualListener extends Listener {
 										StreamedBlockedFile sbl = (StreamedBlockedFile) o;										
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
 										
-										//TODO: remove sbl debugging
-										Metadata chosenMeta = null;
-										for(Metadata meta : Core.metaDex) {
-											if(meta.matchBf(intermediate.getChecksum())) {
-												chosenMeta = meta;
-											}
-										}
-										if(chosenMeta != null) {
-											Utilities.log("debug.DualListener", chosenMeta.toString(), false);
-										} else {
-											Utilities.log("debug.DualListener", "chosenMeta = null", false);
-										}
-										
-										//Store name and blockList in preparation for Download thread fetching from GUI
+										//Store name + blockList in index in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
 										if(FilterUtils.mandatoryFilter(name)) {
 											String checksum = intermediate.getChecksum();
+											String metaScore = null;
+											Metadata chosenMeta = null;
+											for(Metadata meta : Core.metaDex) {
+												if(meta.matchBf(intermediate.getChecksum())) {
+													chosenMeta = meta;
+												}
+											}
+											if(chosenMeta != null) {
+												metaScore = "" + chosenMeta.getScore();
+											}
 											
 											if(!Core.mainWindow.haveSearchAlready(checksum)) {
 												ArrayList<String> blockList = intermediate.getBlockList();
@@ -375,8 +372,12 @@ public class DualListener extends Listener {
 												} else {
 													sizeEstimate += estimateKb + "KB";
 												}
-												//TODO: GUI implementation of metadata
-												Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
+												
+												if(metaScore != null) {
+													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, metaScore});
+												} else {
+													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, "-"});
+												}
 											}
 										}
 									}
