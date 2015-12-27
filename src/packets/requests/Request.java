@@ -2,20 +2,20 @@ package packets.requests;
 
 public class Request {
 
-	private String type;
+	private byte type;
 	private Object payload;
 	
 	public Request() {
-		type = null;
+		type = 0x00;
 		payload = null;
 	}
 	
-	public Request(String type, Object payload) {
+	public Request(byte type, Object payload) {
 		this.type = type;
 		this.payload = payload;
 	}
 	
-	public String getType() {
+	public byte getType() {
 		return type;
 	}
 	

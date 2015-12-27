@@ -113,6 +113,7 @@ public class Peer {
 	 * Log a disconnect for this peer, with some debug data
 	 */
 	public void disconnect() {
+		connection.close();
 		if(mutex != null) {
 			Utilities.log(this, "Peer " + mutex + " disconnected", false);
 		} else {
@@ -122,7 +123,6 @@ public class Peer {
 		if(!Core.config.hubMode) {
 			Core.mainWindow.updatePeerCount();
 		}
-		connection.close();
 	}
 
 	/**

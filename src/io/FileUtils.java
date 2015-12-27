@@ -28,6 +28,8 @@ import com.esotericsoftware.kryo.io.Input;
 import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
+import io.block.BlockedFile;
+import io.block.Metadata;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 
@@ -123,7 +125,7 @@ public class FileUtils {
 	public static File findBlockAppData(BlockedFile foundBlock, String block) {
 		File directory = new File(foundBlock.getBlocksFolder());
 		if(!directory.exists()) {
-			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock + " does not exist", false);
+			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock.getPointer().getName() + " is not initialized", true);
 			return null;
 		}
 		File[] listOfFiles = directory.listFiles();
@@ -174,7 +176,7 @@ public class FileUtils {
 		}
 		return null;
 	}
-
+	
 	public static void genBlockIndex() {
 		try {
 			File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
@@ -213,11 +215,15 @@ public class FileUtils {
 			if(Core.config.hubMode) {
 				if(baseFolder != null && baseFolder.listFiles().length > 0) {
 					File[] files = baseFolder.listFiles();
+					int counter = 0;
 					if(files != null) {
 						for(File file : files) {
-							FileUtils.deleteRecursive(file);
+							if(!file.getName().startsWith(".")) {
+								FileUtils.deleteRecursive(file);
+								counter++;
+							}
 						}
-						if(files.length > 0) {
+						if(counter > 0) {
 							Utilities.log("atriuum.FileUtils", "Hub-mode violation: files in workpace. Clearing workspace.", false);
 						}
 					}
@@ -236,9 +242,11 @@ public class FileUtils {
 						actualBfCount = appDataDirectories.size();
 
 						while(actualBfCount != Core.blockDex.size() && Core.blockDex.size() > appDataDirectories.size()) {
-							for(BlockedFile bf : Core.blockDex) {
+							for(int i=0; i < Core.blockDex.size(); i++) {
+								BlockedFile bf = Core.blockDex.get(i);
 								if(!appDataDirectories.contains(bf.getChecksum())) {
 									Core.blockDex.remove(bf);
+									i--;
 								}
 							}
 							BlockdexSerializer.run();
@@ -329,6 +337,28 @@ public class FileUtils {
 			+ " and detected " + actualBfCount, false);
 		} catch(Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public static void loadMetaIndex() {
+		File metaFile = new File(getConfigDir() + "/metadex.dat");
+		if(metaFile.exists()) {
+			try {
+				Utilities.log("atrium.FileUtils", "Attempting to read metadex cache", false);
+				Kryo kryo = new Kryo();
+				Input input = new Input(new FileInputStream(metaFile));
+				ArrayList<?> uMeta = kryo.readObject(input, ArrayList.class);
+				ArrayList<Metadata> finalList = new ArrayList<Metadata> ();
+				for(int i=0; i < uMeta.size(); i++) {
+					Object o = uMeta.get(i);
+					if(o instanceof Metadata) {
+						finalList.add((Metadata) o);
+					}
+				}
+				Core.metaDex = finalList;
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	
