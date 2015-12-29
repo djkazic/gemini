@@ -60,10 +60,12 @@ public class NetHandler {
 	 */
 	public NetHandler() {
 		getExtIp();
-		registerServerListeners();
+		checkExtVisibility();
+		if(Core.config.hubMode || extVisible) {
+			registerServerListeners();
+		}
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
-		checkExtVisibility();
 		peerDiscovery(initialClient);
 	}
 
