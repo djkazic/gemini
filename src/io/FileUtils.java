@@ -30,7 +30,6 @@ import atrium.Utilities;
 import filter.FilterUtils;
 import io.block.BlockedFile;
 import io.block.Metadata;
-import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 
 public class FileUtils {
@@ -249,7 +248,7 @@ public class FileUtils {
 									i--;
 								}
 							}
-							BlockdexSerializer.run();
+							BlockedFile.serializeAll();
 						}	
 
 						while(appDataDirectories.size() != Core.blockDex.size() && Core.blockDex.size() < appDataDirectories.size()) {
@@ -308,7 +307,7 @@ public class FileUtils {
 							}
 						}
 					}
-					BlockdexSerializer.run();
+					BlockedFile.serializeAll();
 				}
 
 				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() > actualBfCount) {
@@ -328,7 +327,7 @@ public class FileUtils {
 							Core.blockDex.remove(curBf);
 						}
 					}
-					BlockdexSerializer.run();
+					BlockedFile.serializeAll();
 				}
 			}
 

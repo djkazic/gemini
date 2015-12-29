@@ -19,7 +19,6 @@ import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
 import io.block.BlockedFile;
-import io.serialize.BlockdexSerializer;
 
 /**
  * Watches file in working directory, and adds/removes them as BlockedFiles live
@@ -163,7 +162,7 @@ public class FileWatcher implements Runnable {
 			if(!Core.config.hubMode && bf != null) {
 				Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
 				bf.reset();
-				BlockdexSerializer.run();
+				BlockedFile.serializeAll();
 				if(!Core.config.hubMode) {
 					Core.mainWindow.removeDownload(bf);
 					Core.mainWindow.updateLibrary();
@@ -182,7 +181,7 @@ public class FileWatcher implements Runnable {
 						bf.reset();
 					}
 				}
-				BlockdexSerializer.run();
+				BlockedFile.serializeAll();
 				if(!Core.config.hubMode) {
 					Core.mainWindow.removeDownload(bf);
 					Core.mainWindow.updateLibrary();

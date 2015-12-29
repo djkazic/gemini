@@ -25,7 +25,6 @@ public class RSA {
 	
 	public RSA(byte[] pubBytes, byte[] privBytes) {
 		try {
-			Utilities.log(this, "Loading RSA from file...", false);
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubBytes);
 			PublicKey publicKey = kf.generatePublic(pubKeySpec);
@@ -44,7 +43,6 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public RSA() throws NoSuchAlgorithmException {
-		Utilities.log(this, "Generating RSA keys...", false);
 		kpg = KeyPairGenerator.getInstance("RSA");
 		myPair = kpg.generateKeyPair();
 		byte[] pubKeyBytes = myPair.getPublic().getEncoded();
