@@ -63,7 +63,7 @@ public class Peer {
 	 * New thread to begin requesting data from this peer
 	 */
 	private void bootstrapRequests() {
-		(new Thread(new Runnable() {
+		Thread bootstrapThread = (new Thread(new Runnable() {
 			public void run() {
 				try {
 					if(inOut == 1) {
@@ -100,12 +100,16 @@ public class Peer {
 					ex.printStackTrace();
 				}
 			}
-		})).start();
+		}));
+		bootstrapThread.setName("Peer " + connection.getID() + " Bootstrap");
+		bootstrapThread.start();
 		
 		//If we are a cacher, also send cache requests every minute
 		if(Core.config.cacheEnabled) {
 			Utilities.log(this, "Starting polling thread for peer", true);
-			new Thread(new CachePoller(this)).start();
+			Thread cachePollerThread = new Thread(new CachePoller(this));
+			cachePollerThread.setName("Peer " + connection.getID() + " Cache Poller");
+			cachePollerThread.start();
 		}
 	}
 	

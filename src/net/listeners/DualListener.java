@@ -32,7 +32,9 @@ public class DualListener extends Listener {
 		super();
 		this.inOut = inOut;
 		rt = new ReplyThread();
-		(new Thread(rt)).start();
+		Thread replyThread = (new Thread(rt));
+		replyThread.setName("Reply Coordinator");
+		replyThread.start();
 	}
 
 	//New connection, either incoming or outgoing

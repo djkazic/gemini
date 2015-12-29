@@ -46,7 +46,7 @@ public class StreamedBlock {
 	}
 	
 	public void insertSelf(final AES aes) {
-		(new Thread(new Runnable() {
+		Thread insertionThread = (new Thread(new Runnable() {
 			public void run() {
 				String blockDest = aes.decrypt(blockName);
 				byte[] decrypted = aes.decrypt(fileBytes);
@@ -93,6 +93,8 @@ public class StreamedBlock {
 					}
 				}
 			}
-		})).start();
+		}));
+		insertionThread.setName(blockName + " Inserter");
+		insertionThread.start();
 	}
 }

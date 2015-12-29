@@ -541,7 +541,9 @@ public class MainWindow extends JFrame {
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									downloadPopupMenuPause.setEnabled(true);
 									downloadPopupMenuResume.setEnabled(true);
-									(new Thread(new Downloader(bf))).start();
+									Thread downloadThread = (new Thread(new Downloader(bf)));
+									downloadThread.setName("Downloader");
+									downloadThread.start();
 									return;
 								}
 								if(bf.isComplete()) {

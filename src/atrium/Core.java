@@ -117,12 +117,14 @@ public class Core {
 		if(loadWindow != null) {
 			loadWindow.setProgress(35);
 		}
-		Runtime.getRuntime().addShutdownHook((new Thread(new Runnable() {
+		Thread shutHook = (new Thread(new Runnable() {
 			public void run() {
 				Utilities.log(this, "Writing config before shutting down", false);
 				config.writeConfig();
 			}
-		})));
+		}));
+		shutHook.setName("Shutdown Hook");
+		Runtime.getRuntime().addShutdownHook(shutHook);
 		
 		//Filter loading
 		if(loadWindow != null) {

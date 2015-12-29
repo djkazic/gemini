@@ -5,12 +5,14 @@ import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -254,9 +256,12 @@ public class NetHandler {
 
 			foundHosts = new ArrayList<InetAddress> ();
 			
-			(new Thread(new DiscoveryServer())).start();
+			Thread discoverServerThread = (new Thread(new DiscoveryServer()));
+			discoverServerThread.setName("Discovery Server Thread");
+			discoverServerThread.start();
 			DiscoveryClient discoveryClient = new DiscoveryClient();
 			Thread discoverClientThread = new Thread(discoveryClient);
+			discoverClientThread.setName("Discovery Client Thread");
 			discoverClientThread.start();
 			long startTime = System.currentTimeMillis();
 			while(System.currentTimeMillis() < startTime + 3000L) {
@@ -314,34 +319,16 @@ public class NetHandler {
 					newConnection.connect(8000, ia, Core.config.tcpPort);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed", false);
-					newConnection.stop();
+					newConnection.close();
+					System.gc();
 				}
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			}
 
 			Utilities.log(this, "Terminated peer connections loop", false);
-			(new Thread(new Runnable() {
-				public void run() {
-					while(true) {
-						boolean runCondition = Core.config.hubMode;
-						if(!runCondition) {
-							if(Core.peers.isEmpty()) {
-								try {
-									Thread.sleep(1000);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							} else {
-								Core.mainWindow.ready();
-								break;
-							}
-						} else {
-							return;
-						}
-					}
-				}
-			})).start();
-			(new Thread(new PeerCountListener())).start();
+			Thread peerCountListenerThread = (new Thread(new PeerCountListener()));
+			peerCountListenerThread.setName("Peer Count Listener");
+			peerCountListenerThread.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -351,7 +338,7 @@ public class NetHandler {
 	 * Creates a new thread, and displays a warning on port forwarding
 	 */
 	private void displayPortForwardWarning() {
-		(new Thread(new Runnable() {
+		Thread warningThread = (new Thread(new Runnable() {
 			public void run() {
 				Utilities.log(this, "Not externally visible, caching disabled", true);
 				Core.config.notifiedPortForwarding = true;
@@ -386,6 +373,8 @@ public class NetHandler {
 				ep.setEditable(false);
 				JOptionPane.showMessageDialog(null, ep);
 			}
-		})).start();
+		}));
+		warningThread.setName("Warning Popup");
+		warningThread.start();
 	}
 }
