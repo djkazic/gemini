@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
+import io.block.BlockedFile;
 import io.serialize.BlockdexSerializer;
 
 public class Downloader implements Runnable {
@@ -20,12 +21,20 @@ public class Downloader implements Runnable {
 
 	public void run() {
 		try {
-			if(downloaders.contains(this)) {
-				return;
-			} else {
-				downloaders.add(this);
-				Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
+			for(Downloader downloader : downloaders) {
+				if(downloader != this && downloader.blockedFile.getChecksum().equals(blockedFile.getChecksum())) {
+					return;
+				}
 			}
+			
+			while(downloaders.size() > 0) {
+				Thread.sleep(1000);
+				continue;
+			}
+
+			downloaders.add(this);
+			Utilities.log(this, "Downloader instance created for BlockedFile " + blockedFile.getPointer().getName(), true);
+		
 			Utilities.log(this, "Enumerating block data blacklist", true);
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
@@ -49,7 +58,6 @@ public class Downloader implements Runnable {
 				}
 
 				block = blockedFile.nextBlockNeeded();
-				
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);
@@ -64,18 +72,19 @@ public class Downloader implements Runnable {
 					Thread.sleep(100 / Core.peers.size());
 				} else if(block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);
-					Thread.sleep(5);
+					Thread.sleep(25);
 					continue;
 				}
 				
 				if(blockedFile.getProgressNum() == 100) {
 					Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
 					blockedFile.setComplete(true);
+					blockedFile.setProgress("Done");
 					BlockdexSerializer.run();
 					break;
 				}
 
-				if(Core.peers.size() == 1) {
+				if(Core.peers.size() >= 3) {
 					//If bytes counter is greater or equal to 32MB
 					if(quadrantMark >= (32000 * 1000)) {
 						Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
@@ -88,17 +97,17 @@ public class Downloader implements Runnable {
 				}
 			}
 
-
 			download = false;
-			downloaders.remove(this);
+			
 			if(!Core.config.hubMode) {
 				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}
-		} catch (Exception ex) {
 			downloaders.remove(this);
+		} catch (Exception ex) {
 			Utilities.log(this, "Downloader exception: ", false);
 			ex.printStackTrace();
+			downloaders.remove(this);
 		}
 	}
 

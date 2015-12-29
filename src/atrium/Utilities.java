@@ -60,8 +60,8 @@ public class Utilities {
 	 * @param msg debug message
 	 */
 	public static void switchGui(String someClass, String msg, boolean debug) {
-		if(Core.mainWindow != null) {
-			Core.mainWindow.out(msg);
+		if(Core.loadWindow != null) {
+			Core.loadWindow.out(msg);
 		}
 		log(someClass, msg, debug);
 	}
@@ -91,7 +91,6 @@ public class Utilities {
 				log("atrium.Utilities", "Interfaces are null, falling back to config mutex", false);
 				if(Core.config.generatedMAC == null) {
 					Core.config.generatedMAC = randomMACAddress();
-					Utilities.log("atrium.Utilities", "\t" + Core.config.generatedMAC, false);
 				}
 				return base64(Core.config.generatedMAC);
 			}			

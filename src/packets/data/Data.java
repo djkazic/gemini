@@ -2,20 +2,20 @@ package packets.data;
 
 public class Data {
 
-	private String type;
+	private byte type;
 	private Object payload;
 	
 	public Data() {
-		type = null;
+		type = 0x00;
 		payload = null;
 	}
 	
-	public Data(String type, Object payload) {
+	public Data(byte type, Object payload) {
 		this.type = type;
 		this.payload = payload;
 	}
 	
-	public String getType() {
+	public byte getType() {
 		return type;
 	}
 	

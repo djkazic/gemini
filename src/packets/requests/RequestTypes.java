@@ -2,13 +2,13 @@ package packets.requests;
 
 public class RequestTypes {
 	
-	public static final String PUBKEY   = "REQ_PUBKEY";
-	public static final String MUTEX    = "REQ_MUTEX";
-	public static final String PEERLIST = "REQ_PEERLIST";
-	public static final String SEARCH   = "REQ_SEARCH";
-	public static final String BLOCK    = "REQ_BLOCK";
-	public static final String CACHE    = "REQ_CACHE";
-	public static final String EXTVIS   = "REQ_EXTVIS";
-	public static final String CACHEPULL = "REQ_CACHE_PULL";
+	public static final byte PUBKEY   = 0x02;
+	public static final byte MUTEX    = 0x04;
+	public static final byte PEERLIST = 0x06;
+	public static final byte SEARCH   = 0x08;
+	public static final byte BLOCK    = 0x10;
+	public static final byte CACHE    = 0x12;
+	public static final byte EXTVIS   = 0x14;
+	public static final byte CACHEPULL = 0x16;
 	
 }

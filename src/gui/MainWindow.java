@@ -34,15 +34,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
-import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 
 import atrium.Core;
 import atrium.NetHandler;
@@ -52,14 +49,15 @@ import filter.FilterUtils;
 import gui.render.ProgressCellRenderer;
 import gui.render.TableModelDL;
 import gui.render.TableModelSpec;
-import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
+import io.block.BlockedFile;
 import net.iharder.dnd.FileDrop;
 
 public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = -4060708900516820183L;
+	
 	private JPanel contentPane;
 	private JTable searchRes;
 	private JTable downloadList;
@@ -108,18 +106,12 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		
-		Utilities.log("atrium.Core", "Setting graphical preferences", true);
-		try {
-			UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
+		Core.loadWindow.setProgress(100);
 		
 		searchMode = false;
 		setTitle("Radiator Beta");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 625, 535);
+		setBounds(100, 100, 645, 535);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 0, 5));
 		setContentPane(contentPane);
@@ -228,6 +220,7 @@ public class MainWindow extends JFrame {
 								searchModel.addColumn("Filename");
 								searchModel.addColumn("Size");
 								searchModel.addColumn("Checksum");
+								searchModel.addColumn("Rating");
 								searchRes.getColumnModel().getColumn(2).setMinWidth(0);
 								searchRes.getColumnModel().getColumn(2).setMaxWidth(0);
 								searchRes.getColumnModel().getColumn(2).setWidth(0);
@@ -275,6 +268,7 @@ public class MainWindow extends JFrame {
 							searchModel.addColumn("Filename");
 							searchModel.addColumn("Size");
 							searchModel.addColumn("Checksum");
+							searchModel.addColumn("Rating");
 							searchRes.getColumnModel().getColumn(2).setMinWidth(0);
 							searchRes.getColumnModel().getColumn(2).setMaxWidth(0);
 							searchRes.getColumnModel().getColumn(2).setWidth(0);
@@ -316,8 +310,7 @@ public class MainWindow extends JFrame {
 		searchRes.setDefaultRenderer(Object.class, betterRenderer);
 		searchRes.getTableHeader().setReorderingAllowed(false);
 		searchRes.getTableHeader().setResizingAllowed(false);
-		searchRes.setCellSelectionEnabled(true);
-		searchRes.setColumnSelectionAllowed(true);
+		searchRes.setRowSelectionAllowed(true);
 		searchResScrollPane.setViewportView(searchRes);
 		
 		spacerLabel_1 = new JLabel("");
@@ -407,7 +400,6 @@ public class MainWindow extends JFrame {
 		lblPeers.setToolTipText("[0|0]");
 		lblPeers.setOpaque(false);
 		lblPeers.setIcon(new ImageIcon(MainWindow.class.getResource("/res/imgres/0bars.png")));
-		
 		registerListeners();
 	}
 	
@@ -566,6 +558,8 @@ public class MainWindow extends JFrame {
 			}
 		});
 		resLatch.countDown();
+		Core.loadWindow.setVisible(false);
+		Core.loadWindow.dispose();
 		setVisible(true);
 	}
 
@@ -626,6 +620,7 @@ public class MainWindow extends JFrame {
 			e.printStackTrace();
 		}
 		if(searchMode) {
+			removeColumnAndData(searchRes, 3);
 			removeColumnAndData(searchRes, 2);
 			removeColumnAndData(searchRes, 1);
 			removeColumnAndData(searchRes, 0);
@@ -634,7 +629,6 @@ public class MainWindow extends JFrame {
 		}
 		clearTable(searchModel);
 		searchModel.addRow(new String[]{str});
-
 	}
 
 	/**
@@ -728,19 +722,6 @@ public class MainWindow extends JFrame {
 	 */
 	public void addRowToSearchModel(String[] info) {
 		searchModel.addRow(info);
-	}
-	
-	/**
-	 * Removes a specific row from the search results table
-	 * @param pointerName pointer reference for the BlockedFile to remove
-	 */
-	public void removeRowFromSearchModel(String pointerName) {
-		for(int i=0; i < searchModel.getRowCount(); i++) {
-			if(searchModel.getValueAt(i, 0).equals(pointerName)) {
-				searchModel.removeRow(i);
-				return;
-			}
-		}
 	}
 	
 	public boolean haveSearchAlready(String checksum) { 

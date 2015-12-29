@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -26,6 +25,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 
+import gui.MainWindow;
+import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import net.discover.DiscoveryClient;
@@ -66,6 +67,9 @@ public class NetHandler {
 		}
 		Client initialClient = getClient();
 		registerClientListeners(initialClient);
+		if(!Core.config.hubMode) {
+			Core.mainWindow = new MainWindow();
+		}
 		peerDiscovery(initialClient);
 	}
 
@@ -153,7 +157,7 @@ public class NetHandler {
 	 */
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000 * 6, 512000 * 6);
+			server = new Server(512000 * 5, 512000 * 5);
 			registerClasses(server.getKryo());
 			
 			Utilities.log(this, "Registering block listener", false);
@@ -209,9 +213,14 @@ public class NetHandler {
 	 * @param block BlockedFile block name (auto-hashed)
 	 */
 	public static void requestBlock(String originChecksum, String block) {
+		/**
 		int ind = new SecureRandom().nextInt(Core.peers.size());
 		Peer chosenPeer = Core.peers.get(ind);
 		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		**/
+		for(Peer peer : Core.peers) {
+			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		}
 	}
 	
 	/**
@@ -232,6 +241,7 @@ public class NetHandler {
 		kryo.register(Inet4Address.class);
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
+		kryo.register(Metadata.class);	
 	}
 	
 	/**
@@ -259,11 +269,10 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			foundHosts.add(InetAddress.getByName("136.167.66.138"));
-			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			
-			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
+			foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP
@@ -297,13 +306,15 @@ public class NetHandler {
 			//DEBUG
 			//TODO: make this not just an IP, but also port
 			//TODO: port randomization
+			Client newConnection = null;
 			for(InetAddress ia : foundHosts) {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress(), false);
-					Client newConnection = getClient();
+					newConnection = getClient();
 					newConnection.connect(8000, ia, Core.config.tcpPort);
 				} catch (Exception ex) {
 					Utilities.log(this, "Connection to " + ia.getHostAddress() + " failed", false);
+					newConnection.stop();
 				}
 				Thread.sleep(500);
 			}

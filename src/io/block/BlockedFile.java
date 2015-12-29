@@ -1,4 +1,4 @@
-package io;
+package io.block;
 
 import java.io.File;
 import java.security.SecureRandom;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import atrium.Core;
+import io.FileUtils;
 import io.serialize.BlockdexSerializer;
 import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
@@ -241,7 +242,7 @@ public class BlockedFile {
 			progress = "100%";
 			updateTime("0 sec");
 		} else {
-			double dProgress = ((double) blackList.size()) / blockList.size();
+			float dProgress = ((float) blackList.size()) / blockList.size();
 			dProgress *= 100;
 			progress = Math.round(dProgress) + "%";
 		}
@@ -270,8 +271,8 @@ public class BlockedFile {
 	 * Returns numerical representation of progress
 	 * @return numerical representation of progress
 	 */
-	public double getProgressNum() {
-		double dProgress = ((double) blackList.size()) / blockList.size();
+	public float getProgressNum() {
+		float dProgress = ((float) blackList.size()) / blockList.size();
 		dProgress *= 100;
 		return dProgress;
 	}
@@ -289,7 +290,9 @@ public class BlockedFile {
 	 * @param str value provided
 	 */
 	public void setProgress(String str) {
-		progress = str;
+		if(!progress.equals("Done")) {
+			progress = str;
+		}
 	}
 	
 	/**
@@ -315,7 +318,7 @@ public class BlockedFile {
 	}
 	
 	/**
-	 * Converts this BlockedFile to SerialBlockedFile for network transmission
+	 * Converts this BlockedFile to StreamedBlockedFile for network transmission
 	 * @return StreamedBlockedFile conversion
 	 */
 	public StreamedBlockedFile toStreamedBlockedFile() {
@@ -323,7 +326,14 @@ public class BlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
-		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList);
+		Metadata streamMeta = null;
+		for(Metadata meta : Core.metaDex) {
+			if(meta.matchBf(checksum)) {
+				streamMeta = meta;
+				break;
+			}
+		}
+		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList, streamMeta);
 	}
 	
 	/**

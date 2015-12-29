@@ -12,9 +12,10 @@ import atrium.Peer;
 import atrium.Utilities;
 import crypto.RSA;
 import filter.FilterUtils;
-import io.BlockedFile;
 import io.Downloader;
 import io.FileUtils;
+import io.block.BlockedFile;
+import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import packets.data.Data;
@@ -25,10 +26,13 @@ import packets.requests.RequestTypes;
 public class DualListener extends Listener {
 	
 	private int inOut;
+	private ReplyThread rt;
 	
 	public DualListener(int inOut) {
 		super();
 		this.inOut = inOut;
+		rt = new ReplyThread();
+		(new Thread(rt)).start();
 	}
 
 	//New connection, either incoming or outgoing
@@ -63,29 +67,29 @@ public class DualListener extends Listener {
 		
 		if(object instanceof Request) {
 			final Request request = (Request) object;
-			String type = request.getType();
+			byte type = request.getType();
 
 			switch(type) {
 				//Requests below are non-encrypted
 			
 				case RequestTypes.PUBKEY:
 					Utilities.log(this, "Received request for pubkey", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
 							Utilities.log(this, "\tSent pubkey back", false);
 						}
-					})).start();
+					});
 					break;
 			
 				case RequestTypes.MUTEX:
 					Utilities.log(this, "Received request for mutex", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.MUTEX, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
 							Utilities.log(this, "\tSent mutex back", false);
 						}
-					})).start();
+					});
 					break;
 					
 				//Requests below are symmetrically encrypted
@@ -93,7 +97,7 @@ public class DualListener extends Listener {
 				case RequestTypes.PEERLIST:
 					Utilities.log(this, "Received request for peerlist", false);
 					//TODO: more refined peerList filtering
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							ArrayList<String> refinedPeerList = new ArrayList<String> ();
 							for(Peer peer : Core.peers) {
@@ -109,12 +113,12 @@ public class DualListener extends Listener {
 								foundPeer.getDeferredLatch().countDown();
 							}
 						}
-					})).start();
+					});
 					break;
 				
 				case RequestTypes.SEARCH:
 					Utilities.log(this, "Received request for search", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							String encryptedQuery = (String) request.getPayload();
 							String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
@@ -149,23 +153,23 @@ public class DualListener extends Listener {
 							connection.sendTCP(new Data(DataTypes.SEARCH, streams));
 							Utilities.log(this, "\tSent search results back", false);
 						}
-					})).start();
+					});
 					//Search results are ArrayList<StreamedBlockedFile> which have encrypted name + onboard encrypted blockList
 					break;
 					
 				case RequestTypes.EXTVIS:
 					Utilities.log(this, "Received request for external visibility", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.EXTVIS, Core.config.cacheEnabled));
 							Utilities.log(this, "\tSent external visibility data back", false);
 						}
-					})).start();
+					});
 					break;
 					
 				case RequestTypes.CACHE:
 					Utilities.log(this, "Received request for cache feed", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							//String encryptedQuery = (String) request.getPayload();
 							//String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
@@ -201,12 +205,12 @@ public class DualListener extends Listener {
 							connection.sendTCP(new Data(DataTypes.CACHE, cacheStreams));
 							Utilities.log(this, "\tSent cache search results back", false);
 						}
-					})).start();
+					});
 					break;
 					
 				case RequestTypes.CACHEPULL:
 					Utilities.log(this, "Received request for cache pull", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							Object oCachePull = request.getPayload();
 							ArrayList<String> cacheNeeded = new ArrayList<String> ();
@@ -234,51 +238,55 @@ public class DualListener extends Listener {
 								}
 							}
 						}
-					})).start();
+					});
 					break;
 					
 			}
 		} else if(object instanceof Data) {
 			final Data data = (Data) object;
-			String type = data.getType();
+			byte type = data.getType();
 
 			switch(type) {
 				//Data below are encryption keys, mutex is encrypted via RSA
 			
 				case DataTypes.PUBKEY:
 					Utilities.log(this, "Received pubkey data: ", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							String pubkeyData = (String) data.getPayload();
 							if(foundPeer.setPubkey(pubkeyData)) {
 								foundPeer.getPubkeyLatch().countDown();
 							}
 						}
-					})).start();
+					});
 					break;
 			
 				case DataTypes.MUTEX:
 					Utilities.log(this, "Received mutex data", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							String encryptedMutex = (String) data.getPayload();
 							try {
 								String mutexData = Core.rsa.decrypt(encryptedMutex);
 								//Update foundPeer
 								Peer bridgeFoundPeer = foundPeer;
-								while(bridgeFoundPeer == null) {
+								int attemptsToFindPeer = 0;
+								while(bridgeFoundPeer == null && attemptsToFindPeer <= 5) {
 									bridgeFoundPeer = Peer.findPeer(connection);
 									Thread.sleep(100);
+									attemptsToFindPeer++;
 								}
-								if(bridgeFoundPeer.mutexCheck(mutexData)) {
-									bridgeFoundPeer.getCryptoLatch().countDown();
+								if(bridgeFoundPeer != null) {
+									if(bridgeFoundPeer.mutexCheck(mutexData)) {
+										bridgeFoundPeer.getCryptoLatch().countDown();
+									}
 								}
 							} catch (Exception ex) {
 								Utilities.log(this, "Failed to set mutex", false);
 								ex.printStackTrace();
 							}
 						}
-					})).start();
+					});
 					break;
 	
 				//All data past this point is encrypted via symmetric encryption
@@ -287,7 +295,7 @@ public class DualListener extends Listener {
 				case DataTypes.PEERLIST:
 					Utilities.log(this, "Received peerlist data", false);
 					//TODO: implement peerlist processing
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							Object payload = data.getPayload();
 							if(payload instanceof ArrayList<?>) {
@@ -318,12 +326,12 @@ public class DualListener extends Listener {
 								}
 							}
 						}
-					})).start();
+					});
 					break;
 					
 				case DataTypes.SEARCH:
 					Utilities.log(this,  "Received search reply data", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							Object searchPayload = data.getPayload();
 							if(searchPayload instanceof ArrayList<?>) {
@@ -331,13 +339,23 @@ public class DualListener extends Listener {
 								for(int i=0; i < potentialStreams.size(); i++) {
 									Object o = potentialStreams.get(i);
 									if(o instanceof StreamedBlockedFile) {
-										StreamedBlockedFile sbl = (StreamedBlockedFile) o;
+										StreamedBlockedFile sbl = (StreamedBlockedFile) o;										
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
 										
-										//Store name and blockList in preparation for Download thread fetching from GUI
+										//Store name + blockList in index in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
 										if(FilterUtils.mandatoryFilter(name)) {
 											String checksum = intermediate.getChecksum();
+											String metaScore = null;
+											Metadata chosenMeta = null;
+											for(Metadata meta : Core.metaDex) {
+												if(meta.matchBf(intermediate.getChecksum())) {
+													chosenMeta = meta;
+												}
+											}
+											if(chosenMeta != null) {
+												metaScore = "" + chosenMeta.getScore();
+											}
 											
 											if(!Core.mainWindow.haveSearchAlready(checksum)) {
 												ArrayList<String> blockList = intermediate.getBlockList();
@@ -354,35 +372,40 @@ public class DualListener extends Listener {
 												} else {
 													sizeEstimate += estimateKb + "KB";
 												}
-												Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum});
+												
+												if(metaScore != null) {
+													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, metaScore});
+												} else {
+													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, "-"});
+												}
 											}
 										}
 									}
 								}
 							}
 						}
-					})).start();
+					});
 					break;
 					
 				case DataTypes.BLOCK:
 					Utilities.log(this, "Received block data", true);
 					//Threaded decryption
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
 							streamedBlock.insertSelf(foundPeer.getAES());
 						}
-					})).start();
+					});
 					break;
 					
 				case DataTypes.EXTVIS:
 					Utilities.log(this, "Received external visibility data", false);
-					(new Thread(new Runnable() {
+					rt.queue(new Runnable() {
 						public void run() {
 							boolean vis = (boolean) data.getPayload();
 							foundPeer.setExtVis(vis);
 						}
-					})).start();
+					});
 					break;
 					
 				case DataTypes.CACHE:
@@ -392,7 +415,7 @@ public class DualListener extends Listener {
 						break;
 					} else {
 						final Object oPayload = data.getPayload();
-						(new Thread(new Runnable() {
+						rt.queue(new Runnable() {
 							public void run() {
 								ArrayList<String> cacheDataRes = new ArrayList<String> ();
 								if(oPayload instanceof ArrayList<?>) {
@@ -424,38 +447,42 @@ public class DualListener extends Listener {
 									Utilities.log(this, "No new data found from peer " + foundPeer.getMutex(), false);
 								}
 							}
-						})).start();
+						});
 					}
 					break;
 					
 				case DataTypes.CACHEPULL:
 					Utilities.log(this, "Received cache pull data", false);
-					Object cachePullPayload = data.getPayload();
-					if(cachePullPayload instanceof ArrayList<?>) {
-						ArrayList<?> potentialStreams = (ArrayList<?>) cachePullPayload;
-						for(int i=0; i < potentialStreams.size(); i++) {
-							Object o = potentialStreams.get(i);
-							if(o instanceof StreamedBlockedFile) {
-								StreamedBlockedFile sbl = (StreamedBlockedFile) o;
-								BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
-								
-								if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
-									BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
-									if(testBf != null) {
-										if(testBf.isComplete()) {
-											Utilities.log(this, "Already own a complete copy of BlockedFile " + intermediate.getChecksum(), false);
-										} else {
-											//Silently download this BlockedFile (partial)
-											fetchCache(intermediate, false);
+					final Object cachePullPayload = data.getPayload();
+					rt.queue(new Runnable() {
+						public void run() {
+							if(cachePullPayload instanceof ArrayList<?>) {
+								ArrayList<?> potentialStreams = (ArrayList<?>) cachePullPayload;
+								for(int i=0; i < potentialStreams.size(); i++) {
+									Object o = potentialStreams.get(i);
+									if(o instanceof StreamedBlockedFile) {
+										StreamedBlockedFile sbl = (StreamedBlockedFile) o;
+										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
+										
+										if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
+											BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
+											if(testBf != null) {
+												if(testBf.isComplete()) {
+													Utilities.log(this, "Already own a complete copy of BlockedFile " + intermediate.getChecksum(), false);
+												} else {
+													//Silently download this BlockedFile (partial)
+													fetchCache(intermediate, false);
+												}
+											} else {
+												//Silently download this BlockedFile (complete)
+												fetchCache(intermediate, true);
+											}
 										}
-									} else {
-										//Silently download this BlockedFile (complete)
-										fetchCache(intermediate, true);
 									}
 								}
 							}
 						}
-					}
+					});
 					break;
 			}
 		}
@@ -463,10 +490,10 @@ public class DualListener extends Listener {
 	
 	private void fetchCache(BlockedFile intermediate, boolean complete) {
 		if(complete) {	
-			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), false);
+			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
 			(new Thread(new Downloader(intermediate))).start();
 		} else {
-			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), false);
+			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
 			(new Thread(new Downloader(intermediate))).start();
 		}
 	}

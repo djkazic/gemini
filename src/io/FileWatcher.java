@@ -18,6 +18,7 @@ import java.util.List;
 import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
+import io.block.BlockedFile;
 import io.serialize.BlockdexSerializer;
 
 /**

@@ -14,18 +14,20 @@ public class DiscoveryServer implements Runnable {
 		try {
 			discoverySocket = new DatagramSocket(Core.config.discoverPort, InetAddress.getByName("0.0.0.0"));
 			discoverySocket.setBroadcast(true);
+			byte[] recvBuf;
+			byte[] sendData;
+			DatagramPacket packet = null;
 			while(true) {
 				//Receive a packet
 				//Utilities.log(this, "Received potential broadcast packet");
-				byte[] recvBuf = new byte[15000];
-				DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
+				recvBuf = new byte[15000];
+				packet = new DatagramPacket(recvBuf, recvBuf.length);
 				discoverySocket.receive(packet);
 				//Check packet contents
 				String message = new String(packet.getData()).trim();
 				if(message.equals("DISC_RAD_REQ")) {
-					byte[] sendData = "DISC_RAD_RESP".getBytes();
-					DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
-					discoverySocket.send(sendPacket);
+					sendData = "DISC_RAD_RESP".getBytes();
+					discoverySocket.send(new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort()));
 				}
 				Thread.sleep(300);
 			}
