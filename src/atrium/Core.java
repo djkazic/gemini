@@ -168,5 +168,6 @@ public class Core {
 			loadWindow.setProgress(85);
 		}
 		netHandler = new NetHandler();
+		netHandler.peerDiscovery();
 	}
 }

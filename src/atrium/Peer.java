@@ -32,6 +32,7 @@ public class Peer {
 	private PublicKey pubkey;
 	private AES aes;
 	private String mutex;
+	private String hostPort;
 	private int inOut;
 
 	/**
@@ -82,6 +83,8 @@ public class Peer {
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
 						Utilities.log(this, "Requesting extVisible data", true);
 						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
+						Utilities.log(this, "Requesting peer's hostPort", true);
+						connection.sendTCP(new Request(RequestTypes.HOSTPORT, null));
 					} else {
 						//When we've received both a pubkey and sent our peerlist out,
 						//Start sending requests to this (out)peer
@@ -95,6 +98,8 @@ public class Peer {
 						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
 						Utilities.log(this, "Requesting extVisible data", true);
 						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
+						Utilities.log(this, "Requesting peer's hostPort", true);
+						connection.sendTCP(new Request(RequestTypes.HOSTPORT, null));
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -233,6 +238,14 @@ public class Peer {
 	 */
 	public void setMutex(String mutex) {
 		this.mutex = mutex;
+	}
+	
+	public String getHostPort() {
+		return hostPort;
+	}
+	
+	public void setHostPort(String hostPortData) {
+		hostPort = hostPortData;
 	}
 
 	/**

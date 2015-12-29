@@ -5,14 +5,12 @@ import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URL;
-import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -25,6 +23,7 @@ import javax.swing.event.HyperlinkListener;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
 import gui.MainWindow;
@@ -63,16 +62,14 @@ public class NetHandler {
 	 */
 	public NetHandler() {
 		getExtIp();
+		registerServerListeners();
 		checkExtVisibility();
-		if(Core.config.hubMode || extVisible) {
-			registerServerListeners();
+		if(!Core.config.hubMode && !extVisible) {
+			destroyServerListeners();
 		}
-		Client initialClient = getClient();
-		registerClientListeners(initialClient);
 		if(!Core.config.hubMode) {
 			Core.mainWindow = new MainWindow();
 		}
-		peerDiscovery(initialClient);
 	}
 
 	/**
@@ -177,6 +174,14 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
+	
+	public void destroyServerListeners() {
+		Utilities.log(this, "Deregistering server and its listeners", false);
+		for(Connection con : server.getConnections()) {
+			con.close();
+		}
+		server.close();
+	}
 
 	/**
 	 * Registers listeners for a client instance
@@ -250,7 +255,7 @@ public class NetHandler {
 	 * Begins peer discovery routine
 	 * @param client Client instance provided
 	 */
-	private void peerDiscovery(Client client) {
+	public void peerDiscovery() {
 		try {
 			Utilities.switchGui(this, "Locating peers...", true);
 
@@ -277,7 +282,7 @@ public class NetHandler {
 			
 			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			//Filter out local IP

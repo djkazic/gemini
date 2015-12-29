@@ -2,8 +2,10 @@ package net.listeners;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -105,12 +107,12 @@ public class DualListener extends Listener {
 							for(Peer peer : Core.peers) {
 								if(peer.getExtVis()) {
 									String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
-													+ peer.getConnection().getRemoteAddressTCP().getPort();
+													+ peer.getHostPort();
 									refinedPeerList.add(Core.aes.encrypt(peerData));
 								}
 							}
 							connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
-							Utilities.log(this, "\tSent peerlist back", false);
+							Utilities.log(this, "\tSent peerlist back, len " + refinedPeerList.size(), false);
 							if(foundPeer.getInOut() == 0) {
 								foundPeer.getDeferredLatch().countDown();
 							}
@@ -243,6 +245,16 @@ public class DualListener extends Listener {
 					});
 					break;
 					
+				case RequestTypes.HOSTPORT:
+					Utilities.log(this, "Received request for hosting port", false);
+					rt.queue(new Runnable() {
+						public void run() {
+							Utilities.log(this, "\tSent back hostport", false);
+							foundPeer.getConnection().sendTCP(new Data(DataTypes.HOSTPORT, Core.config.tcpPort));
+						}
+					});
+					break;
+					
 			}
 		} else if(object instanceof Data) {
 			final Data data = (Data) object;
@@ -295,8 +307,7 @@ public class DualListener extends Listener {
 				//TODO: symmetric encryption for peerlist and on
 					
 				case DataTypes.PEERLIST:
-					Utilities.log(this, "Received peerlist data", false);
-					//TODO: implement peerlist processing
+					Utilities.log(this, "Received peerlist data", false);	
 					rt.queue(new Runnable() {
 						public void run() {
 							Object payload = data.getPayload();
@@ -320,9 +331,17 @@ public class DualListener extends Listener {
 											String[] split = finishedList.get(i).split(":");
 											String host = split[0];
 											int port = Integer.parseInt(split[1]);
-											Core.netHandler.getClient().connect(8000, InetAddress.getByName(host), port);
+											Client tempClient = Core.netHandler.getClient();
+											tempClient.connect(8000, host, port);
 										} catch (Exception ex) {
+											try {
+												Utilities.log(this, InetAddress.getByName(finishedList.get(i).split(":")[0]).toString(), false);
+											} catch(UnknownHostException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
 											Utilities.log(this, "Peerlist data corrupted", false);
+											ex.printStackTrace();
 										}
 									}
 								}
@@ -401,7 +420,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.EXTVIS:
-					Utilities.log(this, "Received external visibility data", false);
+					Utilities.log(this, "Received external visibility data: " + ((boolean) data.getPayload()), false);
 					rt.queue(new Runnable() {
 						public void run() {
 							boolean vis = (boolean) data.getPayload();
@@ -483,6 +502,16 @@ public class DualListener extends Listener {
 									}
 								}
 							}
+						}
+					});
+					break;
+					
+				case DataTypes.HOSTPORT:
+					Utilities.log(this, "Received hostport data", false);
+					rt.queue(new Runnable() {
+						public void run() {
+							int hostPortData = (Integer) data.getPayload();
+							foundPeer.setHostPort("" + hostPortData);
 						}
 					});
 					break;
