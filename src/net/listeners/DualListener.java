@@ -42,9 +42,9 @@ public class DualListener extends Listener {
 	//New connection, either incoming or outgoing
 	public void connected(Connection connection) {
 		if(inOut == 1) {
-			Utilities.log(this, "New incoming peer", false);
+			Utilities.log(this, "New incoming peer: " + connection.getRemoteAddressTCP().getHostString(), false);
 		} else {
-			Utilities.log(this, "New outgoing peer", false);
+			Utilities.log(this, "New outgoing peer: " + connection.getRemoteAddressTCP().getHostString(), false);
 		}
 		connection.setIdleThreshold(0.4f);
 		try {
@@ -61,7 +61,9 @@ public class DualListener extends Listener {
 	public void disconnected(Connection connection) {
 		Peer foundPeer = Peer.findPeer(connection);
 		if(foundPeer != null) {
-			foundPeer.disconnect();
+			if(foundPeer.getConnection().isConnected()) {
+				foundPeer.disconnect();
+			}
 		}
 	}
 	
@@ -105,7 +107,7 @@ public class DualListener extends Listener {
 						public void run() {
 							ArrayList<String> refinedPeerList = new ArrayList<String> ();
 							for(Peer peer : Core.peers) {
-								if(peer.getExtVis()) {
+								if(peer != foundPeer && peer.getExtVis()) {
 									String peerData = peer.getConnection().getRemoteAddressTCP().getHostString() + ":"
 													+ peer.getHostPort();
 									refinedPeerList.add(Core.aes.encrypt(peerData));
@@ -326,6 +328,9 @@ public class DualListener extends Listener {
 									Utilities.log(this, "No viable peers were received from " + foundPeer.getMutex(), false);
 								} else {
 									for(int i=0; i < finishedList.size(); i++) {
+										try {
+											Thread.sleep(1000);
+										} catch(Exception ex) {}
 										//Attempt to split the entry
 										try {
 											String[] split = finishedList.get(i).split(":");
