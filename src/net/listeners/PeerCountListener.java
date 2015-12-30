@@ -4,6 +4,8 @@ import atrium.Core;
 
 public class PeerCountListener implements Runnable {
 	
+	private boolean triggeredReady = false;
+	
 	public void run() {
 		while(true) {
 			try {
@@ -15,6 +17,13 @@ public class PeerCountListener implements Runnable {
 							Core.mainWindow.clearSearchData();
 							Core.mainWindow.out("Ready");
 						}
+					} else {
+						return;
+					}
+				} else {
+					if(!triggeredReady && !Core.config.hubMode) {
+						triggeredReady = true;
+						Core.mainWindow.ready();
 					}
 				}
 				Thread.sleep(450);
