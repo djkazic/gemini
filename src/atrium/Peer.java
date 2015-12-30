@@ -24,6 +24,7 @@ import packets.requests.RequestTypes;
  */
 public class Peer {
 
+	private static Thread cacheThread;
 	private CountDownLatch deferredRequesting;
 	private CountDownLatch pubkeyDone;
 	private CountDownLatch cryptoDone;
@@ -41,20 +42,22 @@ public class Peer {
 	 * @param inOut the status of incoming/outgoing; 0 = out, 1 = in
 	 */
 	public Peer(Connection connection, int inOut) {
-		//Add ourselves to peers without data
-		Core.peers.add(this);
+		//Update peer count in GUI
 		if(!Core.config.hubMode) {
 			Core.mainWindow.updatePeerCount();
 		}
+		
+		//Store instance vars
+		this.connection = connection;
+		this.inOut = inOut;
+		
+		//Add ourselves to peers with instance data
+		Core.peers.add(this);
 		
 		//Set CountDownLatches
 		deferredRequesting = new CountDownLatch(1);
 		pubkeyDone = new CountDownLatch(1);
 		cryptoDone = new CountDownLatch(1);
-		
-		//Store instance vars
-		this.connection = connection;
-		this.inOut = inOut;
 
 		//Begin to bootstrap data from this peer
 		bootstrapRequests();
@@ -110,11 +113,11 @@ public class Peer {
 		bootstrapThread.start();
 		
 		//If we are a cacher, also send cache requests every minute
-		if(Core.config.cacheEnabled) {
+		if(Core.config.cacheEnabled && cacheThread == null) {
 			Utilities.log(this, "Starting polling thread for peer", true);
-			Thread cachePollerThread = new Thread(new CachePoller(this));
-			cachePollerThread.setName("Peer " + connection.getID() + " Cache Poller");
-			cachePollerThread.start();
+			cacheThread = new Thread(new CachePoller());
+			cacheThread.setName(" Cache Poller");
+			cacheThread.start();
 		}
 	}
 	
@@ -122,11 +125,12 @@ public class Peer {
 	 * Log a disconnect for this peer, with some debug data
 	 */
 	public void disconnect() {
+		int connNumber = connection.getID();
 		connection.close();
 		if(mutex != null) {
 			Utilities.log(this, "Peer " + mutex + " disconnected", false);
 		} else {
-			Utilities.log(this, "Peer disconnected (mutex was null on disconnect)", false);
+			Utilities.log(this, "Peer disconnected (mutex null, #" + connNumber + ")", false);
 		}
 		Core.peers.remove(this);
 		if(!Core.config.hubMode) {
@@ -260,7 +264,7 @@ public class Peer {
 		} else {
 			boolean passed = true;
 			for(Peer peer : Core.peers) {
-				if(peer != this && peer.getMutex().equals(mutexData)) {
+				if(peer != this && peer.getMutex() != null && peer.getMutex().equals(mutexData)) {
 					passed = false;
 					break;
 				}
