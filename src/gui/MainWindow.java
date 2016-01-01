@@ -518,15 +518,8 @@ public class MainWindow extends JFrame {
 							ArrayList<String> blockList = (ArrayList<String>) pairs.getValue();
 							//Check to see if the HashMap's matching is accurate
 							if((indexName != null && checksum != null) && tableChecksum.equals(checksum)) {
-								BlockedFile bf;
-								//Check if this BlockedFile exists in index by checksum
-								if(FileUtils.getBlockedFile(checksum) != null) {
-									bf = FileUtils.getBlockedFile(checksum);
-									bf.setBlockList(blockList);
-								} else {
-									//If not, create a new BlockedFile instance
-									bf = new BlockedFile(fileName, checksum, blockList);
-								}
+								BlockedFile bf = new BlockedFile(fileName, checksum, blockList, true);
+
 								boolean alreadyDoneInPane = false;
 								for(int i = 0; i < downloadModel.getRowCount(); i++) {
 									if(downloadModel.getValueAt(i, 3).equals(bf.getChecksum())) {
@@ -536,6 +529,7 @@ public class MainWindow extends JFrame {
 										}
 									}
 								}
+								
 								if(!alreadyDoneInPane && !bf.isComplete()) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", " ... ", bf.getChecksum()});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
@@ -546,6 +540,7 @@ public class MainWindow extends JFrame {
 									downloadThread.start();
 									return;
 								}
+								
 								if(bf.isComplete()) {
 									String bfFileName = bf.getPointer().getName();
 									Utilities.log(this, "File is already downloaded: [" + bfFileName + "]", false);
@@ -553,7 +548,6 @@ public class MainWindow extends JFrame {
 																  JOptionPane.INFORMATION_MESSAGE);
 								}
 							}
-							//it.remove();
 						}
 					}
 				}

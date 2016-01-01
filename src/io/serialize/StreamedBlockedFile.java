@@ -44,7 +44,7 @@ public class StreamedBlockedFile {
 				Core.metaDex.add(metadata);
 			}
 		}
-		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted);
+		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, false);
 	}
 	
 	public boolean hasMetadata() {

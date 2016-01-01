@@ -55,17 +55,19 @@ public class BlockedFile {
 	 * @param pointer string pointer for File
 	 * @param blockList ArrayList<String> of block names
 	 */
-	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList) {
+	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, boolean searchConstructed) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
 		this.checksum = checksum;
 		this.blockList = blockList;
 		blackList = new ArrayList<String> ();
 		complete = false;
 		progress = "";
-		if(!FileUtils.haveInBlockDex(this.pointer)) {
-			Core.blockDex.add(this);
+		if(searchConstructed) {
+			if(!FileUtils.haveInBlockDex(this.pointer)) {
+				Core.blockDex.add(this);
+			}
+			BlockedFile.serializeAll();
 		}
-		BlockedFile.serializeAll();
 	}
 
 	/**
