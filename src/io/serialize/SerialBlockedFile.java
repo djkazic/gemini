@@ -15,6 +15,7 @@ public class SerialBlockedFile {
 	private String progress;
 	private float blockRate;
 	private long lastChecked;
+	private boolean cache;
 	
 	public SerialBlockedFile() {
 		pointerPath = "";
@@ -25,11 +26,12 @@ public class SerialBlockedFile {
 		progress = "";
 		blockRate = 0;
 		lastChecked = 0;
+		cache = false;
 	}
 	
 	public SerialBlockedFile(String absolutePath, String checksum, ArrayList<String> blockList,
 			               ArrayList<String> blacklist, boolean complete, String progress, 
-			               float blockRate, long lastChecked) {
+			               float blockRate, long lastChecked, boolean cache) {
 		this.pointerPath = absolutePath;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -38,6 +40,7 @@ public class SerialBlockedFile {
 		this.progress = progress;
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
+		this.cache = cache;
 	}
 
 	public BlockedFile toBlockedFile() {
@@ -48,6 +51,7 @@ public class SerialBlockedFile {
 							   complete, 
 							   progress, 
 							   blockRate, 
-							   lastChecked);
+							   lastChecked,
+							   cache);
 	}
 }

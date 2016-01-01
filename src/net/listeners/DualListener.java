@@ -487,6 +487,7 @@ public class DualListener extends Listener {
 									if(o instanceof StreamedBlockedFile) {
 										StreamedBlockedFile sbl = (StreamedBlockedFile) o;
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
+										intermediate.setCache(true);
 										
 										if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
 											BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
@@ -501,6 +502,9 @@ public class DualListener extends Listener {
 												//Silently download this BlockedFile (complete)
 												fetchCache(intermediate, true);
 											}
+										} else {
+											intermediate.reset();
+											Core.blockDex.remove(intermediate);
 										}
 									}
 								}
@@ -523,12 +527,14 @@ public class DualListener extends Listener {
 	}
 	
 	private void fetchCache(BlockedFile intermediate, boolean complete) {
-		if(complete) {	
-			Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
-			(new Thread(new Downloader(intermediate))).start();
-		} else {
-			Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
-			(new Thread(new Downloader(intermediate))).start();
+		if(FileUtils.cacheReady(intermediate.getBlockList().size() * Core.blockSize)) {
+			if(complete) {	
+				Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
+				(new Thread(new Downloader(intermediate))).start();
+			} else {
+				Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
+				(new Thread(new Downloader(intermediate))).start();
+			}
 		}
 	}
 }

@@ -26,6 +26,7 @@ public class BlockedFile {
 	private String progress;
 	private float blockRate;
 	private long lastChecked;
+	private boolean cache;
 	
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -77,9 +78,10 @@ public class BlockedFile {
 	 * @param progress string representation of progress downloaded
 	 * @param blockRate rate of block downloads
 	 * @param lastChecked last millisecond value checked for blockRate
+	 * @param cache 
 	 */
 	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
-					   boolean complete, String progress, float blockRate, long lastChecked) {
+					   boolean complete, String progress, float blockRate, long lastChecked, boolean cache) {
 		this.pointer = file;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -88,6 +90,7 @@ public class BlockedFile {
 		this.progress = progress;
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
+		this.cache = cache;
 		if(!FileUtils.haveInBlockDex(pointer)) {
 			Core.blockDex.add(this);
 		}
@@ -299,6 +302,14 @@ public class BlockedFile {
 		}
 	}
 	
+	public boolean getCache() {
+		return cache;
+	}
+	
+	public void setCache(boolean in) {
+		cache = in;
+	}
+	
 	/**
 	 * Calculates and returns date modified for this BlockedFile
 	 * @return string date modified for this BlockedFile
@@ -318,7 +329,7 @@ public class BlockedFile {
 	 */
 	public SerialBlockedFile toSerialBlockedFile() {
 		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
-								   complete, progress, blockRate, lastChecked);
+								     complete, progress, blockRate, lastChecked, cache);
 	}
 	
 	/**
@@ -337,7 +348,10 @@ public class BlockedFile {
 				break;
 			}
 		}
-		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList, streamMeta);
+		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), 
+									   Core.aes.encrypt(checksum), 
+									   encryptedList, 
+									   streamMeta);
 	}
 	
 	/**

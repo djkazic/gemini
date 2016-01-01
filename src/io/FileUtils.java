@@ -271,29 +271,7 @@ public class FileUtils {
 					}
 				}
 			} else {
-				filterPassed = new ArrayList<File> ();
-
-				File[] list = baseFolder.listFiles();
-				if(list != null && list.length > 0) {
-					for(int i=0; i < list.length; i++) {
-						if(!list[i].getName().startsWith(".")) {
-							if(list[i].isFile()) {
-								if(FilterUtils.mandatoryFilter(list[i].getName())) {
-									filterPassed.add(list[i]);
-								} else {
-									list[i].delete();
-								}
-							} else {
-								try {
-									processDir(list[i]);
-								} catch(Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-						}
-					}
-				}
-				
+				filterPassed = enumerateBasefolder();
 				actualBfCount = filterPassed.size();
 
 				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
@@ -337,6 +315,35 @@ public class FileUtils {
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public static ArrayList<File> enumerateBasefolder() {
+		ArrayList<File> output = new ArrayList<File> ();
+		File baseFolder = new File(getWorkspaceDir());
+		if(baseFolder != null && baseFolder.listFiles().length > 0) {
+			File[] list = baseFolder.listFiles();
+			if(list != null && list.length > 0) {
+				for(int i=0; i < list.length; i++) {
+					if(!list[i].getName().startsWith(".")) {
+						if(list[i].isFile()) {
+							if(FilterUtils.mandatoryFilter(list[i].getName())) {
+								output.add(list[i]);
+							} else {
+								list[i].delete();
+							}
+						} else {
+							try {
+								processDir(list[i]);
+							} catch(Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
+		return output;
+		
 	}
 	
 	public static void loadMetaIndex() {
@@ -627,5 +634,24 @@ public class FileUtils {
 			}
 		}
 		removeFileAndParentsIfEmpty(path.getParent());
+	}
+	
+	public static boolean cacheReady(long estimatedAddition) {
+		if(Core.config.hubMode) {
+			return true;
+		} else {
+			long nonCache = 0;
+			long cached = 0;
+			
+			for(BlockedFile bf : Core.blockDex) {
+				if(bf.getCache()) {
+					cached += (bf.getBlacklist().size() * Core.blockSize);
+				} else {
+					nonCache += bf.getPointer().length();
+				}
+			}
+			
+			return ((cached + estimatedAddition) <= nonCache);
+		}
 	}
 }

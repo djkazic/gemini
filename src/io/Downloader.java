@@ -14,8 +14,8 @@ public class Downloader implements Runnable {
 	private BlockedFile blockedFile;
 	private boolean download = true;
 
-	public Downloader(BlockedFile bf) {
-		blockedFile = bf;
+	public Downloader(BlockedFile blockedFile) {
+		this.blockedFile = blockedFile;
 	}
 
 	public void run() {
@@ -98,8 +98,10 @@ public class Downloader implements Runnable {
 
 			download = false;
 			
-			if(!Core.config.hubMode) {
-				Utilities.log(this, "Assembling BlockedFile " + blockedFile.getPointer().getName(), true);
+			if(Core.config.hubMode || blockedFile.getCache()) {
+				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
+			} else {
+				Utilities.log(this, "Assembling BlockedFile: " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}
 			downloaders.remove(this);
