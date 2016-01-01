@@ -636,10 +636,11 @@ public class FileUtils {
 		removeFileAndParentsIfEmpty(path.getParent());
 	}
 	
-	public static boolean cacheReady(long estimatedAddition) {
+	public static boolean cacheReady(BlockedFile intermediate) {
 		if(Core.config.hubMode) {
 			return true;
 		} else {
+			long estimatedAddition = intermediate.getBlockList().size() * Core.blockSize;
 			long nonCache = 0;
 			long cached = 0;
 			

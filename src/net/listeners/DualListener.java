@@ -527,7 +527,7 @@ public class DualListener extends Listener {
 	}
 	
 	private void fetchCache(BlockedFile intermediate, boolean complete) {
-		if(FileUtils.cacheReady(intermediate.getBlockList().size() * Core.blockSize)) {
+		if(FileUtils.cacheReady(intermediate)) {
 			if(complete) {	
 				Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
 				(new Thread(new Downloader(intermediate))).start();
