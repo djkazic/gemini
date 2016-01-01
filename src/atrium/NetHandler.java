@@ -138,7 +138,6 @@ public class NetHandler {
 				ex.printStackTrace();
 			}
 		}
-		extVisible = false;
 	}
 	
 	/**
