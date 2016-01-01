@@ -423,7 +423,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.EXTVIS:
-					Utilities.log(this, "Received external visibility data: " + ((boolean) data.getPayload()), false);
+					Utilities.log(this, "Received external visibility data", false);
 					rt.queue(new Runnable() {
 						public void run() {
 							boolean vis = (boolean) data.getPayload();
@@ -491,20 +491,10 @@ public class DualListener extends Listener {
 										
 										if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
 											BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
-											if(testBf != null) {
-												if(testBf.isComplete()) {
-													Utilities.log(this, "Already own a complete copy of BlockedFile " + intermediate.getChecksum(), false);
-												} else {
-													//Silently download this BlockedFile (partial)
-													fetchCache(intermediate, false);
-												}
-											} else {
+											if(testBf == null) {
 												//Silently download this BlockedFile (complete)
 												fetchCache(intermediate, true);
 											}
-										} else {
-											intermediate.reset();
-											Core.blockDex.remove(intermediate);
 										}
 									}
 								}
@@ -528,6 +518,9 @@ public class DualListener extends Listener {
 	
 	private void fetchCache(BlockedFile intermediate, boolean complete) {
 		if(FileUtils.cacheReady(intermediate)) {
+			if(!Core.blockDex.contains(intermediate)) {
+				Core.blockDex.add(intermediate);
+			}
 			if(complete) {	
 				Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(), true);
 				(new Thread(new Downloader(intermediate))).start();
@@ -537,8 +530,6 @@ public class DualListener extends Listener {
 			}
 		} else {
 			Utilities.log(this, "Non-compliance with cache readiness, deleting cachepull data", false);
-			intermediate.reset();
-			Core.blockDex.remove(intermediate);
 		}
 	}
 }
