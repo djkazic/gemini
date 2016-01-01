@@ -61,9 +61,7 @@ public class DualListener extends Listener {
 	public void disconnected(Connection connection) {
 		Peer foundPeer = Peer.findPeer(connection);
 		if(foundPeer != null) {
-			if(foundPeer.getConnection().isConnected()) {
-				foundPeer.disconnect();
-			}
+			foundPeer.disconnect();
 		}
 	}
 	
