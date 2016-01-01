@@ -652,6 +652,9 @@ public class FileUtils {
 				}
 			}
 			
+			if(nonCache == 0) {
+				Utilities.log("atrium.FileUtils", "No downloaded files yet, stopping cachepull", false);
+			}
 			return ((cached + estimatedAddition) <= nonCache);
 		}
 	}

@@ -535,6 +535,10 @@ public class DualListener extends Listener {
 				Utilities.log(this, "Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
 				(new Thread(new Downloader(intermediate))).start();
 			}
+		} else {
+			Utilities.log(this, "Non-compliance with cache readiness, deleting cachepull data", false);
+			intermediate.reset();
+			Core.blockDex.remove(intermediate);
 		}
 	}
 }
