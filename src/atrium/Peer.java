@@ -41,18 +41,18 @@ public class Peer {
 	 * @param connection the connection this peer is identified for
 	 * @param inOut the status of incoming/outgoing; 0 = out, 1 = in
 	 */
-	public Peer(Connection connection, int inOut) {
-		//Update peer count in GUI
-		if(!Core.config.hubMode) {
-			Core.mainWindow.updatePeerCount();
-		}
-		
+	public Peer(Connection connection, int inOut) {		
 		//Store instance vars
 		this.connection = connection;
 		this.inOut = inOut;
 		
 		//Add ourselves to peers with instance data
 		Core.peers.add(this);
+		
+		//Update peer count in GUI
+		if(!Core.config.hubMode) {
+			Core.mainWindow.updatePeerCount();
+		}
 		
 		//Set CountDownLatches
 		deferredRequesting = new CountDownLatch(1);
@@ -116,7 +116,7 @@ public class Peer {
 		if(Core.config.cacheEnabled && cacheThread == null) {
 			Utilities.log(this, "Starting polling thread for peer", true);
 			cacheThread = new Thread(new CachePoller());
-			cacheThread.setName(" Cache Poller");
+			cacheThread.setName("Cache Poller");
 			cacheThread.start();
 		}
 	}
@@ -125,6 +125,7 @@ public class Peer {
 	 * Log a disconnect for this peer, with some debug data
 	 */
 	public void disconnect() {
+		Core.peers.remove(this);
 		int connNumber = connection.getID();
 		connection.close();
 		if(mutex != null) {
@@ -132,7 +133,6 @@ public class Peer {
 		} else {
 			Utilities.log(this, "Peer disconnected (mutex null, #" + connNumber + ")", false);
 		}
-		Core.peers.remove(this);
 		if(!Core.config.hubMode) {
 			Core.mainWindow.updatePeerCount();
 		}
@@ -259,12 +259,14 @@ public class Peer {
 	 */
 	public boolean mutexCheck(String mutexData) {
 		if(mutexData.equals(Core.mutex)) {
+			Utilities.log(this, "Duplicate mutex against core: " + mutexData, false);
 			disconnect();
 			return false;
 		} else {
 			boolean passed = true;
 			for(Peer peer : Core.peers) {
 				if(peer != this && peer.getMutex() != null && peer.getMutex().equals(mutexData)) {
+					Utilities.log(this, "Duplicate mutex: " + mutexData, false);
 					passed = false;
 					break;
 				}
