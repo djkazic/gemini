@@ -51,7 +51,9 @@ public class Peer {
 		
 		//Update peer count in GUI
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updatePeerCount();
+			if(Core.mainWindow != null) {
+				Core.mainWindow.updatePeerCount();
+			}
 		}
 		
 		//Set CountDownLatches
@@ -134,7 +136,9 @@ public class Peer {
 			Utilities.log(this, "Peer disconnected (mutex null, #" + connNumber + ")", false);
 		}
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updatePeerCount();
+			if(Core.mainWindow != null) {
+				Core.mainWindow.updatePeerCount();
+			}
 		}
 	}
 
