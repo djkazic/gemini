@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
@@ -145,7 +144,7 @@ public class NetHandler {
 	 * @return new instance of a Client for forging out-bound connections
 	 */
 	public Client getClient() {
-		Client client = new Client(512000 * 5, 512000 * 5);
+		Client client = new Client(512000 * 6, 512000 * 5);
 		registerClientListeners(client);
 		return client;
 	}
@@ -155,7 +154,7 @@ public class NetHandler {
 	 */
 	public void registerServerListeners() {
 		try {
-			server = new Server(512000 * 5, 512000 * 5);
+			server = new Server(512000 * 6, 512000 * 5);
 			registerClasses(server.getKryo());
 			
 			Utilities.log(this, "Registering block listener", false);
@@ -224,8 +223,11 @@ public class NetHandler {
 		Peer chosenPeer = Core.peers.get(ind);
 		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
 		**/
-		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		for(int i=0; i < Core.peers.size(); i++) {
+			Peer peer = Core.peers.get(i);
+			if(peer != null) {
+				peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+			}
 		}
 	}
 	
@@ -242,9 +244,6 @@ public class NetHandler {
 		//Specifics import
 		kryo.register(Data.class);
 		kryo.register(Request.class);
-		kryo.register(Peer.class);
-		kryo.register(Client.class);
-		kryo.register(Inet4Address.class);
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
 		kryo.register(Metadata.class);	
