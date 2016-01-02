@@ -246,15 +246,14 @@ public class BlockedFile {
 	/**
 	 * Updates the progress value via calculating sizes of blackList/blockList
 	 */
-	private void updateProgress() {
-		if(complete) {
-			progress = "100%";
-			updateTime("0 sec");
-		} else {
-			float dProgress = ((float) blackList.size()) / blockList.size();
-			dProgress *= 100;
-			progress = Math.round(dProgress) + "%";
+	public void updateProgress() {	
+		float dProgress = ((float) blackList.size()) / blockList.size();
+		dProgress *= 100;
+		progress = Math.round(dProgress) + "%";
+		if(progress.equals("100%")) {
+			updateTime("Done");
 		}
+
 		if(!Core.config.hubMode) {
 			Core.mainWindow.updateProgress(checksum, progress);
 		}
@@ -299,9 +298,7 @@ public class BlockedFile {
 	 * @param str value provided
 	 */
 	public void setProgress(String str) {
-		if(!progress.equals("Done")) {
-			progress = str;
-		}
+		progress = str;
 	}
 	
 	public boolean getCache() {
