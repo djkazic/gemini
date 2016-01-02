@@ -1,12 +1,18 @@
 package io.block;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
+
 import atrium.Core;
+import io.FileUtils;
 
 public class Metadata {
 	
@@ -75,5 +81,23 @@ public class Metadata {
 	
 	public String toString() {
 		return "Checksum: " + bfChecksum + " | Score: " + getScore() + " | Comments: " + comments;
+	}
+	
+	public static void serializeAll() {
+		try {
+			File metaDexSerialized = new File(FileUtils.getConfigDir() + "/metadex.dat");
+			if(metaDexSerialized.exists()) {
+				metaDexSerialized.delete();
+			}
+			
+			if(Core.metaDex.size() > 0) {
+				metaDexSerialized.createNewFile();
+				Kryo kryo = new Kryo();
+				FileOutputStream fos = new FileOutputStream(metaDexSerialized);
+				Output out = new Output(fos);
+				kryo.writeObject(out, Core.metaDex);
+				out.close();
+			}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 }
