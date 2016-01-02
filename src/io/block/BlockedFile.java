@@ -12,12 +12,17 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 
 import atrium.Core;
+import atrium.Utilities;
 import io.FileUtils;
 import io.serialize.SerialBlockedFile;
 import io.serialize.StreamedBlockedFile;
 
 public class BlockedFile {
-
+	
+	private static final File blockDexCache = new File(FileUtils.getConfigDir() + "/eblockdex.dat");
+	private static final File protoBlockDexCache = new File(FileUtils.getConfigDir() + "/blockdex.dat");
+	private static Kryo kryo = new Kryo();
+	
 	private File pointer;
 	private String checksum;
 	private ArrayList<String> blockList;
@@ -375,8 +380,6 @@ public class BlockedFile {
 	 */
 	public static void serializeAll() {
 		try {
-			File blockDexCache = new File(FileUtils.getConfigDir() + "/eblockdex.dat");
-			File protoBlockDexCache = new File(FileUtils.getConfigDir() + "/blockdex.dat");
 			if(blockDexCache.exists()) {
 				blockDexCache.delete();
 			}
@@ -385,7 +388,6 @@ public class BlockedFile {
 			}
 			if(Core.blockDex.size() > 0) {
 				protoBlockDexCache.createNewFile();
-				Kryo kryo = new Kryo();
 				FileOutputStream fos = new FileOutputStream(protoBlockDexCache);
 				Output out = new Output(fos);
 				ArrayList<SerialBlockedFile> kbf = new ArrayList<SerialBlockedFile> ();
@@ -395,14 +397,15 @@ public class BlockedFile {
 				kryo.writeObject(out, kbf);
 				out.close();
 				
-				byte[] fileBytes = Files.readAllBytes(protoBlockDexCache.toPath());
-				byte[] encFileBytes = Core.aes.encrypt(fileBytes);
+				byte[] encFileBytes = Core.aes.encrypt(Files.readAllBytes(protoBlockDexCache.toPath()));
 				FileOutputStream fosEnc = new FileOutputStream(blockDexCache);
 				fosEnc.write(encFileBytes);
 				fosEnc.close();
 				
 				protoBlockDexCache.delete();
 			}
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch(Exception ex) { 
+			Utilities.log("io.block.BlockedFile", "Attempted write to blockdex, lock detected", false); 
+		}
 	}
 }
