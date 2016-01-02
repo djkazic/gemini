@@ -524,19 +524,20 @@ public class MainWindow extends JFrame {
 							ArrayList<String> blockList = (ArrayList<String>) pairs.getValue();
 							//Check to see if the HashMap's matching is accurate
 							if((indexName != null && checksum != null) && tableChecksum.equals(checksum)) {
-								BlockedFile bf = new BlockedFile(fileName, checksum, blockList, true);
+								BlockedFile bf = FileUtils.getBlockedFile(checksum);
+								if(bf == null) {
+									bf = new BlockedFile(fileName, checksum, blockList, true);
+								}
 
-								boolean alreadyDoneInPane = false;
+								boolean alreadyInPane = false;
 								for(int i = 0; i < downloadModel.getRowCount(); i++) {
 									if(downloadModel.getValueAt(i, 3).equals(bf.getChecksum())) {
-										if(downloadModel.getValueAt(i, 1).equals("100%")) {
-											alreadyDoneInPane = true;
-											break;
-										}
+										alreadyInPane = true;
+										break;
 									}
 								}
 								
-								if(!alreadyDoneInPane && !bf.isComplete()) {
+								if(!alreadyInPane && !bf.isComplete()) {
 									downloadModel.addRow(new String[]{bf.getPointer().getName(), "0%", " ... ", bf.getChecksum()});
 									downloadList.getColumnModel().getColumn(1).setCellRenderer(new ProgressCellRenderer());
 									downloadPopupMenuPause.setEnabled(true);
