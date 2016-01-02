@@ -81,7 +81,6 @@ public class Core {
 		} else {
 			Utilities.log("atrium.Core", "Initializing front-end", false);
 			loadWindow = new LoadWindow();
-			//mainWindow = new MainWindow();
 		}
 		
 		//Set mutex
@@ -162,12 +161,14 @@ public class Core {
 		}
 		FileUtils.genBlockIndex();
 		
-		//Start NetHandling
+		//Initialize NetHandler object
 		Utilities.switchGui("atrium.Core", "Initializing networking", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(85);
 		}
 		netHandler = new NetHandler();
+		
+		//Do peer discovery
 		netHandler.peerDiscovery();
 	}
 }

@@ -98,6 +98,8 @@ public class NetHandler {
 		} catch(Exception ex) {
 			externalIp = null;
 			ex.printStackTrace();
+			Utilities.log(this, "Internet connection unstable, shutting down", false);
+			System.exit(0);
 		}
 	}
 
@@ -135,6 +137,8 @@ public class NetHandler {
 				}
 			} catch(Exception ex) {
 				ex.printStackTrace();
+				Utilities.log(this, "Internet connection unstable, shutting down", false);
+				System.exit(0);
 			}
 		}
 	}
