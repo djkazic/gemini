@@ -45,7 +45,7 @@ public class Downloader implements Runnable {
 
 			Utilities.log(this, "Starting download for " + blockedFile.getPointer().getName(), false);
 
-			while(Core.peers.size() > 0 || !blockedFile.isComplete()) {
+			while(Core.peers.size() > 0 && !blockedFile.isComplete()) {
 				if(!download) {
 					Utilities.log(this, "Idling in pause", true);
 					if(!Core.config.hubMode) {
@@ -73,14 +73,11 @@ public class Downloader implements Runnable {
 					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(25);
 					continue;
-				}
-				
-				if(blockedFile.getProgressNum() == 100) {
+				} else if(block == null) {
 					Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
 					blockedFile.setComplete(true);
-					blockedFile.setProgress("Done");
+					blockedFile.updateProgress();
 					BlockedFile.serializeAll();
-					break;
 				}
 
 				if(Core.peers.size() >= 3) {
@@ -97,13 +94,13 @@ public class Downloader implements Runnable {
 			}
 
 			download = false;
-			
 			if(Core.config.hubMode || blockedFile.getCache()) {
 				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
 			} else {
 				Utilities.log(this, "Assembling BlockedFile: " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}
+			
 			downloaders.remove(this);
 		} catch (Exception ex) {
 			Utilities.log(this, "Downloader exception: ", false);
