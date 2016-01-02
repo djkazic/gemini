@@ -1,7 +1,8 @@
 package net.listeners;
 
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
@@ -21,15 +22,19 @@ public class BlockListener extends TcpIdleSender {
 
 	private String blockOriginChecksum;
 	private String blockName;
-	private ArrayList<Object> sendQueue;
+	private HashMap<Connection, Object> sendQueue;
 
 	public BlockListener() {
-		sendQueue = new ArrayList<Object> ();
+		sendQueue = new HashMap<Connection, Object> ();
 	}
 
 	public void idle(Connection connection) {
 		if(!sendQueue.isEmpty()) {
-			super.idle(connection);
+			Entry<Connection, Object> entry = next();
+			Connection finalConn = entry.getKey();
+			Object sendObj = entry.getValue();
+			finalConn.sendTCP(sendObj);
+			sendQueue.remove(finalConn);
 		}
 	}
 
@@ -68,8 +73,9 @@ public class BlockListener extends TcpIdleSender {
 							Utilities.log(this, "\tSending back block " + blockName, true);
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
 							boolean dupe = false;
-							//TODO: replace with equals() impl
-							for(Object odata : sendQueue) {
+							
+							for(Entry<Connection, Object> entry : sendQueue.entrySet()) {
+								Object odata = entry.getValue();
 								if(odata instanceof Data) {
 									Data data = (Data) odata;
 									Object opayload = data.getPayload();
@@ -82,7 +88,7 @@ public class BlockListener extends TcpIdleSender {
 								}
 							}
 							if(!dupe) {
-								sendQueue.add(new Data(DataTypes.BLOCK, sb));
+								sendQueue.put(connection, new Data(DataTypes.BLOCK, sb));
 							}
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {
@@ -99,7 +105,7 @@ public class BlockListener extends TcpIdleSender {
 		}
 	}
 
-	protected Object next() {
-		return sendQueue.remove(0);
+	protected Entry<Connection, Object> next() {
+		return sendQueue.entrySet().iterator().next();
 	}
 }
