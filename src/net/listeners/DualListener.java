@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -27,16 +29,15 @@ import packets.requests.RequestTypes;
 
 public class DualListener extends Listener {
 	
+	private static ExecutorService replyPool;
 	private int inOut;
-	private ReplyThread rt;
 	
 	public DualListener(int inOut) {
 		super();
 		this.inOut = inOut;
-		rt = new ReplyThread();
-		Thread replyThread = (new Thread(rt));
-		replyThread.setName("Reply Coordinator");
-		replyThread.start();
+		if(replyPool == null) {
+			replyPool = Executors.newCachedThreadPool();
+		}
 	}
 
 	//New connection, either incoming or outgoing
@@ -78,7 +79,7 @@ public class DualListener extends Listener {
 			
 				case RequestTypes.PUBKEY:
 					Utilities.log(this, "Received request for pubkey", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
 							Utilities.log(this, "\tSent pubkey back", false);
@@ -88,7 +89,7 @@ public class DualListener extends Listener {
 			
 				case RequestTypes.MUTEX:
 					Utilities.log(this, "Received request for mutex", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.MUTEX, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
 							Utilities.log(this, "\tSent mutex back", false);
@@ -101,7 +102,7 @@ public class DualListener extends Listener {
 				case RequestTypes.PEERLIST:
 					Utilities.log(this, "Received request for peerlist", false);
 					//TODO: more refined peerList filtering
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							ArrayList<String> refinedPeerList = new ArrayList<String> ();
 							for(Peer peer : Core.peers) {
@@ -122,7 +123,7 @@ public class DualListener extends Listener {
 				
 				case RequestTypes.SEARCH:
 					Utilities.log(this, "Received request for search", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							String encryptedQuery = (String) request.getPayload();
 							String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
@@ -163,7 +164,7 @@ public class DualListener extends Listener {
 					
 				case RequestTypes.EXTVIS:
 					Utilities.log(this, "Received request for external visibility", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							connection.sendTCP(new Data(DataTypes.EXTVIS, Core.config.cacheEnabled));
 							Utilities.log(this, "\tSent external visibility data back", false);
@@ -173,7 +174,7 @@ public class DualListener extends Listener {
 					
 				case RequestTypes.CACHE:
 					Utilities.log(this, "Received request for cache feed", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							//String encryptedQuery = (String) request.getPayload();
 							//String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
@@ -214,7 +215,7 @@ public class DualListener extends Listener {
 					
 				case RequestTypes.CACHEPULL:
 					Utilities.log(this, "Received request for cache pull", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							Object oCachePull = request.getPayload();
 							ArrayList<String> cacheNeeded = new ArrayList<String> ();
@@ -247,7 +248,7 @@ public class DualListener extends Listener {
 					
 				case RequestTypes.HOSTPORT:
 					Utilities.log(this, "Received request for hosting port", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							Utilities.log(this, "\tSent back hostport", false);
 							foundPeer.getConnection().sendTCP(new Data(DataTypes.HOSTPORT, Core.config.tcpPort));
@@ -265,7 +266,7 @@ public class DualListener extends Listener {
 			
 				case DataTypes.PUBKEY:
 					Utilities.log(this, "Received pubkey data: ", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							String pubkeyData = (String) data.getPayload();
 							if(foundPeer.setPubkey(pubkeyData)) {
@@ -277,7 +278,7 @@ public class DualListener extends Listener {
 			
 				case DataTypes.MUTEX:
 					Utilities.log(this, "Received mutex data", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							String encryptedMutex = (String) data.getPayload();
 							try {
@@ -308,7 +309,7 @@ public class DualListener extends Listener {
 					
 				case DataTypes.PEERLIST:
 					Utilities.log(this, "Received peerlist data", false);	
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							Object payload = data.getPayload();
 							if(payload instanceof ArrayList<?>) {
@@ -355,7 +356,7 @@ public class DualListener extends Listener {
 					
 				case DataTypes.SEARCH:
 					Utilities.log(this,  "Received search reply data", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							Object searchPayload = data.getPayload();
 							if(searchPayload instanceof ArrayList<?>) {
@@ -414,7 +415,7 @@ public class DualListener extends Listener {
 				case DataTypes.BLOCK:
 					Utilities.log(this, "Received block data", true);
 					//Threaded decryption
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
 							streamedBlock.insertSelf(foundPeer.getAES());
@@ -424,7 +425,7 @@ public class DualListener extends Listener {
 					
 				case DataTypes.EXTVIS:
 					Utilities.log(this, "Received external visibility data", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							boolean vis = (boolean) data.getPayload();
 							foundPeer.setExtVis(vis);
@@ -439,7 +440,7 @@ public class DualListener extends Listener {
 						break;
 					} else {
 						final Object oPayload = data.getPayload();
-						rt.queue(new Runnable() {
+						replyPool.execute(new Runnable() {
 							public void run() {
 								ArrayList<String> cacheDataRes = new ArrayList<String> ();
 								if(oPayload instanceof ArrayList<?>) {
@@ -478,7 +479,7 @@ public class DualListener extends Listener {
 				case DataTypes.CACHEPULL:
 					Utilities.log(this, "Received cache pull data", false);
 					final Object cachePullPayload = data.getPayload();
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							if(cachePullPayload instanceof ArrayList<?>) {
 								ArrayList<?> potentialStreams = (ArrayList<?>) cachePullPayload;
@@ -505,7 +506,7 @@ public class DualListener extends Listener {
 					
 				case DataTypes.HOSTPORT:
 					Utilities.log(this, "Received hostport data", false);
-					rt.queue(new Runnable() {
+					replyPool.execute(new Runnable() {
 						public void run() {
 							int hostPortData = (Integer) data.getPayload();
 							foundPeer.setHostPort("" + hostPortData);
