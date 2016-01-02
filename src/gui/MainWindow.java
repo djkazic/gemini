@@ -229,7 +229,9 @@ public class MainWindow extends JFrame {
 							NetHandler.doSearch(input);
 						}
 					}
-					searchInput.setText("");
+					if(Core.config.clearBarAfterSearch) {
+						searchInput.setText("");
+					}
 				}
 			}
 		});
@@ -258,7 +260,9 @@ public class MainWindow extends JFrame {
 					String input = searchInput.getText();
 					if(input.equals("")) {
 						out("You cannot search for a blank query.");
-					} else if(input.startsWith(".")) {
+					} else if(input.startsWith(".") 
+						      || FilterUtils.extensionOnly(input) 
+							  || FilterUtils.extensionOnly(input.substring(1))) {
 						out("You cannot search for a query that starts with an extension.");
 					} else if(input.length() < 3) {
 						out("You cannot search for a query shorter than 3 characters.");
@@ -277,7 +281,9 @@ public class MainWindow extends JFrame {
 						NetHandler.doSearch(input);
 					}
 				}
-				searchInput.setText("");
+				if(Core.config.clearBarAfterSearch) {
+					searchInput.setText("");
+				}
 			}
 		});
 		searchPanel.add(btnSearch, gbc_btnSearch);
