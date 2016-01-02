@@ -9,16 +9,22 @@ import com.esotericsoftware.kryo.io.Output;
 import io.FileUtils;
 
 public class Config {
-
-	//Instance variables, serialized data
+	
+	//Networking
 	public int tcpPort = 35500;
 	public int discoverPort = 35501;
 	public boolean cacheEnabled = false;
-	public boolean notifiedPortForwarding = false;
-	public boolean hubMode = false;
 	public String generatedMAC = null;
+	
+	//GUI
+	public boolean hubMode = false;
+	public boolean clearBarAfterSearch = true;
+	public boolean notifiedPortForwarding = false;
+
+	//Crypto
 	public byte[] rsaPub;
 	public byte[] rsaPriv;
+	
 	
 	/**
 	 * Writes configuration to disk (config.dat)
@@ -43,5 +49,4 @@ public class Config {
 			ex.printStackTrace();
 		}
 	}
-	
 }
