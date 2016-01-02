@@ -20,21 +20,23 @@ import packets.requests.RequestTypes;
 
 public class BlockListener extends TcpIdleSender {
 
+	private static HashMap<Connection, Object> sendQueue;
 	private String blockOriginChecksum;
 	private String blockName;
-	private HashMap<Connection, Object> sendQueue;
 
 	public BlockListener() {
-		sendQueue = new HashMap<Connection, Object> ();
+		if(sendQueue == null) {
+			sendQueue = new HashMap<Connection, Object> ();
+		}
 	}
 
 	public void idle(Connection connection) {
 		if(!sendQueue.isEmpty()) {
-			Entry<Connection, Object> entry = next();
-			Connection finalConn = entry.getKey();
-			Object sendObj = entry.getValue();
-			finalConn.sendTCP(sendObj);
-			sendQueue.remove(finalConn);
+			Object sendObj = sendQueue.get(connection);
+			if(sendObj != null) {
+				connection.sendTCP(sendObj);
+				sendQueue.remove(connection);
+			}
 		}
 	}
 
@@ -70,7 +72,7 @@ public class BlockListener extends TcpIdleSender {
 						}
 
 						if(searchRes != null) {
-							Utilities.log(this, "\tSending back block " + blockName, true);
+							Utilities.log(this, "\tReadying block " + blockName, true);
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
 							boolean dupe = false;
 							
@@ -105,7 +107,6 @@ public class BlockListener extends TcpIdleSender {
 		}
 	}
 
-	protected Entry<Connection, Object> next() {
-		return sendQueue.entrySet().iterator().next();
-	}
+	@Override
+	protected Object next() { return null; }
 }
