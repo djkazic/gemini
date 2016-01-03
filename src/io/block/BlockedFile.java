@@ -345,13 +345,7 @@ public class BlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
-		Metadata streamMeta = null;
-		for(Metadata meta : Core.metaDex) {
-			if(meta.matchBf(checksum)) {
-				streamMeta = meta;
-				break;
-			}
-		}
+		Metadata streamMeta = Metadata.findMetaByChecksum(checksum);
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), 
 									   Core.aes.encrypt(checksum), 
 									   encryptedList, 
