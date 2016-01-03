@@ -40,9 +40,7 @@ public class StreamedBlockedFile {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
 		if(hasMetadata()) {
-			if(!Core.metaDex.contains(metadata)) {
-				Core.metaDex.add(metadata);
-			}
+			metadata.metaDexCheck();
 		}
 		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, false);
 	}

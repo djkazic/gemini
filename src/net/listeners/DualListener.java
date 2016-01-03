@@ -290,7 +290,7 @@ public class DualListener extends Listener {
 										}
 									}
 									Utilities.log(this, "Sending back data for cache pull, package size " + metasFinalSend.size(), false);
-									foundPeer.getConnection().sendTCP(new Data(DataTypes.CACHEPULL, metasFinalSend));
+									foundPeer.getConnection().sendTCP(new Data(DataTypes.METAPULL, metasFinalSend));
 								} else {
 									Utilities.log(this, "No metadata available to send", false);
 								}
@@ -576,7 +576,7 @@ public class DualListener extends Listener {
 										for(Metadata md : Core.metaDex) {
 											if(md.getChecksum().equals(key)) {
 												//Fail if match is more recent
-												if(md.getTime() > time) {
+												if(md.getTime() >= time) {
 													add = false;
 												}
 											}
