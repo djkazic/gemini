@@ -4,14 +4,14 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.Random;
 
+import org.apache.commons.codec.binary.Base64;
+
 import com.esotericsoftware.minlog.Log;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 /**
  * General utility methods class
  * @author Kevin Cai
  */
-@SuppressWarnings("restriction")
 public class Utilities {
 
 	/**
@@ -102,13 +102,13 @@ public class Utilities {
 	}
 	
 	public static String base64(String input) {
-		return Base64.encode(input.getBytes());
+		return Base64.encodeBase64String(input.getBytes());
 	}
 
 	public static String debase64(String base64) {
 		String output = "";
 		try {
-			output = new String(Base64.decode(base64.getBytes()), "UTF-8");
+			output = new String(Base64.decodeBase64(base64.getBytes()), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
