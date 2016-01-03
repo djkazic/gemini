@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JEditorPane;
@@ -246,6 +247,7 @@ public class NetHandler {
 		kryo.register(String[].class);
 		kryo.register(ArrayList.class);
 		kryo.register(byte[].class);
+		kryo.register(HashMap.class);
 
 		//Specifics import
 		kryo.register(Data.class);
