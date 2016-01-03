@@ -567,7 +567,7 @@ public class DualListener extends Listener {
 										key = (String) entry.getKey();
 									}
 									if(entry.getValue() instanceof Long) {
-										time = (long) entry.getValue();
+										time = ((Long) entry.getValue()).longValue();
 									}
 									if(key != null && time != -1) {
 										for(Metadata md : Core.metaDex) {
