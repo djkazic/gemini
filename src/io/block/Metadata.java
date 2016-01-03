@@ -30,13 +30,7 @@ public class Metadata {
 	public Metadata(String bfChecksum) {
 		this.bfChecksum = bfChecksum;
 		comments = new HashMap<String, Object[]> ();
-		if(Core.metaDex.contains(this)) {
-			Metadata md = Metadata.findMetaByChecksum(bfChecksum);
-			if(md.getTime() < timestamp) {
-				Core.metaDex.remove(md);
-			}
-		}
-		Core.metaDex.add(this);
+		metaDexCheck();
 	}
 	
 	public Metadata(String bfChecksum, int ups, int downs, Map<String, Object[]> comments, boolean voted,
@@ -155,6 +149,17 @@ public class Metadata {
 			finalized.put(aes.decrypt(comment), new Object[] {pubKey, aes.decrypt(signature)});
 		}
 		comments = finalized;
+		metaDexCheck();
+	}
+	
+	private void metaDexCheck() {
+		if(Core.metaDex.contains(this)) {
+			Metadata md = Metadata.findMetaByChecksum(bfChecksum);
+			if(md.getTime() < timestamp) {
+				Core.metaDex.remove(md);
+			}
+		}
+		Core.metaDex.add(this);
 	}
 	
 	public static Metadata findMetaByChecksum(String checksum) {
