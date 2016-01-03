@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -176,12 +178,6 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received request for cache feed", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							//String encryptedQuery = (String) request.getPayload();
-							//String decrypted = foundPeer.getAES().decrypt(encryptedQuery);
-							//For all known BlockedFiles, check if relevant
-							
-							//TODO: if the request has no payload, then return the list
-							//TODO: if the request has a payload, do not return those blockedfiles matching that checksum
 							ArrayList<String> cacheStreams = new ArrayList<String> ();
 							for(BlockedFile bf : Core.blockDex) {
 								boolean add = false;
@@ -260,13 +256,46 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received request for metadata feed", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							ArrayList<Metadata> encMeta = new ArrayList<Metadata> ();
+							HashMap<String, Long> preMetas = new HashMap<String, Long> ();
 							for(Metadata md : Core.metaDex) {
-								md.encrypt();
-								encMeta.add(md);
+								preMetas.put(md.getChecksum(), md.getTime());
 							}
-							connection.sendTCP(new Data(DataTypes.METADATA, encMeta));
-							Utilities.log(this, "\tSent metadata search results len " + encMeta.size(), false);
+							connection.sendTCP(new Data(DataTypes.METADATA, preMetas));
+							Utilities.log(this, "\tSent metadata search results back", false);
+						}
+					});
+					break;
+					
+				case RequestTypes.METAPULL:
+					Utilities.log(this, "Received request for metadata pull", false);
+					replyPool.execute(new Runnable() {
+						public void run() {
+							Object oMetaPull = request.getPayload();
+							
+							ArrayList<String> metasNeeded = new ArrayList<String> ();
+							if(oMetaPull instanceof ArrayList<?>) {
+								ArrayList<?> potentialMetas = (ArrayList<?>) oMetaPull;
+								for(Object o : potentialMetas) {
+									if(o instanceof String) {
+										metasNeeded.add((String) o);
+									}
+								}
+								
+								if(metasNeeded.size() > 0) {
+									ArrayList<Metadata> metasFinalSend = new ArrayList<Metadata> ();
+									for(Metadata md : Core.metaDex) {
+										String checksum = md.getChecksum();
+										if(metasNeeded.contains(checksum)) {
+											md.encrypt();
+											metasFinalSend.add(md);
+										}
+									}
+									Utilities.log(this, "Sending back data for cache pull, package size " + metasFinalSend.size(), false);
+									foundPeer.getConnection().sendTCP(new Data(DataTypes.CACHEPULL, metasFinalSend));
+								} else {
+									Utilities.log(this, "No metadata available to send", false);
+								}
+							}
 						}
 					});
 					break;
@@ -443,7 +472,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.CACHE:
-					Utilities.log(this, "Received cache data", true);
+					Utilities.log(this, "Received cache pre-sync data", true);
 					if(!Core.config.cacheEnabled) {
 						Utilities.log(this, "Garbage cache data received, discarded", false);
 						break;
@@ -524,17 +553,59 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.METADATA:
-					final Object metaPayload = data.getPayload();
+					Utilities.log(this, "Received metadata pre-sync data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							if(metaPayload instanceof ArrayList<?>) {
-								ArrayList<?> potentialMetas = (ArrayList<?>) metaPayload;
-								Utilities.log(this, "Received metadata len " + potentialMetas.size(), false);
-								for(int i=0; i < potentialMetas.size(); i++) {
-									Object o = potentialMetas.get(i);
-									if(o instanceof Metadata) {
-										Metadata md = (Metadata) o;
-										md.decrypt(foundPeer.getAES());
+							Object oMetaPull = data.getPayload();
+							ArrayList<String> metasNeeded = new ArrayList<String> ();
+							if(oMetaPull instanceof HashMap) {
+								HashMap<?, ?> potentialMetasToReq = (HashMap<?, ?>) oMetaPull;
+								for(Entry<?, ?> entry : potentialMetasToReq.entrySet()) {
+									String key = null;
+									long time = -1;
+									if(entry.getKey() instanceof String) {
+										key = (String) entry.getKey();
+									}
+									if(entry.getValue() instanceof Long) {
+										time = (long) entry.getValue();
+									}
+									if(key != null && time != -1) {
+										for(Metadata md : Core.metaDex) {
+											if(md.getChecksum().equals(key)) {
+												if(md.getTime() < time) {
+													metasNeeded.add(key);
+												}
+											}
+										}
+									}
+								}
+
+								if(metasNeeded.size() > 0) {
+									Utilities.log(this, "Sending request for meta pull, package size " + metasNeeded.size(), false);
+									foundPeer.getConnection().sendTCP(new Request(RequestTypes.METAPULL, metasNeeded));
+								} else {
+									Utilities.log(this, "No metadata requested", false);
+								}
+							}
+						}
+					});
+					break;
+					
+				case DataTypes.METAPULL:
+					Utilities.log(this, "Received meta pull data", false);
+					final Object ometaPullPayload = data.getPayload();
+					replyPool.execute(new Runnable() {
+						public void run() {
+							if(ometaPullPayload instanceof ArrayList<?>) {
+								ArrayList<?> potentialMetas = (ArrayList<?>) ometaPullPayload;
+								if(potentialMetas.size() > 0) {
+									Utilities.log(this, "\t" + potentialMetas.size() + " meta pull objects", false);
+									for(int i=0; i < potentialMetas.size(); i++) {
+										Object o = potentialMetas.get(i);
+										if(o instanceof Metadata) {
+											Metadata md = (Metadata) o;
+											md.decrypt(foundPeer.getAES());
+										}
 									}
 								}
 							}

@@ -12,5 +12,6 @@ public class DataTypes {
 	public static final byte CACHEPULL = 0x15;
 	public static final byte HOSTPORT  = 0x17;
 	public static final byte METADATA  = 0x19;
+	public static final byte METAPULL  = 0x21;
 	
 }
