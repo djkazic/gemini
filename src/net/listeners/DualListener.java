@@ -428,13 +428,8 @@ public class DualListener extends Listener {
 					
 				case DataTypes.BLOCK:
 					Utilities.log(this, "Received block data", true);
-					//Threaded decryption
-					replyPool.execute(new Runnable() {
-						public void run() {
-							StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
-							streamedBlock.insertSelf(foundPeer.getAES());
-						}
-					});
+					StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
+					streamedBlock.insertSelf(foundPeer.getAES());
 					break;
 					
 				case DataTypes.EXTVIS:
