@@ -563,19 +563,27 @@ public class DualListener extends Listener {
 								for(Entry<?, ?> entry : potentialMetasToReq.entrySet()) {
 									String key = null;
 									long time = -1;
+									
 									if(entry.getKey() instanceof String) {
 										key = (String) entry.getKey();
 									}
 									if(entry.getValue() instanceof Long) {
 										time = ((Long) entry.getValue()).longValue();
 									}
+									
 									if(key != null && time != -1) {
+										boolean add = true;
+										//Searches metaDex for match, and sets continuation flag
 										for(Metadata md : Core.metaDex) {
 											if(md.getChecksum().equals(key)) {
-												if(md.getTime() < time) {
-													metasNeeded.add(key);
+												//Fail if match is more recent
+												if(md.getTime() > time) {
+													add = false;
 												}
 											}
+										}
+										if(add) {
+											metasNeeded.add(key);
 										}
 									}
 								}
