@@ -59,8 +59,18 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = -4060708900516820183L;
 	
 	private JPanel contentPane;
+	
 	private JTable searchRes;
 	private JTable downloadList;
+	private JPopupMenu downloadPopupMenu;
+	private JMenuItem downloadPopupMenuPause;
+	private JMenuItem downloadPopupMenuResume;
+	private JMenuItem downloadPopupMenuRemoveFromList;
+	
+	private JTable libraryTable;
+	private JPopupMenu libraryPopupMenu;
+	private JMenuItem libraryPopupMenuRate;
+	
 	private DefaultTableModel searchModel;
 	private DefaultTableModel libraryModel;
 	private DefaultTableModel downloadModel;
@@ -70,14 +80,9 @@ public class MainWindow extends JFrame {
 	private JScrollPane downloadScrollPane;
 	private JLabel lblPeers;
 	private JLabel lblDownloads;
-	private JPopupMenu downloadPopupMenu;
-	private JMenuItem downloadPopupMenuPause;
-	private JMenuItem downloadPopupMenuResume;
-	private JMenuItem downloadPopupMenuRemoveFromList;
 	private boolean searchMode;
 	private JTabbedPane tabbedPane;
 	private JScrollPane libraryScrollPane;
-	private JTable libraryTable;
 	private JPanel searchPanel;
 	private JTextField searchInput;
 	private JLabel lblSearchResults;
@@ -137,6 +142,7 @@ public class MainWindow extends JFrame {
 		libraryModel.addColumn("Filename");
 		libraryModel.addColumn("Size");
 		libraryModel.addColumn("Date");
+		libraryModel.addColumn("Checksum");
 
 		resLatch = new CountDownLatch(1);
 		
@@ -159,6 +165,11 @@ public class MainWindow extends JFrame {
 		downloadPopupMenu.add(downloadPopupMenuPause);
 		downloadPopupMenu.add(downloadPopupMenuResume);
 		downloadPopupMenu.add(downloadPopupMenuRemoveFromList);
+		
+		libraryPopupMenu = new JPopupMenu();
+		libraryPopupMenuRate = new JMenuItem("Rate download");
+		libraryPopupMenu.add(libraryPopupMenuRate);
+			
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{299, 0};
 		gbl_contentPane.rowHeights = new int[]{460, 26, 0};
@@ -392,6 +403,9 @@ public class MainWindow extends JFrame {
 		
 		libraryTable = new JTable(libraryModel);
 		libraryTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+		libraryTable.getColumnModel().getColumn(3).setMinWidth(0);
+		libraryTable.getColumnModel().getColumn(3).setMaxWidth(0);
+		libraryTable.getColumnModel().getColumn(3).setWidth(0);
 		libraryTable.getTableHeader().setReorderingAllowed(false);
 		libraryTable.getTableHeader().setResizingAllowed(false);
 		libraryScrollPane.setViewportView(libraryTable);
@@ -489,6 +503,35 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+		
+		libraryPopupMenuRate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				int[] selectedRows = libraryTable.getSelectedRows();
+				for(Integer i : selectedRows) {
+					Object firstColumn = libraryTable.getValueAt(i, 3);
+					if(firstColumn instanceof String) {
+						String checksum = (String) firstColumn;
+						BlockedFile bf = null;
+						if((bf = FileUtils.getBlockedFile(checksum)) != null) {
+							new RateWindow(bf);
+						}
+					}
+				}
+			}
+		});
+		
+		libraryTable.addMouseListener(new MouseAdapter() {
+			public void mouseReleased(MouseEvent ae) {
+				if(ae.isPopupTrigger()) {
+					Point clickPoint = ae.getPoint();
+					int tableRow = libraryTable.rowAtPoint(clickPoint);
+					if(!libraryTable.isRowSelected(tableRow)) {
+						libraryTable.changeSelection(tableRow, 0, false, false);
+					}
+					libraryPopupMenu.show(ae.getComponent(), ae.getX(), ae.getY());
+				}
+			}
+		});
 
 		searchRes.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("unchecked")
@@ -560,6 +603,7 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+		
 		resLatch.countDown();
 		Core.loadWindow.setVisible(false);
 		Core.loadWindow.dispose();
@@ -700,7 +744,8 @@ public class MainWindow extends JFrame {
 				}
 				libraryModel.addRow(new String[]{" " + bf.getPointer().getName(), 
 												 " " + fileEstimateStr, 
-												 " " + bf.getDateModified()});
+												 " " + bf.getDateModified(),
+												 bf.getChecksum()});
 			}
 		}
 	}

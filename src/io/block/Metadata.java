@@ -21,20 +21,15 @@ public class Metadata {
 	private int downs;
 	private Map<String, Object[]> comments;
 	private boolean voted;
+	private String lastState;
 	private long timestamp;
 
-	public Metadata() {
-		bfChecksum = null;
-		ups = 0;
-		downs = 0;
-		comments = null;
-		voted = false;
-		timestamp = 0;
-	}
+	public Metadata() {}
 	
 	public Metadata(String bfChecksum) {
 		this.bfChecksum = bfChecksum;
 		comments = new HashMap<String, Object[]> ();
+		Core.metaDex.add(this);
 	}
 	
 	public boolean matchBf(String checksum) {
@@ -45,6 +40,14 @@ public class Metadata {
 		String signKey = Core.rsa.sign(comment);
 		comments.put(comment, new Object[] {Core.rsa.rawPublicKey(), signKey});
 		timestamp = System.currentTimeMillis();
+	}
+	
+	public String getLastState() {
+		return lastState;
+	}
+	
+	public void setLastState(String state) {
+		lastState = state;
 	}
 	
 	public int getScore() {
@@ -76,11 +79,40 @@ public class Metadata {
 			} else if(upDown == -1) {
 				downs++;
 			}
+		} else {
+			if(upDown == 1) {
+				if(downs > 0) {
+					downs -= 2;
+				} else {
+					ups += 2;
+				}
+			} else if(upDown == -1) {
+				if(ups > 0) {
+					ups -= 2;
+				} else {
+					downs += 2;
+				}
+			}
 		}
 	}
 	
+	public boolean voted() {
+		return voted;
+	}
+	
 	public String toString() {
-		return "Checksum: " + bfChecksum + " | Score: " + getScore() + " | Comments: " + comments;
+		return "Checksum: " + bfChecksum + " | Score: " + getScore() + "( " + ups + "." + downs + ") | Comments: " + comments;
+	}
+	
+	public static Metadata findMetaByChecksum(String checksum) {
+		Metadata streamMeta = null;
+		for(Metadata meta : Core.metaDex) {
+			if(meta.matchBf(checksum)) {
+				streamMeta = meta;
+				break;
+			}
+		}
+		return streamMeta;
 	}
 	
 	public static void serializeAll() {

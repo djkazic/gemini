@@ -153,6 +153,7 @@ public class Core {
 			loadWindow.setProgress(70);
 		}
 		FileUtils.loadMetaIndex();
+		Utilities.log("atrium.Core", "Number of metadata objects: " + Core.metaDex.size(), false);
 		
 		//Generate block index
 		Utilities.switchGui("atrium.Core", "Generating block index", false);
