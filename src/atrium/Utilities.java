@@ -11,6 +11,7 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
  * General utility methods class
  * @author Kevin Cai
  */
+@SuppressWarnings("restriction")
 public class Utilities {
 
 	/**
