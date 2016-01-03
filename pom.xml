@@ -20,8 +20,8 @@
 			<url>file://${project.basedir}/extlibs</url>
 		</repository>
 		<repository>
-			<id>clojars</id>
-			<url>http://clojars.org/repo/</url>
+			<id>clojars mirror</id>
+			<url>https://clojars-mirror.tcrawley.org/repo/</url>
 		</repository>
 		<repository>
 			<id>sonatype-snapshots</id>
