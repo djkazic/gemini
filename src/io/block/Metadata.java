@@ -39,6 +39,17 @@ public class Metadata {
 		Core.metaDex.add(this);
 	}
 	
+	public Metadata(String bfChecksum, int ups, int downs, Map<String, Object[]> comments, boolean voted,
+					String lastState, long timestamp) {
+		this.bfChecksum = bfChecksum;
+		this.ups = ups;
+		this.downs = downs;
+		this.comments = comments;
+		this.voted = voted;
+		this.lastState = lastState;
+		this.timestamp = timestamp;
+	}
+	
 	public boolean matchBf(String checksum) {
 		return bfChecksum.equals(checksum);
 	}
@@ -120,8 +131,8 @@ public class Metadata {
 		return "Checksum: " + bfChecksum + " | Score: " + getScore() + "(" + ups + "." + downs + ")";
 	}
 	
-	public void encrypt() {
-		bfChecksum = Core.aes.encrypt(bfChecksum);
+	public Metadata encrypted() {
+		String encBfChecksum = Core.aes.encrypt(bfChecksum);
 		Map<String, Object[]> finalized = new HashMap<String, Object[]> ();
 		for(Entry<String, Object[]> entry : comments.entrySet()) {
 			String comment = (String) entry.getKey();
@@ -130,7 +141,7 @@ public class Metadata {
 			String signature = (String) pkAndSignature[1];
 			finalized.put(Core.aes.encrypt(comment), new Object[] {pubKey, Core.aes.encrypt(signature)});
 		}
-		comments = finalized;
+		return new Metadata(encBfChecksum, ups, downs, finalized, voted, lastState, timestamp);
 	}
 	
 	public void decrypt(AES aes) {

@@ -286,8 +286,7 @@ public class DualListener extends Listener {
 									for(Metadata md : Core.metaDex) {
 										String checksum = md.getChecksum();
 										if(metasNeeded.contains(checksum)) {
-											md.encrypt();
-											metasFinalSend.add(md);
+											metasFinalSend.add(md.encrypted());
 										}
 									}
 									Utilities.log(this, "Sending back data for cache pull, package size " + metasFinalSend.size(), false);
