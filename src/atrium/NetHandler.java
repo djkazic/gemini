@@ -59,12 +59,8 @@ public class NetHandler {
 		getExtIp();
 		registerServerListeners();
 		checkExtVisibility();
-		if(!Core.config.hubMode && !extVisible) {
-			destroyServerListeners();
-		}
-		if(!Core.config.hubMode) {
-			Core.mainWindow = new MainWindow();
-		}
+		checkDestroyServer();
+		checkAndStartMainwindow();
 	}
 
 	/**
@@ -173,7 +169,19 @@ public class NetHandler {
 		}
 	}
 	
-	public void destroyServerListeners() {
+	private void checkDestroyServer() {
+		if(!Core.config.hubMode && !extVisible) {
+			destroyServerListeners();
+		}
+	}
+	
+	private void checkAndStartMainwindow() {
+		if(!Core.config.hubMode) {
+			Core.mainWindow = new MainWindow();
+		}
+	}
+	
+	private void destroyServerListeners() {
 		Utilities.log(this, "Deregistering server and its listeners", false);
 		for(Connection con : server.getConnections()) {
 			con.close();
@@ -185,16 +193,14 @@ public class NetHandler {
 	 * Registers listeners for a client instance
 	 * @param client Client instance specified
 	 */
-	public void registerClientListeners(Client client) {
+	private void registerClientListeners(Client client) {
 		try {
 			registerClasses(client.getKryo());
 			Utilities.log(this, "Registered client listeners", false);
-			
+			client.addListener(new DualListener(0));
 			Utilities.log(this, "Registering block listener", false);
 			client.addListener(new BlockListener());
-
-			client.addListener(new DualListener(0));
-
+			
 			Utilities.log(this, "Starting client component", false);
 			client.start();
 		} catch (Exception ex) {
@@ -256,9 +262,34 @@ public class NetHandler {
 	public void peerDiscovery() {
 		try {
 			Utilities.switchGui(this, "Locating peers...", true);
-
 			foundHosts = new ArrayList<InetAddress> ();
+			bootstrapDiscovery();
+
+			//TODO: remove this debug section
+			foundHosts.clear();
 			
+			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
+			foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
+
+			filterHosts();
+			if(foundHosts.size() == 0) {
+				Utilities.log(this, "No hosts found on LAN", false);
+			} else {
+				Utilities.log(this, "Found hosts: " + foundHosts, true);
+			}
+
+			//TODO: port randomization
+			attemptConnections();
+			startPeerCountListener();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private void bootstrapDiscovery() {
+		try {
 			Thread discoverServerThread = (new Thread(new DiscoveryServer()));
 			discoverServerThread.setName("Discovery Server Thread");
 			discoverServerThread.start();
@@ -274,15 +305,13 @@ public class NetHandler {
 			discoveryClient.terminate();
 			discoverClientThread.interrupt();
 			Thread.sleep(150);
-
-			//TODO: remove this debug section
-			foundHosts.clear();
-			
-			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
-			foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
-
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private void filterHosts() {
+		try {
 			//Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
 			foundHosts.remove(localhost);
@@ -304,16 +333,13 @@ public class NetHandler {
 					foundHosts.remove(inetAddress);
 				}
 			}
-
-			if(foundHosts.size() == 0) {
-				Utilities.log(this, "No hosts found on LAN", false);
-			} else {
-				Utilities.log(this, "Found hosts: " + foundHosts, true);
-			}
-
-			//DEBUG
-			//TODO: make this not just an IP, but also port
-			//TODO: port randomization
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private void attemptConnections() {
+		try {
 			Client newConnection = null;
 			for(InetAddress ia : foundHosts) {
 				try {
@@ -327,14 +353,16 @@ public class NetHandler {
 				}
 				Thread.sleep(1000);
 			}
-
-			Utilities.log(this, "Terminated peer connections loop", false);
-			Thread peerCountListenerThread = (new Thread(new PeerCountListener()));
-			peerCountListenerThread.setName("Peer Count Listener");
-			peerCountListenerThread.start();
-		} catch (Exception ex) {
+		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	private void startPeerCountListener() {
+		Utilities.log(this, "Terminated peer connections loop", false);
+		Thread peerCountListenerThread = (new Thread(new PeerCountListener()));
+		peerCountListenerThread.setName("Peer Count Listener");
+		peerCountListenerThread.start();
 	}
 	
 	/**
