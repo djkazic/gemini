@@ -265,7 +265,7 @@ public class DualListener extends Listener {
 								md.encrypt();
 								encMeta.add(md);
 							}
-							connection.sendTCP(new Data(DataTypes.CACHE, encMeta));
+							connection.sendTCP(new Data(DataTypes.METADATA, encMeta));
 							Utilities.log(this, "\tSent metadata search results back", false);
 						}
 					});
