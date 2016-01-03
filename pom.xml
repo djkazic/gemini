@@ -124,6 +124,16 @@
 			<groupId>kryonet</groupId>
 			<artifactId>kryonet</artifactId>
 			<version>2.21</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>minlog</artifactId>
+					<groupId>com.esotericsoftware.minlog</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>reflectasm</artifactId>
+					<groupId>com.esotericsoftware.reflectasm</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
