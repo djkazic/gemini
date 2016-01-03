@@ -47,10 +47,6 @@ public class NetHandler {
 	public static String externalIp;             //External IP, as reported by web API
 	public static boolean extVisible;            //External visibility
 	public static List<InetAddress> foundHosts;  //Hosts discovered by LAN
-	
-	//TODO: hook foundHosts with peerList processing
-	//TODO: no more peers hook (independent of GUI) such that operations like index is reset,
-	//searchRes is cleared, and search data is reset to "Ready"
 
 	//Instance variable for internal server
 	private Server server;
