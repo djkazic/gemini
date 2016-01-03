@@ -12,6 +12,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 
 import atrium.Core;
+import atrium.Utilities;
 import crypto.AES;
 import io.FileUtils;
 
@@ -152,12 +153,15 @@ public class Metadata {
 		metaDexCheck();
 	}
 	
-	private void metaDexCheck() {
-		if(Core.metaDex.contains(this)) {
-			Metadata md = Metadata.findMetaByChecksum(bfChecksum);
+	public void metaDexCheck() {
+		Metadata md;
+		if((md = Metadata.findMetaByChecksum(bfChecksum)) != null) {
+			Utilities.log(this, "Metadata checksum match found", true);
 			if(md.getTime() < timestamp) {
 				Core.metaDex.remove(md);
 			}
+		} else {
+			Utilities.log(this, "Metadata checksum match NOT found", true);
 		}
 		Core.metaDex.add(this);
 	}
