@@ -12,6 +12,7 @@ import com.esotericsoftware.kryonet.Connection;
 import crypto.AES;
 import crypto.RSA;
 import net.poll.CachePoller;
+import net.poll.MetaPoller;
 import packets.data.Data;
 import packets.data.DataTypes;
 import packets.requests.Request;
@@ -25,6 +26,7 @@ import packets.requests.RequestTypes;
 public class Peer {
 
 	private static Thread cacheThread;
+	private static Thread metaThread;
 	private CountDownLatch deferredRequesting;
 	private CountDownLatch pubkeyDone;
 	private CountDownLatch cryptoDone;
@@ -114,12 +116,19 @@ public class Peer {
 		bootstrapThread.setName("Peer " + connection.getID() + " Bootstrap");
 		bootstrapThread.start();
 		
-		//If we are a cacher, also send cache requests every minute
+		//If we are a cacher, send cache requests every 90s
 		if(Core.config.cacheEnabled && cacheThread == null) {
 			Utilities.log(this, "Starting polling thread for peer", true);
 			cacheThread = new Thread(new CachePoller());
 			cacheThread.setName("Cache Poller");
 			cacheThread.start();
+		}
+		
+		//If MetaPoller is not yet online, also start it
+		if(metaThread == null) {
+			metaThread = new Thread(new MetaPoller());
+			metaThread.setName("Metadata Poller");
+			metaThread.start();
 		}
 	}
 	

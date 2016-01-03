@@ -11,5 +11,6 @@ public class RequestTypes {
 	public static final byte EXTVIS    = 0x14;
 	public static final byte CACHEPULL = 0x16;
 	public static final byte HOSTPORT  = 0x18;
+	public static final byte METADATA  = 0x20;
 	
 }

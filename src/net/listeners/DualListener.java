@@ -256,6 +256,20 @@ public class DualListener extends Listener {
 					});
 					break;
 					
+				case RequestTypes.METADATA:
+					Utilities.log(this, "Received request for metadata feed", false);
+					replyPool.execute(new Runnable() {
+						public void run() {
+							ArrayList<Metadata> encMeta = new ArrayList<Metadata> ();
+							for(Metadata md : Core.metaDex) {
+								md.encrypt();
+								encMeta.add(md);
+							}
+							connection.sendTCP(new Data(DataTypes.CACHE, encMeta));
+							Utilities.log(this, "\tSent metadata search results back", false);
+						}
+					});
+					break;
 			}
 		} else if(object instanceof Data) {
 			final Data data = (Data) object;
@@ -510,6 +524,25 @@ public class DualListener extends Listener {
 						public void run() {
 							int hostPortData = (Integer) data.getPayload();
 							foundPeer.setHostPort("" + hostPortData);
+						}
+					});
+					break;
+					
+				case DataTypes.METADATA:
+					Utilities.log(this, "Received metadata", false);
+					final Object metaPayload = data.getPayload();
+					replyPool.execute(new Runnable() {
+						public void run() {
+							if(metaPayload instanceof ArrayList<?>) {
+								ArrayList<?> potentialMetas = (ArrayList<?>) metaPayload;
+								for(int i=0; i < potentialMetas.size(); i++) {
+									Object o = potentialMetas.get(i);
+									if(o instanceof Metadata) {
+										Metadata md = (Metadata) o;
+										md.decrypt(foundPeer.getAES());
+									}
+								}
+							}
 						}
 					});
 					break;

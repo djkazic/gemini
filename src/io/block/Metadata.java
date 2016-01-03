@@ -12,6 +12,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 
 import atrium.Core;
+import crypto.AES;
 import io.FileUtils;
 
 public class Metadata {
@@ -29,7 +30,9 @@ public class Metadata {
 	public Metadata(String bfChecksum) {
 		this.bfChecksum = bfChecksum;
 		comments = new HashMap<String, Object[]> ();
-		Core.metaDex.add(this);
+		if(!Core.metaDex.contains(this)) {
+			Core.metaDex.add(this);
+		}
 	}
 	
 	public boolean matchBf(String checksum) {
@@ -52,6 +55,14 @@ public class Metadata {
 	
 	public int getScore() {
 		return ups - downs;
+	}
+	
+	public String getChecksum() {
+		return bfChecksum;
+	}
+	
+	public long getTime() {
+		return timestamp;
 	}
 	
 	public ArrayList<String> getComments() {
@@ -94,6 +105,7 @@ public class Metadata {
 				}
 			}
 		}
+		timestamp = System.currentTimeMillis();
 	}
 	
 	public boolean voted() {
@@ -102,6 +114,32 @@ public class Metadata {
 	
 	public String toString() {
 		return "Checksum: " + bfChecksum + " | Score: " + getScore() + "( " + ups + "." + downs + ") | Comments: " + comments;
+	}
+	
+	public void encrypt() {
+		bfChecksum = Core.aes.encrypt(bfChecksum);
+		Map<String, Object[]> finalized = new HashMap<String, Object[]> ();
+		for(Entry<String, Object[]> entry : comments.entrySet()) {
+			String comment = (String) entry.getKey();
+			Object[] pkAndSignature = (Object[]) entry.getValue();
+			PublicKey pubKey = (PublicKey) pkAndSignature[0];
+			String signature = (String) pkAndSignature[1];
+			finalized.put(Core.aes.encrypt(comment), new Object[] {pubKey, Core.aes.encrypt(signature)});
+		}
+		comments = finalized;
+	}
+	
+	public void decrypt(AES aes) {
+		bfChecksum = aes.decrypt(bfChecksum);
+		Map<String, Object[]> finalized = new HashMap<String, Object[]> ();
+		for(Entry<String, Object[]> entry : comments.entrySet()) {
+			String comment = (String) entry.getKey();
+			Object[] pkAndSignature = (Object[]) entry.getValue();
+			PublicKey pubKey = (PublicKey) pkAndSignature[0];
+			String signature = (String) pkAndSignature[1];
+			finalized.put(aes.decrypt(comment), new Object[] {pubKey, aes.decrypt(signature)});
+		}
+		comments = finalized;
 	}
 	
 	public static Metadata findMetaByChecksum(String checksum) {
