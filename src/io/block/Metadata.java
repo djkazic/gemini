@@ -113,7 +113,7 @@ public class Metadata {
 	}
 	
 	public String toString() {
-		return "Checksum: " + bfChecksum + " | Score: " + getScore() + "( " + ups + "." + downs + ") | Comments: " + comments;
+		return "Checksum: " + bfChecksum + " | Score: " + getScore() + "(" + ups + "." + downs + ")";
 	}
 	
 	public void encrypt() {

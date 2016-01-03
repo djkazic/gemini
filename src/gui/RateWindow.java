@@ -42,12 +42,13 @@ public class RateWindow extends JFrame {
 	public RateWindow(BlockedFile bf) {
 		blockedFile = bf;
 		metadata = Metadata.findMetaByChecksum(bf.getChecksum());
-		Utilities.log(this, "Match found for: " + bf.getChecksum() + "\t" + Core.metaDex, false);
 		
 		if(metadata == null) {
 			Utilities.log(this, "No match found for: " + bf.getChecksum() + "\t" + Core.metaDex, false);
 			metadata = new Metadata(bf.getChecksum());
 			Metadata.serializeAll();
+		} else {
+			Utilities.log(this, "Match found for: " + bf.getChecksum() + "\t" + Core.metaDex, false);
 		}
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

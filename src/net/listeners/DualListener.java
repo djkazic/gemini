@@ -266,7 +266,7 @@ public class DualListener extends Listener {
 								encMeta.add(md);
 							}
 							connection.sendTCP(new Data(DataTypes.METADATA, encMeta));
-							Utilities.log(this, "\tSent metadata search results back", false);
+							Utilities.log(this, "\tSent metadata search results len " + encMeta.size(), false);
 						}
 					});
 					break;
@@ -524,12 +524,12 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.METADATA:
-					Utilities.log(this, "Received metadata", false);
 					final Object metaPayload = data.getPayload();
 					replyPool.execute(new Runnable() {
 						public void run() {
 							if(metaPayload instanceof ArrayList<?>) {
 								ArrayList<?> potentialMetas = (ArrayList<?>) metaPayload;
+								Utilities.log(this, "Received metadata len " + potentialMetas.size(), false);
 								for(int i=0; i < potentialMetas.size(); i++) {
 									Object o = potentialMetas.get(i);
 									if(o instanceof Metadata) {
