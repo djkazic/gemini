@@ -25,12 +25,10 @@ public class Config {
 	public byte[] rsaPub;
 	public byte[] rsaPriv;
 	
-	
 	/**
 	 * Writes configuration to disk (config.dat)
 	 */
 	public void writeConfig() {
-		//Try saving config data
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
 			if(configFile.exists()) {

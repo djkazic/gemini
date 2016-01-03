@@ -65,13 +65,17 @@ public class Core {
 			ex.printStackTrace();
 		}
 		
-		if(args.length > 0 && args[0].equals("-daemon")) {
-			Core.config.hubMode = true;
-			Log.set(Log.LEVEL_INFO);
-			if(args.length == 2) {
-				if(args[1].equals("-debug")) {
+		Log.set(Log.LEVEL_INFO);
+		
+		for(String str : args) {
+			switch(str) {
+				case "-daemon":
+					Core.config.hubMode = true;
+					break;
+					
+				case "-debug":
 					Log.set(Log.LEVEL_DEBUG);
-				}
+					break;
 			}
 		}
 		
