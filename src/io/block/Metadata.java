@@ -30,9 +30,13 @@ public class Metadata {
 	public Metadata(String bfChecksum) {
 		this.bfChecksum = bfChecksum;
 		comments = new HashMap<String, Object[]> ();
-		if(!Core.metaDex.contains(this)) {
-			Core.metaDex.add(this);
+		if(Core.metaDex.contains(this)) {
+			Metadata md = Metadata.findMetaByChecksum(bfChecksum);
+			if(md.getTime() < timestamp) {
+				Core.metaDex.remove(md);
+			}
 		}
+		Core.metaDex.add(this);
 	}
 	
 	public boolean matchBf(String checksum) {
