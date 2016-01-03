@@ -570,6 +570,8 @@ public class MainWindow extends JFrame {
 								BlockedFile bf = FileUtils.getBlockedFile(checksum);
 								if(bf == null) {
 									bf = new BlockedFile(fileName, checksum, blockList, true);
+								} else {
+									bf.setBlockList(blockList);
 								}
 
 								boolean alreadyInPane = false;

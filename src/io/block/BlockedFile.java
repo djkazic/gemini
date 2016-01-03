@@ -256,7 +256,9 @@ public class BlockedFile {
 		dProgress *= 100;
 		progress = Math.round(dProgress) + "%";
 		if(progress.equals("100%")) {
-			updateTime("Done");
+			if(!Core.config.hubMode) {
+				updateTime("Done");
+			}
 		}
 
 		if(!Core.config.hubMode) {
