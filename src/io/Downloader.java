@@ -53,7 +53,6 @@ public class Downloader implements Runnable {
 					}
 					Thread.sleep(3000);
 					continue;
-					//TODO: switch to CountDownLatch
 				}
 
 				block = blockedFile.nextBlockNeeded();
@@ -64,10 +63,6 @@ public class Downloader implements Runnable {
 						quadrantMark += Core.blockSize;
 					}
 					NetHandler.requestBlock(blockedFile.getChecksum(), block);
-					//long defaultWait = 100;
-					//defaultWait *= (1 + ((blockedFile.getProgressNum() / 100D) * 1.5));
-					//Utilities.log(this, "blockSleep: " + defaultWait);
-					//Thread.sleep(100);
 					Thread.sleep(90 / Core.peers.size());
 				} else if(block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);

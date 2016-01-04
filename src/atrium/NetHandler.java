@@ -271,8 +271,8 @@ public class NetHandler {
 			foundHosts.clear();
 			
 			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
-			foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			//foundHosts.add(InetAddress.getByName("192.227.251.74"));
+			//foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			foundHosts.add(InetAddress.getByName("192.227.251.74"));
 			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			filterHosts();
