@@ -2,7 +2,6 @@ package io.serialize;
 
 import java.util.ArrayList;
 
-import atrium.Core;
 import crypto.AES;
 import io.block.BlockedFile;
 import io.block.Metadata;

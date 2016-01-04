@@ -20,19 +20,19 @@ import packets.requests.RequestTypes;
 
 public class BlockListener extends TcpIdleSender {
 
-	private static HashMap<Connection, Object> sendQueue;
+	private static HashMap<Connection, Data> sendQueue;
 	private String blockOriginChecksum;
 	private String blockName;
 
 	public BlockListener() {
 		if(sendQueue == null) {
-			sendQueue = new HashMap<Connection, Object> ();
+			sendQueue = new HashMap<Connection, Data> ();
 		}
 	}
 
 	public void idle(Connection connection) {
 		if(!sendQueue.isEmpty()) {
-			Object sendObj = sendQueue.get(connection);
+			Data sendObj = sendQueue.get(connection);
 			if(sendObj != null) {
 				connection.sendTCP(sendObj);
 				sendQueue.remove(connection);
@@ -74,23 +74,11 @@ public class BlockListener extends TcpIdleSender {
 						if(searchRes != null) {
 							Utilities.log(this, "\tReadying block " + blockName, true);
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
-							boolean dupe = false;
-							
-							for(Entry<Connection, Object> entry : sendQueue.entrySet()) {
-								Object odata = entry.getValue();
-								if(odata instanceof Data) {
-									Data data = (Data) odata;
-									Object opayload = data.getPayload();
-									if(opayload instanceof StreamedBlock) {
-										StreamedBlock payload = (StreamedBlock) opayload;
-										if(payload.getOrigin().equals(sb.getOrigin())) {
-											dupe = true;
-										}
-									}
-								}
-							}
+							boolean dupe = sendQueue.containsValue(sb);
 							if(!dupe) {
 								sendQueue.put(connection, new Data(DataTypes.BLOCK, sb));
+							} else {
+								Utilities.log(this, "Duplicate detected in BlockListener HashMap", true);
 							}
 							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
 						} else {

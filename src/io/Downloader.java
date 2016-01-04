@@ -68,7 +68,7 @@ public class Downloader implements Runnable {
 					//defaultWait *= (1 + ((blockedFile.getProgressNum() / 100D) * 1.5));
 					//Utilities.log(this, "blockSleep: " + defaultWait);
 					//Thread.sleep(100);
-					Thread.sleep(100 / Core.peers.size());
+					Thread.sleep(90 / Core.peers.size());
 				} else if(block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(25);

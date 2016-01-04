@@ -45,6 +45,13 @@ public class StreamedBlock {
 		return fileBytes;
 	}
 	
+	public boolean equals(Object o) {
+		if(o instanceof StreamedBlock) {
+			return blockName.equals(((StreamedBlock) o).blockName);
+		}
+		return false;
+	}
+	
 	public void insertSelf(final AES aes) {
 		Thread insertionThread = (new Thread(new Runnable() {
 			public void run() {
