@@ -48,9 +48,12 @@ public class Downloader implements Runnable {
 			while(Core.peers.size() > 0 && !blockedFile.isComplete()) {
 				if(!download) {
 					Utilities.log(this, "Idling in pause", true);
+					//TODO: GUI update
+					/**
 					if(!Core.config.hubMode) {
 						Core.mainWindow.updateTime(blockedFile.getChecksum(), "Paused");
 					}
+					 */
 					Thread.sleep(3000);
 					continue;
 				}
@@ -116,9 +119,12 @@ public class Downloader implements Runnable {
 		for(Downloader dl : downloaders) {
 			if(dl.blockedFile.getChecksum().equals(bfPointerStr)) {
 				if(!dl.download) {
+					//TODO: updateTime GUI fix
+					/**
 					if(!Core.config.hubMode) {
 						Core.mainWindow.updateTime(dl.blockedFile.getChecksum(), " ... ");
 					}
+					 */
 					dl.download = true;
 				}
 			}

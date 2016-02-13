@@ -43,19 +43,6 @@ public class Utilities {
 	}
 	
 	/**
-	 * Primary dynamic switching method for debug; if headless, no GUI out
-	 * @param someClass origin class of debug
-	 * @param msg debug message
-	 * @param debug 
-	 */
-	public static void switchGui(Object someClass, String msg, boolean debug) {
-		if(Core.mainWindow != null) {
-			Core.mainWindow.out(msg);
-		}
-		log(someClass, msg, debug);
-	}
-	
-	/**
 	 * Secondary dynamic switching method for debug; if headless, no GUI out
 	 * @param someClass origin class of debug
 	 * @param msg debug message

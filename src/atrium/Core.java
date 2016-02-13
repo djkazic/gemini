@@ -15,7 +15,6 @@ import crypto.AES;
 import crypto.RSA;
 import filter.FilterUtils;
 import gui.LoadWindow;
-import gui.MainWindow;
 import io.FileUtils;
 import io.FileWatcher;
 import io.block.BlockedFile;
@@ -32,7 +31,6 @@ public class Core {
 	public static ArrayList<Peer> peers;
 	public static NetHandler netHandler;
 	public static LoadWindow loadWindow;
-	public static MainWindow mainWindow;
 	public static ArrayList<BlockedFile> blockDex;
 	public static ArrayList<Metadata> metaDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
@@ -172,6 +170,11 @@ public class Core {
 			loadWindow.setProgress(85);
 		}
 		netHandler = new NetHandler();
+		
+		Utilities.switchGui("atrium.Core", "Done being initialized", false);
+		loadWindow.setProgress(100);
+		loadWindow.setVisible(false);
+		loadWindow.dispose();
 		
 		//Do peer discovery
 		netHandler.peerDiscovery();

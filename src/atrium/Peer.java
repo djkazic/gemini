@@ -51,13 +51,6 @@ public class Peer {
 		//Add ourselves to peers with instance data
 		Core.peers.add(this);
 		
-		//Update peer count in GUI
-		if(!Core.config.hubMode) {
-			if(Core.mainWindow != null) {
-				Core.mainWindow.updatePeerCount();
-			}
-		}
-		
 		//Set CountDownLatches
 		deferredRequesting = new CountDownLatch(1);
 		pubkeyDone = new CountDownLatch(1);
@@ -143,11 +136,6 @@ public class Peer {
 			Utilities.log(this, "Peer " + mutex + " disconnected", false);
 		} else {
 			Utilities.log(this, "Peer disconnected (mutex null, #" + connNumber + ")", false);
-		}
-		if(!Core.config.hubMode) {
-			if(Core.mainWindow != null) {
-				Core.mainWindow.updatePeerCount();
-			}
 		}
 	}
 

@@ -424,7 +424,9 @@ public class DualListener extends Listener {
 												metaScore = "" + chosenMeta.getScore();
 											}
 											
-											if(!Core.mainWindow.haveSearchAlready(checksum)) {
+											//TODO: URGENT [haveSearchAlready container]
+											//if(!Core.mainWindow.haveSearchAlready(checksum)) {
+											if(true) {
 												ArrayList<String> blockList = intermediate.getBlockList();
 												ArrayList<String> dualStore = new ArrayList<String> ();
 												dualStore.add(name);
@@ -441,9 +443,11 @@ public class DualListener extends Listener {
 												}
 												
 												if(metaScore != null) {
-													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, metaScore});
+													//TODO: row add
+													//Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, metaScore});
 												} else {
-													Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, "-"});
+													//TODO: row add
+													//Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, "-"});
 												}
 											}
 										}
