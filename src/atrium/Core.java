@@ -3,9 +3,13 @@ package atrium;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import net.api.APIRouter;
+import net.web.WebServer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -171,10 +175,34 @@ public class Core {
 		}
 		netHandler = new NetHandler();
 		
+		//Start webServer
+		Utilities.switchGui("atrium.Core", "Initializing internal server", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(90);
+		}
+		Thread webServerThread = new Thread(new WebServer());
+		webServerThread.start();
+		
+		//Start APIRouter
+		Utilities.switchGui("atrium.Core", "Initializing API router", false);
+		if(loadWindow != null) {
+			loadWindow.setProgress(95);
+		}
+		APIRouter.init();
+		
 		Utilities.switchGui("atrium.Core", "Done being initialized", false);
 		loadWindow.setProgress(100);
 		loadWindow.setVisible(false);
 		loadWindow.dispose();
+		
+		//Open browser window (if this is not headless)
+		try {
+			if(!Core.config.hubMode) {
+				Utilities.openWebpage(new URL("http://localhost:" + Core.config.webPort));
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		//Do peer discovery
 		netHandler.peerDiscovery();

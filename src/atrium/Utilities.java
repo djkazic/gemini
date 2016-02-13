@@ -1,12 +1,16 @@
 package atrium;
 
+import java.awt.Desktop;
 import java.net.NetworkInterface;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Random;
 
-import com.esotericsoftware.minlog.Log;
-
 import net.iharder.Base64;
+
+import com.esotericsoftware.minlog.Log;
 
 /**
  * General utility methods class
@@ -120,5 +124,24 @@ public class Utilities {
 	        sb.append(String.format("%02X%s", macAddr[i], (i < macAddr.length - 1) ? "-" : ""));
 	    }
 	    return sb.toString();
+	}
+	
+	public static void openWebpage(URI uri) {
+	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+	    if(desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	        try {
+	            desktop.browse(uri);
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+	}
+
+	public static void openWebpage(URL url) {
+	    try {
+	        openWebpage(url.toURI());
+	    } catch (URISyntaxException ex) {
+	        ex.printStackTrace();
+	    }
 	}
 }
