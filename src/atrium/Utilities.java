@@ -24,7 +24,7 @@ public class Utilities {
 	 * @param msg debug message
 	 */
 	public static void log(Object someClass, String msg, boolean debug) {
-		String output = "[" + someClass.getClass().getName() + "]: " + msg;
+		String output = "[" + someClass.getClass().getSimpleName() + "]: " + msg;
 		if(debug) {
 			Log.debug(output);
 		} else {

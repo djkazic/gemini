@@ -52,11 +52,11 @@ public class Core {
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		//Load config if exists
-		Utilities.log("atrium.Core", "Attempting to load configuration from file...", false);
+		Utilities.log("Core", "Attempting to load configuration from file...", false);
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
 			if(configFile.exists()) {
-				Utilities.log("atrium.Core", "Loaded saved configuration", false);
+				Utilities.log("Core", "Loaded saved configuration", false);
 				Kryo kryo = new Kryo();
 				Input input = new Input(new FileInputStream(configFile));
 				config = kryo.readObject(input, Config.class);
@@ -83,21 +83,21 @@ public class Core {
 		
 		//GUI inits
 		if(Core.config.hubMode) {
-			Utilities.log("atrium.Core", "Hub/headless mode engaged", false);
+			Utilities.log("Core", "Hub/headless mode engaged", false);
 		} else {
-			Utilities.log("atrium.Core", "Initializing front-end", false);
+			Utilities.log("Core", "Initializing front-end", false);
 			loadWindow = new LoadWindow();
 		}
 		
 		//Set mutex
-		Utilities.switchGui("atrium.Core", "Calculating mutex", false);
+		Utilities.switchGui("Core", "Calculating mutex", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(5);
 		}
 		mutex = Utilities.getMutex();
 		
 		//Initialize crypto routines
-		Utilities.switchGui("atrium.Core", "Initializing RSA / AES", false);
+		Utilities.switchGui("Core", "Initializing RSA / AES", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(10);
 		}
@@ -112,7 +112,7 @@ public class Core {
 		}
 		
 		//File directory checks
-		Utilities.switchGui("atrium.Core", "Checking for file structures", false);
+		Utilities.switchGui("Core", "Checking for file structures", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(30);
 		}
@@ -138,7 +138,7 @@ public class Core {
 		FilterUtils.init();
 		
 		//FileWatcher initialization
-		Utilities.switchGui("atrium.Core", "Registering file watcher", false);
+		Utilities.switchGui("Core", "Registering file watcher", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(50);
 		}
@@ -154,29 +154,29 @@ public class Core {
 		peers = new ArrayList<Peer> ();
 		
 		//Load meta index
-		Utilities.switchGui("atrium.Core", "Loading metadata index", false);
+		Utilities.switchGui("Core", "Loading metadata index", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(70);
 		}
 		FileUtils.loadMetaIndex();
-		Utilities.log("atrium.Core", "Number of metadata objects: " + Core.metaDex.size(), false);
+		Utilities.log("Core", "Number of metadata objects: " + Core.metaDex.size(), false);
 		
 		//Generate block index
-		Utilities.switchGui("atrium.Core", "Generating block index", false);
+		Utilities.switchGui("Core", "Generating block index", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(75);
 		}
 		FileUtils.genBlockIndex();
 		
 		//Initialize NetHandler object
-		Utilities.switchGui("atrium.Core", "Initializing networking", false);
+		Utilities.switchGui("Core", "Initializing networking", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(85);
 		}
 		netHandler = new NetHandler();
 		
 		//Start webServer
-		Utilities.switchGui("atrium.Core", "Initializing internal server", false);
+		Utilities.switchGui("Core", "Initializing internal server", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(90);
 		}
@@ -184,13 +184,13 @@ public class Core {
 		webServerThread.start();
 		
 		//Start APIRouter
-		Utilities.switchGui("atrium.Core", "Initializing API router", false);
+		Utilities.switchGui("Core", "Initializing API router", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(95);
 		}
 		APIRouter.init();
 		
-		Utilities.switchGui("atrium.Core", "Done being initialized", false);
+		Utilities.switchGui("Core", "Done being initialized", false);
 		loadWindow.setProgress(100);
 		loadWindow.setVisible(false);
 		loadWindow.dispose();

@@ -40,7 +40,7 @@ public class LoadWindow extends JFrame {
 	 */
 	public LoadWindow() {
 		
-		Utilities.log("atrium.Core", "Setting graphical preferences", true);
+		Utilities.log("Core", "Setting graphical preferences", true);
 		try {
 			UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
 		} catch(Exception ex) {
