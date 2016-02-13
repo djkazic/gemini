@@ -6,6 +6,9 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
+import atrium.Core;
+import atrium.Utilities;
+
 /**
  * Specific REST hook for evaluation input
  *
@@ -30,12 +33,17 @@ public class Bridge extends ServerResource {
 					String methodCall = (String) oMethodCall;
 
 					switch(methodCall) {
-						case "exec_init":
-							
+						case "port_check":
+							responseJSON.put("value", Core.config.cacheEnabled);
+							break;
+
+						case "peer_count":
+							responseJSON.put("value", Core.peers.size());
 							break;
 
 						default:
-							
+							Utilities.log(this, "Unknown RPC called: " + methodCall, false);
+							responseJSON.put("error", "unknown_rpc");
 							break;
 					}
 				}
