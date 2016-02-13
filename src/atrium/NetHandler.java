@@ -1,10 +1,17 @@
 package atrium;
 
+import gui.MainWindow;
+import io.block.Metadata;
+import io.serialize.StreamedBlock;
+import io.serialize.StreamedBlockedFile;
+
 import java.awt.Desktop;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -21,23 +28,30 @@ import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Server;
-
-import gui.MainWindow;
-import io.block.Metadata;
-import io.serialize.StreamedBlock;
-import io.serialize.StreamedBlockedFile;
 import net.discover.DiscoveryClient;
 import net.discover.DiscoveryServer;
 import net.listeners.BlockListener;
 import net.listeners.DualListener;
 import net.listeners.PeerCountListener;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+
 import packets.data.Data;
 import packets.requests.Request;
 import packets.requests.RequestTypes;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Server;
 
 /**
  * Handles server, client, and discovery operations
@@ -102,31 +116,45 @@ public class NetHandler {
 	private void checkExtVisibility() {
 		if(externalIp != null) {
 			try {
-				URL apiUrl = new URL("http://tuq.in/tools/port.txt?ip=" + externalIp + "&port=" + Core.config.tcpPort);
-				HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+				HttpClient httpclient = HttpClients.createDefault();
+				HttpPost httppost = new HttpPost("http://ping.eu/action.php?atype=5/");
 
-				if (conn.getResponseCode() != 200) {
-					throw new IOException(conn.getResponseMessage());
-				}
+				//Request parameters and other properties.
+				List<NameValuePair> params = new ArrayList<NameValuePair> (3);
+				params.add(new BasicNameValuePair("host", externalIp));
+				params.add(new BasicNameValuePair("port", "" + Core.config.tcpPort));
+				params.add(new BasicNameValuePair("go", "Go"));
+				httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-				BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = rd.readLine()) != null) {
-					sb.append(line);
-				}
-				rd.close();
-				conn.disconnect();
-				String finalStr = sb.toString();
-				if(finalStr != null) {
-					Boolean works = Boolean.parseBoolean(finalStr);
-					extVisible = Core.config.cacheEnabled = works;
-					Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"), false);
-					if(!Core.config.hubMode) {
-						if(!extVisible && !Core.config.notifiedPortForwarding) {
-							displayPortForwardWarning();
+				//Execute and get the response.
+				HttpResponse response = httpclient.execute(httppost);
+				HttpEntity entity = response.getEntity();
+
+				if(entity != null) {
+				    InputStream instream = entity.getContent();
+				    try {
+				    	BufferedReader rd = new BufferedReader(new InputStreamReader(instream));
+						StringBuilder sb = new StringBuilder();
+						String line;
+						while ((line = rd.readLine()) != null) {
+							sb.append(line);
 						}
-					}
+						rd.close();
+
+						String finalStr = sb.toString();
+						if(finalStr != null) {
+							boolean works = !finalStr.contains("color: red");
+							extVisible = Core.config.cacheEnabled = works;
+							Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"), false);
+							if(!Core.config.hubMode) {
+								if(!extVisible && !Core.config.notifiedPortForwarding) {
+									displayPortForwardWarning();
+								}
+							}
+						}
+				    } finally {
+				        instream.close();
+				    }
 				}
 			} catch(Exception ex) {
 				ex.printStackTrace();
@@ -135,7 +163,7 @@ public class NetHandler {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns a new instance of a Client for forging out-bound connections
 	 * @return new instance of a Client for forging out-bound connections
@@ -153,10 +181,10 @@ public class NetHandler {
 		try {
 			server = new Server(512000 * 6, 512000 * 5);
 			registerClasses(server.getKryo());
-			
+
 			Utilities.log(this, "Registering block listener", false);
 			server.addListener(new BlockListener());
-			
+
 			Utilities.switchGui(this, "Registering server listeners", false);
 			server.addListener(new DualListener(1));
 
@@ -169,19 +197,19 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void checkDestroyServer() {
 		if(!Core.config.hubMode && !extVisible) {
 			destroyServerListeners();
 		}
 	}
-	
+
 	private void checkAndStartMainwindow() {
 		if(!Core.config.hubMode) {
 			Core.mainWindow = new MainWindow();
 		}
 	}
-	
+
 	private void destroyServerListeners() {
 		Utilities.log(this, "Deregistering server and its listeners", false);
 		for(Connection con : server.getConnections()) {
@@ -201,7 +229,7 @@ public class NetHandler {
 			client.addListener(new DualListener(0));
 			Utilities.log(this, "Registering block listener", false);
 			client.addListener(new BlockListener());
-			
+
 			Utilities.log(this, "Starting client component", false);
 			client.start();
 		} catch (Exception ex) {
@@ -229,7 +257,7 @@ public class NetHandler {
 		int ind = new SecureRandom().nextInt(Core.peers.size());
 		Peer chosenPeer = Core.peers.get(ind);
 		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
-		**/
+		 **/
 		for(int i=0; i < Core.peers.size(); i++) {
 			Peer peer = Core.peers.get(i);
 			if(peer != null) {
@@ -237,7 +265,7 @@ public class NetHandler {
 			}
 		}
 	}
-	
+
 	/**
 	 * Registers classes for serialization
 	 * @param kryo Kryo serializer instance provided
@@ -256,7 +284,7 @@ public class NetHandler {
 		kryo.register(StreamedBlock.class);
 		kryo.register(Metadata.class);	
 	}
-	
+
 	/**
 	 * Begins peer discovery routine
 	 * @param client Client instance provided
@@ -269,7 +297,7 @@ public class NetHandler {
 
 			//TODO: remove this debug section
 			foundHosts.clear();
-			
+
 			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			//foundHosts.add(InetAddress.getByName("192.3.165.112"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
@@ -289,7 +317,7 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void bootstrapDiscovery() {
 		try {
 			Thread discoverServerThread = (new Thread(new DiscoveryServer()));
@@ -311,7 +339,7 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void filterHosts() {
 		try {
 			//Filter out local IP
@@ -339,7 +367,7 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void attemptConnections() {
 		try {
 			Client newConnection = null;
@@ -359,14 +387,14 @@ public class NetHandler {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void startPeerCountListener() {
 		Utilities.log(this, "Terminated peer connections loop", false);
 		Thread peerCountListenerThread = (new Thread(new PeerCountListener()));
 		peerCountListenerThread.setName("Peer Count Listener");
 		peerCountListenerThread.start();
 	}
-	
+
 	/**
 	 * Creates a new thread, and displays a warning on port forwarding
 	 */
