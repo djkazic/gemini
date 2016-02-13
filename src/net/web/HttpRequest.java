@@ -107,6 +107,8 @@ public final class HttpRequest implements Runnable {
 			return "text/css";
 		else if(fileName.endsWith(".js"))
 			return "application/javascript";
+		else if(fileName.endsWith(".woff"))
+			return "application/font-woff";
 		
 		return "application/octet-stream";
 	}
