@@ -29,7 +29,7 @@ public class APIRouter extends Application {
 	public Restlet landPageRoute = new Restlet() {
 		@Get
 		public String process() {
-			return "RagTag REST API v1.0";
+			return "Radiator REST API v1.0";
 		}
 	};
 
