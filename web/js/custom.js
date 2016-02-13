@@ -2,7 +2,13 @@ $(document).ready(function() {
 	var formNames = [];
 
 	processForms(formNames);
-	setInterval(pollStatus, 1000);
+
+	//Port status update
+	pollStatus();
+	
+	//Peer number update
+	peerCount();
+	setInterval(peerCount, 1500);
 });
 
 function processForms(formNames) {
@@ -35,5 +41,39 @@ function getAllForms(forms) {
 }
 
 function pollStatus() {
-	$('#statusIndicator').html("Status: [<span class=\"label label-success\"><span id=\"status\">ONLINE</span></span>]");
+	$.ajax({
+		url: 'http://localhost:8888/api',
+		method: 'POST',
+		data: '{ "rpc": "port_check" }'
+	}).done(function(result) {
+		if(result.value) {
+			$('#status').html("<span class=\"label label-success\">OPEN</span>");
+		} else {
+			$('#status').html("<span class=\"label label-danger\">CLOSED</span>");
+		}
+	});
+}
+
+function peerCount() {
+	$.ajax({
+		url: 'http://localhost:8888/api',
+		method: 'POST',
+		data: '{ "rpc": "peer_count" }'
+	}).done(function(result) {
+		result = JSON.parse(result);
+		var peerCount = Number(result.value);
+		var imageSrc;
+		if(peerCount == 0) {
+			imageSrc = 'img/connect0.png';
+		} else if(peerCount > 0 && peerCount <= 2) {
+			imageSrc = 'img/connect1.png';
+		} else if(peerCount > 2 && peerCount <= 4) {
+			imageSrc = 'img/connect2.png';
+		} else if(peerCount > 4 && peerCount <= 6) {
+			imageSrc = 'img/connect3.png';
+		} else if(peerCount > 6) {
+			imageSrc = 'img/connect4.png';
+		}
+		$('#peerCount').html("<img src=\"" + imageSrc + "\" width=25 height=25>");
+	});
 }
