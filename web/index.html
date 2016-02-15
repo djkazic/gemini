@@ -1,237 +1,596 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 
 <head>
+	<title>Radiator</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+	<!-- Mobile support -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Radiator</title>
+	<!-- Material Design fonts -->
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<!-- Bootstrap -->
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
-    <link href="css/sb-admin.css" rel="stylesheet">
+	<!-- Bootstrap Material Design -->
+	<link href="dist/css/bootstrap-material-design.css" rel="stylesheet">
+	<link href="dist/css/ripples.min.css" rel="stylesheet">
 
-    <!-- Morris Charts CSS -->
-    <link href="css/plugins/morris.css" rel="stylesheet">
+	<!-- Dropdown.js -->
+	<link href="//cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
 
-    <!-- Custom Fonts -->
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!-- Page style -->
+	<link href="index.css" rel="stylesheet">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+	<!-- jQuery -->
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 
+	<!-- Custom JS -->
+	<script src="js/custom.js"></script>
 </head>
-
 <body>
 
-    <div id="wrapper">
+<div class="header-panel shadow-z-2">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-3">
+			<h1>Radiator</h1>
+			</div>
+		</div>
+	</div>
+</div>
 
-        <!-- Navigation -->
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="container-fluid main">
+	<div class="row">
+		<nav class="col-xs-3 menu">
+			<ul>
+			<li class="active withripple" data-target="#about">Dashboard</li>
+			<li class="withripple" data-target="#getting-started">Getting Started</li>
+			<li class="withripple" data-target="#input">Input</li>
+			<li class="withripple" data-target="#fileinput">File Input</li>
+			<li class="withripple" data-target="#dialog">Dialog</li>
+			</ul>
+		</nav>
+		<div class="pages col-xs-9">
+			<div class="row">
+				<div class="col-xs-10">
+					<!-- well page !-->
+					<div class="well page active" id="about">
+						<h1 class="header">Dashboard</h1>
 
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="index.html">Radiator</a>
-            </div>
+						<p>
+							Lorem Ipsum
+						</p>
 
-            <!-- Top Menu Items -->
-            <ul class="nav navbar-right top-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> <b class="caret"></b></a>
-                    <ul class="dropdown-menu message-dropdown">
-                        <li class="message-preview">
-                            <a href="#">
-                                <div class="media">
-                                    <span class="pull-left">
-                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
-                                    </span>
-                                    <div class="media-body">
-                                        <h5 class="media-heading"><strong>admin</strong>
-                                        </h5>
-                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
-                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="message-preview">
-                            <a href="#">
-                                <div class="media">
-                                    <span class="pull-left">
-                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
-                                    </span>
-                                    <div class="media-body">
-                                        <h5 class="media-heading"><strong>admin</strong>
-                                        </h5>
-                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
-                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="message-preview">
-                            <a href="#">
-                                <div class="media">
-                                    <span class="pull-left">
-                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
-                                    </span>
-                                    <div class="media-body">
-                                        <h5 class="media-heading"><strong>admin</strong>
-                                        </h5>
-                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
-                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="message-footer">
-                            <a href="#">Read All New Messages</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i> <b class="caret"></b></a>
-                    <ul class="dropdown-menu alert-dropdown">
-                        <li>
-                            <a href="#">Alert Name <span class="label label-default">Alert Badge</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Alert Name <span class="label label-primary">Alert Badge</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Alert Name <span class="label label-success">Alert Badge</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Alert Name <span class="label label-info">Alert Badge</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Alert Name <span class="label label-warning">Alert Badge</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Alert Name <span class="label label-danger">Alert Badge</span></a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#">View All</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> admin <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
-                    <li class="active">
-                        <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="tables.html"><i class="fa fa-fw fa-table"></i> Tables</a>
-                    </li>
-                    <li>
-                        <a href="bootstrap-grid.html"><i class="fa fa-fw fa-wrench"></i> Bootstrap Grid</a>
-                    </li>
-                    <li>
-                        <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="demo" class="collapse">
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </nav>
+						<p>
+							Lorem Ipsum
+						</p>
 
-        <div id="page-wrapper">
+						<p>
+							Lorem Ipsum
+						</p>
+					</div>
 
-            <div class="container-fluid">
+					<!-- well page !-->
+					<div class="well page" id="getting-started">
+						<h1 class="header">Getting Started</h1>
 
-                <!-- Page Heading -->
-                <div class="row">
-                    <div class="col-xs-12">
-                        <h1 class="page-header">
-                            Dashboard
-                        </h1>
-                    </div>
+						<h3>Download</h3>
+						<hr>
+						
+						<p>
+							Lorem Ipsum
+						</p>
+
+						<p>
+							Lorem Ipsum
+						</p>
+
+						<p>
+							Lorem Ipsum
+						</p>
+					</div>
+
+					<!-- well page !-->
+					<div class="well page" id="input">
+						<h1 class="header">Input
+							<small><a href="http://www.google.com/design/spec/components/text-fields.html">specification</a></small>
+						</h1>
+
+						<div class="inputs">
+							<h2>Input label styles
+							<small>default sizing</small>
+							</h2>
+
+							<div class="form-group label-static">
+								<label for="i2" class="control-label">label-static</label>
+								<input type="email" class="form-control" id="i2" placeholder="placeholder attribute">
+
+								<p class="help-block">This is a hint as a <code>p.help-block.hint</code></p>
+							</div>
+
+							<div class="form-group label-floating">
+								<label for="i5" class="control-label">label-floating</label>
+								<input type="email" class="form-control" id="i5">
+								<span class="help-block">This is a hint as a <code>span.help-block.hint</code></span>
+							</div>
+
+							<div class="form-group label-placeholder">
+								<label for="i5p" class="control-label">label-placeholder</label>
+								<input type="email" class="form-control" id="i5p">
+								<span class="help-block">This is a hint as a <code>span.help-block.hint</code></span>
+							</div>
+
+							<form>
+							<div class="form-group">
+								<label for="i5ps" class="control-label col-sm-2">Column label</label>
+
+								<div class="col-sm-10">
+								<input type="email" class="form-control" id="i5ps" placeholder="placeholder attribute">
+								<span class="help-block">This is a hint as a <code>span.help-block.hint</code></span>
+								</div>
+							</div>
+							</form>
+							<br/>
+							<br/>
+
+							<h2>Input - floating labels
+							<small>form-group sizing</small>
+							</h2>
+							<div class="form-group form-group-sm label-floating">
+							<label for="i4" class="control-label">Email address form-group-sm</label>
+							<input type="email" class="form-control" id="i4">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group label-floating">
+							<label for="i5i" class="control-label">Email address default size</label>
+							<input type="email" class="form-control" id="i5i">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group form-group-lg label-floating">
+							<label for="i6" class="control-label">Email address form-group-lg</label>
+							<input type="email" class="form-control" id="i6">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<h2>Input - static labels
+							<small>form-group sizing</small>
+							</h2>
+
+							<div class="form-group form-group-sm label-static">
+							<label for="si4" class="control-label">Email address form-group-sm</label>
+							<input type="email" class="form-control" id="si4" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group label-static">
+							<label for="si5i" class="control-label">Email address default size</label>
+							<input type="email" class="form-control" id="si5i" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group form-group-lg label-static">
+							<label for="si6" class="control-label">Email address form-group-lg</label>
+							<input type="email" class="form-control" id="si6" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<h2>Input - no labels
+							<small>form-group sizing</small>
+							</h2>
+
+							<div class="form-group form-group-sm">
+							<label for="si4n" class="control-label">Email address form-group-sm</label>
+							<input type="email" class="form-control" id="si4n" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group">
+							<label for="si5in" class="control-label">Email address default size</label>
+							<input type="email" class="form-control" id="si5in" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group form-group-lg">
+							<label for="si6n" class="control-label">Email address form-group-lg</label>
+							<input type="email" class="form-control" id="si6n" placeholder="Placeholder">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+
+							<h2>Input -
+							<small>floating label feedback variants</small>
+							</h2>
+							<div class="form-group has-success label-floating">
+							<label for="f1" class="control-label">Email address has-success</label>
+							<input type="email" class="form-control" id="f1">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group has-warning label-floating">
+							<label for="f2" class="control-label">Email address has-warning</label>
+							<input type="email" class="form-control" id="f2">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+							<div class="form-group has-error label-floating">
+							<label for="f3" class="control-label">Email address has-error</label>
+							<input type="email" class="form-control" id="f3">
+							<span class="help-block">Please enter a valid email address</span>
+							</div>
+
+
+							<h2>Input - Legacy</h2>
+							<!-- Exercise backwards compatibility without form-group -->
+							<input type="text" class="form-control floating-label" placeholder="Legacy floating label as placeholder attribute" data-hint="This is a hint using a legacy <code>data-hint</code> attribute on the input">
+
+							<h2>Textarea</h2>
+
+							<div class="form-group label-floating">
+							<label for="t1" class="control-label">Floating label</label>
+							<textarea id="t1" class="form-control"></textarea>
+							</div>
+							<div class="form-group">
+							<textarea class="form-control" placeholder="placeholder without label"></textarea>
+							</div>
+
+							<!-- legacy markup -->
+							<textarea class="form-control floating-label" placeholder="legacy floating label as placeholder"></textarea>
+
+							<h2>Validation</h2>
+
+							<div class="form-group label-floating">
+							<label for="111" class="control-label">email</label>
+							<input type="email" class="form-control" id="111">
+							</div>
+							<div class="form-group label-floating">
+							<label for="222" class="control-label">number</label>
+							<input type="number" class="form-control" id="222">
+							</div>
+
+							<h2>Disabled</h2>
+
+							<div class="form-group label-floating">
+							<label for="333" class="control-label">email</label>
+							<input disabled type="text" class="form-control" id="333">
+							</div>
+							<div class="form-group label-floating">
+							<label for="444" class="control-label">number</label>
+							<input disabled type="text" class="form-control" id="444">
+							</div>
+
+							<h2>Hints</h2>
+
+							<div class="form-group label-floating">
+							<label for="555" class="control-label">label</label>
+							<input type="text" class="form-control" id="555">
+
+							<p class="help-block">Some helpful hint</p>
+							</div>
+							<div class="form-group label-floating">
+							<label for="676" class="control-label">label</label>
+							<input type="email" class="form-control" id="676">
+
+							<p class="help-block">A valid email contains an @ character</p>
+							</div>
+
+
+							<h2>Styling</h2>
+
+							<div class="form-group has-success">
+							<input type="text" class="form-control" placeholder="placeholder">
+							</div>
+							<div class="form-group has-success label-floating">
+							<label for="777" class="control-label">floating label</label>
+							<input type="text" class="form-control" id="777">
+							</div>
+						</div>
+					</div>
+
+					<!-- well page !-->
+					<div class="well page" id="fileinput">
+						<h1 class="header">File Input</h1>
+
+						<div class="form-group">
+							<label class="control-label" for="inputFile2">Static label</label>
+							<input type="file" id="inputFile2" multiple>
+							<input type="text" readonly class="form-control" placeholder="Browse2...">
+						</div>
+
+						<div class="form-group">
+							<!--<label class="control-label" for="inputFile3">File</label>-->
+							<input type="file" id="inputFile3" multiple>
+							<input type="text" readonly class="form-control" placeholder="Placeholder only...">
+						</div>
+
+						<div class="form-group">
+							<input type="file" id="inputFile4" multiple>
+
+							<div class="input-group">
+								<input type="text" readonly class="form-control" placeholder="Placeholder w/input-group...">
+								<span class="input-group-btn input-group-sm">
+									<button type="button" class="btn btn-fab btn-fab-mini">
+									<i class="mdi-editor-attach-file"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- well page !-->
+					<div class="well page" id="progress-bar">
+						<h1 class="header">Progress Bar</h1>
+
+						<h2>Basic</h2>
+
+						<div class="progress">
+							<div class="progress-bar" style="width: 60%;"></div>
+						</div>
+
+						<h2>Contextual alternatives</h2>
+
+						<div class="progress">
+							<div class="progress-bar progress-bar-info" style="width: 20%"></div>
+						</div>
+						<div class="progress">
+							<div class="progress-bar progress-bar-success" style="width: 40%"></div>
+						</div>
+						<div class="progress">
+							<div class="progress-bar progress-bar-warning" style="width: 60%"></div>
+						</div>
+						<div class="progress">
+							<div class="progress-bar progress-bar-danger" style="width: 80%"></div>
+						</div>
+
+						<h2>Striped</h2>
+
+						<div class="progress progress-striped">
+							<div class="progress-bar progress-bar-info" style="width: 20%"></div>
+						</div>
+						<div class="progress progress-striped">
+							<div class="progress-bar progress-bar-success" style="width: 40%"></div>
+						</div>
+						<div class="progress progress-striped">
+							<div class="progress-bar progress-bar-warning" style="width: 60%"></div>
+						</div>
+						<div class="progress progress-striped">
+							<div class="progress-bar progress-bar-danger" style="width: 80%"></div>
+						</div>
+
+						<h2>Animated</h2>
+
+						<div class="progress progress-striped active">
+							<div class="progress-bar" style="width: 45%"></div>
+						</div>
+
+						<h2>Stacked</h2>
+
+						<div class="progress">
+							<div class="progress-bar progress-bar-success" style="width: 35%"></div>
+							<div class="progress-bar progress-bar-warning" style="width: 20%"></div>
+							<div class="progress-bar progress-bar-danger" style="width: 10%"></div>
+						</div>
+					</div>
+					
+					<!-- well page !-->
+					<div class="well page" id="dialog">
+						<h1 class="header">Dialog</h1>
+
+						<h2>Simple Dialog</h2>
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#simple-dialog">Open dialog</button>
+
+						<h2>Dialog with header and footer</h2>
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#complete-dialog">Open dialog</button>
+					</div>
+				</div>
+
+				<!-- After content panel -->
+			</div>
+
+			<!-- After content row -->
+			<div class="row" style="padding-top: 5px">
+				<div class="col-xs-10 text-right">
+					<p>
+						Port status: &nbsp;
+						<span id="status">
+							<span class="label label-default">- - - | - - -</span>
+						</span>
+						<span id="peerCount" style="padding-left: 10px">
+							<img src="img/connect0.png" width="20" height="20">
+						</span>
+					</p>
                 </div>
+			</div>
 
-                <!-- /.row -->
-                <div class="row">
-                    <div class="col-xs-12">
-                        <form id="searchForm">
-                            <div class="form-group">
-                                <div class="col-xs-8">
-                                    <input class="form-control">
-                                </div>
-                                <button class="btn btn-success">Search</button>
-                            </div>
-                        </form>
-                    </div>
+			<div class="row" style="padding-top: 5px">
+				<div class="col-xs-10 text-right">
+
                 </div>
+			</div>
+		</div>
+	</div>
+</div>
 
-                <!-- /.row -->
-                <div class="row">
-                    <div class="col-xs-12 text-right">
-                        <span id="statusIndicator">
-                            Status: [<span class="label label-default"><span id="status">- - - | - - -</span></span>]
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <!-- /.container-fluid -->
+<!--Modals-->
+<div id="simple-dialog" class="modal fade" tabindex="-1">
+	<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-body">
+		<p>E dolore commodo, id anim aute sint cupidatat eu est anim tamen ad possumus,
+			legam officia firmissimum. Eram deserunt domesticarum, iis ita praetermissum,
+			nam aliquip quo probant, incididunt et occaecat an nam enim exquisitaque a
+			nescius velit admodum, non ad cohaerescant, probant o nulla tempor. Aute aut te
+			quis arbitror ubi ne aliqua consequat aliquip. Ad sunt laborum senserit, de do
+			quem possumus. Sint tractavissent cupidatat aute possumus ita elit ad cupidatat.
+			Arbitror ab fabulas o eu e veniam pariatur. Non voluptate comprehenderit ad nisi
+			id voluptate. Quis distinguantur quibusdam quae mentitum o si minim illum nisi
+			mandaremus.</p>
+		</div>
+	</div>
+	</div>
+</div>
 
-        </div>
-        <!-- /#page-wrapper -->
+<div id="complete-dialog" class="modal fade" tabindex="-1">
+	<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Dialog</h4>
+		</div>
+		<div class="modal-body">
+		<p>Fore aut non quem incididunt, varias reprehenderit deserunt quem offendit,
+			cillum proident ne reprehenderit, quem ad laborum, quo possumus praetermissum,
+			si ne illustriora, hic appellat coniunctione, do labore aliqua quo probant. In
+			probant voluptatibus quo mentitum est laboris. Quorum mandaremus graviterque.
+			Mentitum id velit, dolor aut litteris, ea varias illustriora, ita commodo ita
+			ingeniis, iis nulla appellat incurreret, aut irure amet summis pariatur ita ubi
+			quis dolore veniam proident, consequat sed ingeniis.</p>
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-primary" data-dismiss="modal">Dismiss</button>
+		</div>
+	</div>
+	</div>
+</div>
 
-    </div>
-    <!-- /#wrapper -->
+<div id="source-modal" class="modal fade" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+	<div class="modal-content">
+		<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Source Code</h4>
+		</div>
+		<div class="modal-body">
+		<pre></pre>
+		</div>
+	</div>
+	</div>
+</div>
 
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+<!-- Open source code -->
+<script>
+	window.page = window.location.hash || "#about";
 
-    <!-- Custom JS -->
-    <script src="js/custom.js"></script>
+	$(document).ready(function () {
+	if (window.page != "#about") {
+		$(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+	}
+	});
+
+	$(window).on("resize", function () {
+	$("html, body").height($(window).height());
+	$(".main, .menu").height($(window).height() - $(".header-panel").outerHeight());
+	$(".pages").height($(window).height());
+	}).trigger("resize");
+
+	$(".menu li").click(function () {
+	// Menu
+	if (!$(this).data("target")) return;
+	if ($(this).is(".active")) return;
+	$(".menu li").not($(this)).removeClass("active");
+	$(".page").not(page).removeClass("active").hide();
+	window.page = $(this).data("target");
+	var page = $(window.page);
+	window.location.hash = window.page;
+	$(this).addClass("active");
+
+
+	page.show();
+
+	var totop = setInterval(function () {
+		$(".pages").animate({scrollTop: 0}, 0);
+	}, 1);
+
+	setTimeout(function () {
+		page.addClass("active");
+		setTimeout(function () {
+		clearInterval(totop);
+		}, 1000);
+	}, 100);
+	});
+
+	function cleanSource(html) {
+	var lines = html.split(/\n/);
+
+	lines.shift();
+	lines.splice(-1, 1);
+
+	var indentSize = lines[0].length - lines[0].trim().length,
+		re = new RegExp(" {" + indentSize + "}");
+
+	lines = lines.map(function (line) {
+		if (line.match(re)) {
+		line = line.substring(indentSize);
+		}
+
+		return line;
+	});
+
+	lines = lines.join("\n");
+
+	return lines;
+	}
+
+	$("#opensource").click(function () {
+	$.get(window.location.href, function (data) {
+		var html = $(data).find(window.page).html();
+		html = cleanSource(html);
+		$("#source-modal pre").text(html);
+		$("#source-modal").modal();
+	});
+	});
+</script>
+
+<!-- Twitter Bootstrap -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Material Design for Bootstrap -->
+<script src="dist/js/material.js"></script>
+<script src="dist/js/ripples.min.js"></script>
+<script>
+	$.material.init();
+</script>
+
+
+<!-- Sliders -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/noUiSlider/6.2.0/jquery.nouislider.min.js"></script>
+<script>
+	$(function () {
+	$.material.init();
+	$(".shor").noUiSlider({
+		start: 40,
+		connect: "lower",
+		range: {
+		min: 0,
+		max: 100
+		}
+	});
+
+	$(".svert").noUiSlider({
+		orientation: "vertical",
+		start: 40,
+		connect: "lower",
+		range: {
+		min: 0,
+		max: 100
+		}
+	});
+	});
+</script>
+
+<!-- Dropdown.js -->
+<script src="https://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.js"></script>
+<script>
+	$("#dropdown-menu select").dropdown();
+</script>
 
 </body>
-
 </html>

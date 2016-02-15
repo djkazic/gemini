@@ -74,6 +74,6 @@ function peerCount() {
 		} else if(peerCount > 6) {
 			imageSrc = 'img/connect4.png';
 		}
-		$('#peerCount').html("<img src=\"" + imageSrc + "\" width=25 height=25>");
+		$('#peerCount').html("<img src=\"" + imageSrc + "\" width=20 height=20>");
 	});
 }
