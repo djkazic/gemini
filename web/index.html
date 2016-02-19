@@ -3,7 +3,7 @@
 <html>
 
 <head>
-	<title>Radiator</title>
+	<title>Gemini</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
@@ -39,7 +39,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-xs-3">
-			<h1>Radiator</h1>
+			<h1>Gemini</h1>
 			</div>
 		</div>
 	</div>
@@ -47,7 +47,7 @@
 
 <div class="container-fluid main">
 	<div class="row">
-		<nav class="col-xs-3 menu">
+		<nav class="col-xs-2 menu">
 			<ul>
 			<li class="active withripple" data-target="#about">Dashboard</li>
 			<li class="withripple" data-target="#getting-started">Getting Started</li>
@@ -56,9 +56,10 @@
 			<li class="withripple" data-target="#dialog">Dialog</li>
 			</ul>
 		</nav>
-		<div class="pages col-xs-9">
+		
+		<div class="pages col-xs-10">
 			<div class="row">
-				<div class="col-xs-10">
+				<div class="col-xs-11">
 					<!-- well page !-->
 					<div class="well page active" id="about">
 						<h1 class="header">Dashboard</h1>
@@ -82,7 +83,7 @@
 
 						<h3>Download</h3>
 						<hr>
-						
+
 						<p>
 							Lorem Ipsum
 						</p>
@@ -396,7 +397,7 @@
 
 			<!-- After content row -->
 			<div class="row" style="padding-top: 5px">
-				<div class="col-xs-10 text-right">
+				<div class="col-xs-11 text-right">
 					<p>
 						Port status: &nbsp;
 						<span id="status">
@@ -480,117 +481,67 @@
 	window.page = window.location.hash || "#about";
 
 	$(document).ready(function () {
-	if (window.page != "#about") {
-		$(".menu").find("li[data-target=" + window.page + "]").trigger("click");
-	}
+		if (window.page != "#about") {
+			$(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+		}
 	});
 
 	$(window).on("resize", function () {
-	$("html, body").height($(window).height());
-	$(".main, .menu").height($(window).height() - $(".header-panel").outerHeight());
-	$(".pages").height($(window).height());
+		$("html, body").height($(window).height());
+		$(".main, .menu").height($(window).height() - $(".header-panel").outerHeight());
+		$(".pages").height($(window).height());
 	}).trigger("resize");
 
 	$(".menu li").click(function () {
-	// Menu
-	if (!$(this).data("target")) return;
-	if ($(this).is(".active")) return;
-	$(".menu li").not($(this)).removeClass("active");
-	$(".page").not(page).removeClass("active").hide();
-	window.page = $(this).data("target");
-	var page = $(window.page);
-	window.location.hash = window.page;
-	$(this).addClass("active");
+		// Menu
+		if (!$(this).data("target")) return;
+		if ($(this).is(".active")) return;
+		$(".menu li").not($(this)).removeClass("active");
+		$(".page").not(page).removeClass("active").hide();
+		window.page = $(this).data("target");
+		var page = $(window.page);
+		window.location.hash = window.page;
+		$(this).addClass("active");
 
+		page.show();
 
-	page.show();
+		var totop = setInterval(function () {
+			$(".pages").animate({scrollTop: 0}, 0);
+		}, 1);
 
-	var totop = setInterval(function () {
-		$(".pages").animate({scrollTop: 0}, 0);
-	}, 1);
-
-	setTimeout(function () {
-		page.addClass("active");
 		setTimeout(function () {
-		clearInterval(totop);
-		}, 1000);
-	}, 100);
+			page.addClass("active");
+			setTimeout(function () {
+			clearInterval(totop);
+			}, 1000);
+		}, 100);
 	});
 
 	function cleanSource(html) {
-	var lines = html.split(/\n/);
+		var lines = html.split(/\n/);
 
-	lines.shift();
-	lines.splice(-1, 1);
+		lines.shift();
+		lines.splice(-1, 1);
 
-	var indentSize = lines[0].length - lines[0].trim().length,
-		re = new RegExp(" {" + indentSize + "}");
+		var indentSize = lines[0].length - lines[0].trim().length,
+			re = new RegExp(" {" + indentSize + "}");
 
-	lines = lines.map(function (line) {
-		if (line.match(re)) {
-		line = line.substring(indentSize);
-		}
+		lines = lines.map(function (line) {
+			if (line.match(re)) {
+			line = line.substring(indentSize);
+			}
 
-		return line;
-	});
+			return line;
+		});
 
-	lines = lines.join("\n");
+		lines = lines.join("\n");
 
-	return lines;
+		return lines;
 	}
-
-	$("#opensource").click(function () {
-	$.get(window.location.href, function (data) {
-		var html = $(data).find(window.page).html();
-		html = cleanSource(html);
-		$("#source-modal pre").text(html);
-		$("#source-modal").modal();
-	});
-	});
 </script>
 
 <!-- Twitter Bootstrap -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-<!-- Material Design for Bootstrap -->
-<script src="dist/js/material.js"></script>
-<script src="dist/js/ripples.min.js"></script>
-<script>
-	$.material.init();
-</script>
-
-
-<!-- Sliders -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/noUiSlider/6.2.0/jquery.nouislider.min.js"></script>
-<script>
-	$(function () {
-	$.material.init();
-	$(".shor").noUiSlider({
-		start: 40,
-		connect: "lower",
-		range: {
-		min: 0,
-		max: 100
-		}
-	});
-
-	$(".svert").noUiSlider({
-		orientation: "vertical",
-		start: 40,
-		connect: "lower",
-		range: {
-		min: 0,
-		max: 100
-		}
-	});
-	});
-</script>
-
-<!-- Dropdown.js -->
-<script src="https://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.js"></script>
-<script>
-	$("#dropdown-menu select").dropdown();
-</script>
 
 </body>
 </html>

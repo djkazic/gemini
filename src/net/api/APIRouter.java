@@ -29,7 +29,7 @@ public class APIRouter extends Application {
 	public Restlet landPageRoute = new Restlet() {
 		@Get
 		public String process() {
-			return "Radiator REST API v1.0";
+			return "Gemini REST API v1.0";
 		}
 	};
 

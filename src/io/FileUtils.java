@@ -97,9 +97,9 @@ public class FileUtils {
 		try {
 			directory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath().toString();
 			if(Utilities.isMac()) { 
-				directory += "/Documents/Radiator";
+				directory += "/Documents/Gemini";
 			} else {
-				directory += "/Radiator";
+				directory += "/Gemini";
 			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
@@ -110,7 +110,7 @@ public class FileUtils {
 	public static String getAppDataDir() {
 		String scratchDirectory;
 		if(Utilities.isWindows()) {
-			scratchDirectory = System.getenv("AppData") + "/Radiator";
+			scratchDirectory = System.getenv("AppData") + "/Gemini";
 		} else {
 			scratchDirectory = getWorkspaceDir() + "/.cache";
 		}
