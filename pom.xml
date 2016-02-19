@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com</groupId>
-	<artifactId>radiator</artifactId>
+	<artifactId>gemini</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Radiator</name>
+	<name>Gemini</name>
 
 	<repositories>
 		<repository>
-			<id>radiator-internal</id>
+			<id>gemini-internal</id>
 			<name>Internal Repo</name>
 			<releases>
 				<enabled>true</enabled>

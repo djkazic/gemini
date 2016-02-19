@@ -69,7 +69,7 @@ public class LoadWindow extends JFrame {
 		}
 		contentPane.add(lblNewLabel);
 		
-		status = new JLabel("Starting Radiator");
+		status = new JLabel("Starting Gemini");
 		status.setHorizontalAlignment(SwingConstants.CENTER);
 		status.setBounds(10, 11, 292, 18);
 		contentPane.add(status);
