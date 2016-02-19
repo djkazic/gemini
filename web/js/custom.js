@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	var formNames = [];
-
 	processForms(formNames);
 
 	//Port status update
