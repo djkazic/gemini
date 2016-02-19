@@ -203,3 +203,7 @@ body {
 .table {
 	background-color: #EEE;
 }
+
+.active {
+	background-color: #F6F6F6;
+}
