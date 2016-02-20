@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, minimum-scale=1.5, user-scalable=no">
+    <meta name="description" content="P2P music, simplified.">
+
+    <title>Gemini | Streaming</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Material Design -->
+	<link href="css/bootstrap-material-design.min.css" rel="stylesheet">
+	<link href="css/ripples.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <!-- Material Design fonts -->
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        GEMINI
+                    </a>
+                </li>
+                <br>
+                <li>
+                    <a class="withripple active" href="#">HOME</a>
+                </li>
+                <li>
+                    <a class="withripple" href="#">LIBRARY</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                    	<!-- Search section -->
+                        <h1>Search</h1>
+
+                        <hr>
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search for a song...">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button">Go</button>
+							</span>
+						</div>
+
+						<!-- Table section -->
+						<div class="panel panel-default" style="margin-top: 20px">
+							<!-- Panel heading -->
+							<div class="panel-heading">
+								Search Results
+							</div>
+
+							<!-- Panel contents -->
+							<table class="table table-hover" style="color: rgb(51, 51, 51)">
+								<!-- Table headers -->
+								<thead>
+									<tr>
+										<th># *</th>
+										<th>TRACK</th>
+										<th>ARTIST</th>
+										<th>TIME</th>
+									</tr>
+								</thead>
+
+								<!-- Table body -->
+								<tbody>
+									<tr>
+										<td>1 *</td>
+										<td>Adventure of a Lifetime</td>
+										<td>Coldplay</td>
+										<td>5:34</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="row">
+					<div class="navbar-fixed-bottom">
+						<div class="row">
+                            <div class="col-md-12 text-right" style="padding-left: 40px">
+                                <span id="playControls">
+                                    <button id="play-prev"></button>
+                                    <button id="play"></button>
+                                    <button id="play-next"></button>
+
+                                    <span class="pull-left" id="playingTitle" style="padding-top: 12px; padding-left: 60px">
+                                        <p>Kanye West -- Life of Pablo</p>
+                                    </span>
+
+                                    <span class="pull-right" style="margin-top: 12px; margin-right: 15px">
+                                        <p>Port status: &nbsp;
+                                            <span id="status">
+                                                <span class="label label-default">- - - - - - -</span>
+                                            </span>
+                                            <span id="peerCount" style="padding-left: 10px">
+                                                <img src="img/connect0.png" width="20" height="20">
+                                            </span>
+                                        </p>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+					</div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Material Design -->
+    <script src="js/material.js"></script>
+    <script src="js/ripples.js"></script>
+    <script>
+    	$.material.init();
+    </script>
+
+    <!-- Custom JS -->
+	<script src="js/custom.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
+</html>

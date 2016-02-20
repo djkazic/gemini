@@ -13,6 +13,7 @@ public class Config {
 	//Networking
 	public int tcpPort = 35500;
 	public int discoverPort = 35501;
+	public int webPort = 17380;
 	public boolean cacheEnabled = false;
 	public String generatedMAC = null;
 	

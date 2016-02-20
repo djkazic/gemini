@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com</groupId>
-	<artifactId>radiator</artifactId>
+	<artifactId>gemini</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Radiator</name>
+	<name>Gemini</name>
 
 	<repositories>
 		<repository>
-			<id>radiator-internal</id>
+			<id>gemini-internal</id>
 			<name>Internal Repo</name>
 			<releases>
 				<enabled>true</enabled>
@@ -164,6 +164,11 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.json</artifactId>
+			<version>2.3.3</version>
 		</dependency>
 	</dependencies>
 </project>

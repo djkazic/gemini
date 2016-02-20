@@ -1,12 +1,16 @@
 package atrium;
 
+import java.awt.Desktop;
 import java.net.NetworkInterface;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Random;
 
-import com.esotericsoftware.minlog.Log;
-
 import net.iharder.Base64;
+
+import com.esotericsoftware.minlog.Log;
 
 /**
  * General utility methods class
@@ -20,7 +24,7 @@ public class Utilities {
 	 * @param msg debug message
 	 */
 	public static void log(Object someClass, String msg, boolean debug) {
-		String output = "[" + someClass.getClass().getName() + "]: " + msg;
+		String output = "[" + someClass.getClass().getSimpleName() + "]: " + msg;
 		if(debug) {
 			Log.debug(output);
 		} else {
@@ -40,19 +44,6 @@ public class Utilities {
 		} else {
 			Log.info(output);
 		}
-	}
-	
-	/**
-	 * Primary dynamic switching method for debug; if headless, no GUI out
-	 * @param someClass origin class of debug
-	 * @param msg debug message
-	 * @param debug 
-	 */
-	public static void switchGui(Object someClass, String msg, boolean debug) {
-		if(Core.mainWindow != null) {
-			Core.mainWindow.out(msg);
-		}
-		log(someClass, msg, debug);
 	}
 	
 	/**
@@ -133,5 +124,24 @@ public class Utilities {
 	        sb.append(String.format("%02X%s", macAddr[i], (i < macAddr.length - 1) ? "-" : ""));
 	    }
 	    return sb.toString();
+	}
+	
+	public static void openWebpage(URI uri) {
+	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+	    if(desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	        try {
+	            desktop.browse(uri);
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+	}
+
+	public static void openWebpage(URL url) {
+	    try {
+	        openWebpage(url.toURI());
+	    } catch (URISyntaxException ex) {
+	        ex.printStackTrace();
+	    }
 	}
 }

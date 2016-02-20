@@ -245,7 +245,7 @@ public class BlockedFile {
 	 * @param time value provided
 	 */
 	private void updateTime(String time) {
-		Core.mainWindow.updateTime(checksum, time);
+		//TODO: GUI replace Core.mainWindow.updateTime(checksum, time);
 	}
 	
 	/**
@@ -262,7 +262,7 @@ public class BlockedFile {
 		}
 
 		if(!Core.config.hubMode) {
-			Core.mainWindow.updateProgress(checksum, progress);
+			//TODO: GUI call Core.mainWindow.updateProgress(checksum, progress);
 		}
 	}
 	

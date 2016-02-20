@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="12px" height="14px" viewBox="0 0 12 14" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>Skip</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Player" transform="translate(-2620.000000, -397.000000)" fill="#333333">
+            <path d="M2630,403 L2620,397 L2620,411 L2630,405 L2630,411 L2632,411 L2632,397 L2630,397 L2630,403 Z" id="Skip"></path>
+        </g>
+    </g>
+</svg>

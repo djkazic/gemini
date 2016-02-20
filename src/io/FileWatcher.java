@@ -131,9 +131,12 @@ public class FileWatcher implements Runnable {
 						ex.printStackTrace();
 					}	
 				}
+				//TODO: updateLibrary call
+				/**
 				if(!Core.config.hubMode) {
 					Core.mainWindow.updateLibrary();
 				}
+				 */
 			} else {
 				if(!bfs.getName().endsWith(".filepart")) {
 					Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]", false);
@@ -163,10 +166,13 @@ public class FileWatcher implements Runnable {
 				Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
 				bf.reset();
 				BlockedFile.serializeAll();
+				//TODO: deleteHook
+				/**
 				if(!Core.config.hubMode) {
 					Core.mainWindow.removeDownload(bf);
 					Core.mainWindow.updateLibrary();
 				}
+				 */
 			}
 		} else {
 			for(BlockedFile bf : Core.blockDex) {
@@ -182,10 +188,13 @@ public class FileWatcher implements Runnable {
 					}
 				}
 				BlockedFile.serializeAll();
+				//TODO: deleteHook
+				/**
 				if(!Core.config.hubMode) {
 					Core.mainWindow.removeDownload(bf);
 					Core.mainWindow.updateLibrary();
 				}
+				 */
 			}
 		}
 	}

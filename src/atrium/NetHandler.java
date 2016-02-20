@@ -1,6 +1,5 @@
 package atrium;
 
-import gui.MainWindow;
 import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
@@ -11,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -40,7 +38,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -75,7 +72,7 @@ public class NetHandler {
 		registerServerListeners();
 		checkExtVisibility();
 		checkDestroyServer();
-		checkAndStartMainwindow();
+		//TODO: replace checkAndStartMainwindow();
 	}
 
 	/**
@@ -185,10 +182,10 @@ public class NetHandler {
 			Utilities.log(this, "Registering block listener", false);
 			server.addListener(new BlockListener());
 
-			Utilities.switchGui(this, "Registering server listeners", false);
+			Utilities.log(this, "Registering server listeners", false);
 			server.addListener(new DualListener(1));
 
-			Utilities.switchGui(this, "Starting server component", false);
+			Utilities.log(this, "Starting server component", false);
 			server.bind(Core.config.tcpPort);
 			server.start();
 
@@ -201,12 +198,6 @@ public class NetHandler {
 	private void checkDestroyServer() {
 		if(!Core.config.hubMode && !extVisible) {
 			destroyServerListeners();
-		}
-	}
-
-	private void checkAndStartMainwindow() {
-		if(!Core.config.hubMode) {
-			Core.mainWindow = new MainWindow();
 		}
 	}
 
@@ -291,7 +282,7 @@ public class NetHandler {
 	 */
 	public void peerDiscovery() {
 		try {
-			Utilities.switchGui(this, "Locating peers...", true);
+			Utilities.log(this, "Locating peers...", true);
 			foundHosts = new ArrayList<InetAddress> ();
 			bootstrapDiscovery();
 

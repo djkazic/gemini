@@ -38,10 +38,10 @@ public class FileUtils {
 
 	public static void initDirs() {
 		try {
-			Utilities.log("atrium.FileUtils", "Initializing file worker", false);
+			Utilities.log("FileUtils", "Initializing file worker", false);
 			File findir = new File(getWorkspaceDir());
 			if(!findir.exists()) {
-				Utilities.log("atrium.FileUtils", "Could not find directory, creating", false);
+				Utilities.log("FileUtils", "Could not find directory, creating", false);
 				boolean attempt = false;
 				try {
 					findir.mkdir();
@@ -50,14 +50,14 @@ public class FileUtils {
 					se.printStackTrace();
 				}
 				if(attempt) {
-					Utilities.log("atrium.FileUtils", "Successfully created directory", false);
+					Utilities.log("FileUtils", "Successfully created directory", false);
 				}
 			} else {
-				Utilities.log("atrium.FileUtils", "Found workspace directory", false);
+				Utilities.log("FileUtils", "Found workspace directory", false);
 			}
 			File configDir = new File(getConfigDir());
 			if(!configDir.exists()) {
-				Utilities.log("atrium.FileUtils", "Could not find config directory, creating", false);
+				Utilities.log("FileUtils", "Could not find config directory, creating", false);
 				boolean attempt = false;
 				try {
 					configDir.mkdir();
@@ -66,14 +66,14 @@ public class FileUtils {
 					se.printStackTrace();
 				}
 				if(attempt) {
-					Utilities.log("atrium.FileUtils", "Successfully created config directory", false);
+					Utilities.log("FileUtils", "Successfully created config directory", false);
 				}
 			} else {
-				Utilities.log("atrium.FileUtils", "Found config directory", false);
+				Utilities.log("FileUtils", "Found config directory", false);
 			}
 			File appDataGen = new File(getAppDataDir());
 			if(!appDataGen.exists()) {
-				Utilities.log("atrium.FileUtils", "Could not find appData directory, creating", false);
+				Utilities.log("FileUtils", "Could not find appData directory, creating", false);
 				boolean attempt = false;
 				try {
 					appDataGen.mkdir();
@@ -82,10 +82,10 @@ public class FileUtils {
 					e.printStackTrace();
 				}
 				if(attempt) {
-					Utilities.log("atrium.FileUtils", "Successfully created appData directory", false);
+					Utilities.log("FileUtils", "Successfully created appData directory", false);
 				}
 			} else {
-				Utilities.log("atrium.FileUtils", "Found data directory", false);
+				Utilities.log("FileUtils", "Found data directory", false);
 			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
@@ -97,9 +97,9 @@ public class FileUtils {
 		try {
 			directory = FileSystemView.getFileSystemView().getDefaultDirectory().getPath().toString();
 			if(Utilities.isMac()) { 
-				directory += "/Documents/Radiator";
+				directory += "/Documents/Gemini";
 			} else {
-				directory += "/Radiator";
+				directory += "/Gemini";
 			}
 		} catch(Exception ex) {
 			ex.printStackTrace();
@@ -110,7 +110,7 @@ public class FileUtils {
 	public static String getAppDataDir() {
 		String scratchDirectory;
 		if(Utilities.isWindows()) {
-			scratchDirectory = System.getenv("AppData") + "/Radiator";
+			scratchDirectory = System.getenv("AppData") + "/Gemini";
 		} else {
 			scratchDirectory = getWorkspaceDir() + "/.cache";
 		}
@@ -124,7 +124,7 @@ public class FileUtils {
 	public static File findBlockAppData(BlockedFile foundBlock, String block) {
 		File directory = new File(foundBlock.getBlocksFolder());
 		if(!directory.exists()) {
-			Utilities.log("atrium.FileUtils", "Data directory for origin " + foundBlock.getPointer().getName() + " is not initialized", true);
+			Utilities.log("FileUtils", "Data directory for origin " + foundBlock.getPointer().getName() + " is not initialized", true);
 			return null;
 		}
 		File[] listOfFiles = directory.listFiles();
@@ -136,7 +136,7 @@ public class FileUtils {
 						if(generateChecksum(listOfFiles[i]).equals(block)) {
 							return listOfFiles[i];
 						} else {
-							Utilities.log("atrium.FileUtils", "Checksum mismatch for block", true);
+							Utilities.log("FileUtils", "Checksum mismatch for block", true);
 							return null;
 						}
 					} else {
@@ -181,7 +181,7 @@ public class FileUtils {
 			File encCacheFile = new File(getConfigDir() + "/eblockdex.dat");
 			File cacheFile = new File(getConfigDir() + "/blockdex.dat");
 			if(encCacheFile.exists()) {
-				Utilities.log("atrium.FileUtils", "Attempting to read blockdex cache", false);
+				Utilities.log("FileUtils", "Attempting to read blockdex cache", false);
 				try {
 					byte[] encFileBytes = Files.readAllBytes(encCacheFile.toPath());
 					byte[] decryptedBytes = Core.aes.decrypt(encFileBytes);
@@ -194,7 +194,7 @@ public class FileUtils {
 
 					try {
 						ArrayList<?> uKbf = kryo.readObject(input, ArrayList.class);
-						Utilities.log("atrium.FileUtils", "Read " + uKbf.size() + " entries from cache", true);
+						Utilities.log("FileUtils", "Read " + uKbf.size() + " entries from cache", true);
 						for(int i=0; i < uKbf.size(); i++) {
 							((SerialBlockedFile) uKbf.get(i)).toBlockedFile();
 						}
@@ -229,7 +229,7 @@ public class FileUtils {
 				}
 				File appData = new File(FileUtils.getAppDataDir());
 				if(appData.exists()) {
-					Utilities.log("atrium.FileUtils", "Examining app data directory", false);
+					Utilities.log("FileUtils", "Examining app data directory", false);
 					File[] blockedFileFolders = appData.listFiles();
 					if(blockedFileFolders != null && blockedFileFolders.length > 0) {
 						ArrayList<String> appDataDirectories = new ArrayList<String> ();
@@ -275,7 +275,7 @@ public class FileUtils {
 				actualBfCount = filterPassed.size();
 
 				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() < actualBfCount) {
-					Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+					Utilities.log("FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					+ " but detected " + actualBfCount, false);
 					for(int i=0; i < filterPassed.size(); i++) {
 						if(!filterPassed.get(i).getName().startsWith(".") 
@@ -289,7 +289,7 @@ public class FileUtils {
 				}
 
 				while(Core.blockDex.size() != actualBfCount && Core.blockDex.size() > actualBfCount) {
-					Utilities.log("atrium.FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
+					Utilities.log("FileUtils", "Validity check FAIL, cached " + Core.blockDex.size() 
 					+ " but detected " + actualBfCount, false);
 					for(int i=0; i < Core.blockDex.size(); i++) {
 						BlockedFile curBf = Core.blockDex.get(i);
@@ -310,7 +310,7 @@ public class FileUtils {
 			}
 
 			String checkPassFail = (Core.blockDex.size() == actualBfCount) ? "PASS" : "FAIL";
-			Utilities.log("atrium.FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
+			Utilities.log("FileUtils", "Final validity check: " + checkPassFail + "; cached " + Core.blockDex.size() 
 			+ " and detected " + actualBfCount, false);
 		} catch(Exception ex) {
 			ex.printStackTrace();
@@ -350,7 +350,7 @@ public class FileUtils {
 		File metaFile = new File(getConfigDir() + "/metadex.dat");
 		if(metaFile.exists()) {
 			try {
-				Utilities.log("atrium.FileUtils", "Attempting to read metadex cache", false);
+				Utilities.log("FileUtils", "Attempting to read metadex cache", false);
 				Kryo kryo = new Kryo();
 				Input input = new Input(new FileInputStream(metaFile));
 				ArrayList<?> uMeta = kryo.readObject(input, ArrayList.class);
@@ -524,7 +524,7 @@ public class FileUtils {
 		File[] blocks = new File(bf.getBlocksFolder()).listFiles();
 		if(blocks != null && blocks.length > 0) {
 			if(blocks.length != numberParts) {
-				Utilities.log("atrium.FileUtils", "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")", false);
+				Utilities.log("FileUtils", "Number of blocks present (" + blocks.length + ") != number of parts (" + numberParts + ")", false);
 				out.close();
 				return;
 			}
@@ -553,7 +553,7 @@ public class FileUtils {
 		}
 		blocksDir.delete();
 		if(blocksDir.exists()) {
-			Utilities.log("atrium.FileUtils", "Unable to clear data for " + bf.getPointer().getName(), false);
+			Utilities.log("FileUtils", "Unable to clear data for " + bf.getPointer().getName(), false);
 		}
 		//Set complete flag
 		bf.setComplete(true);
@@ -653,7 +653,7 @@ public class FileUtils {
 			}
 			
 			if(nonCache == 0) {
-				Utilities.log("atrium.FileUtils", "No downloaded files yet, stopping cachepull", false);
+				Utilities.log("FileUtils", "No downloaded files yet, stopping cachepull", false);
 			}
 			return ((cached + estimatedAddition) <= nonCache);
 		}

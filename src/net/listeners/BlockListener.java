@@ -2,8 +2,6 @@ package net.listeners;
 
 import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.Map.Entry;
-
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.util.TcpIdleSender;
 
