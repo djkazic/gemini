@@ -7,17 +7,24 @@
 /* Toggle Styles */
 
 body {
-	background-color: #F6F6F6;
-	min-width: 1200px;
-	width: auto !important;
-	width: 1200px;
+    background-color: #F6F6F6;
+    min-width: 1200px;
+    width: auto !important;
+    width: 1200px;
     font-size: 16px;
 }
 
 .form-control:focus {
-	border-color: #cccccc;
+    border-color: #cccccc;
     -webkit-box-shadow: none;
     box-shadow: none;
+}
+
+.form-group.is-focused .form-control {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#4A4D4D), to(#4A4D4D)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
+    background-image: -webkit-linear-gradient(#4A4D4D, #4A4D4D), -webkit-linear-gradient(#D2D2D2, #D2D2D2);
+    background-image: -o-linear-gradient(#4A4D4D, #4A4D4D), -o-linear-gradient(#D2D2D2, #D2D2D2);
+    background-image: linear-gradient(#4A4D4D, #4A4D4D), linear-gradient(#D2D2D2, #D2D2D2);
 }
 
 #wrapper {
@@ -138,73 +145,73 @@ body {
     }
 
     #play-prev {
-    	-webkit-filter: invert(100%);
+        -webkit-filter: invert(100%);
     }
 
     #play {
-    	-webkit-filter: invert(100%);
+        -webkit-filter: invert(100%);
     }
     
     #play-next {
-    	-webkit-filter: invert(100%);
+        -webkit-filter: invert(100%);
     }
 }
 
 #play-prev {
-	background-position: 40% 50%;
-	display: block;
-	float: left;
-	height: 46px;
-	position: relative;
-	width: 33px;
-	z-index: 0;
+    background-position: 40% 50%;
+    display: block;
+    float: left;
+    height: 46px;
+    position: relative;
+    width: 33px;
+    z-index: 0;
     perspective-origin: 16.5px 23px;
     transform-origin: 16.5px 23px;
-	background: rgba(0, 0, 0, 0) url("../img/play-prev.svg") no-repeat scroll 40% 50% / auto padding-box border-box;
-	border: 0px none rgba(0, 0, 0, 0);
-	list-style: none outside none;
-	outline: rgba(0, 0, 0, 0) none 0px;
+    background: rgba(0, 0, 0, 0) url("../img/play-prev.svg") no-repeat scroll 40% 50% / auto padding-box border-box;
+    border: 0px none rgba(0, 0, 0, 0);
+    list-style: none outside none;
+    outline: rgba(0, 0, 0, 0) none 0px;
 }
 
 #play {
-	background-position: 55% 50%;
-	cursor: pointer;
-	display: block;
-	float: left;
-	height: 46px;
-	position: relative;
-	width: 46px;
-	perspective-origin: 23px 23px;
-	transform-origin: 23px 23px;
-	background: rgba(0, 0, 0, 0) url("../img/play.svg") no-repeat scroll 55% 50% / auto padding-box border-box;
-	border: 0px none rgba(0, 0, 0, 0);
-	font: normal normal normal normal 0px / 0px a;
-	list-style: none outside none;
-	margin: 0px 6px;
-	outline: rgba(0, 0, 0, 0) none 0px;
+    background-position: 55% 50%;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 46px;
+    position: relative;
+    width: 46px;
+    perspective-origin: 23px 23px;
+    transform-origin: 23px 23px;
+    background: rgba(0, 0, 0, 0) url("../img/play.svg") no-repeat scroll 55% 50% / auto padding-box border-box;
+    border: 0px none rgba(0, 0, 0, 0);
+    font: normal normal normal normal 0px / 0px a;
+    list-style: none outside none;
+    margin: 0px 6px;
+    outline: rgba(0, 0, 0, 0) none 0px;
 }
 
 #play-next {
-	background-position: 60% 50%;
-	cursor: pointer;
-	display: block;
-	float: left;
-	height: 46px;
-	position: relative;
-	width: 33px;
-	perspective-origin: 16.5px 23px;
-	transform-origin: 16.5px 23px;
-	background: rgba(0, 0, 0, 0) url("../img/play-next.svg") no-repeat scroll 60% 50% / auto padding-box border-box;
-	border: 0px none rgba(0, 0, 0, 0);
-	font: normal normal normal normal 0px / 0px a;
-	list-style: none outside none;
-	outline: rgba(0, 0, 0, 0) none 0px;
+    background-position: 60% 50%;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 46px;
+    position: relative;
+    width: 33px;
+    perspective-origin: 16.5px 23px;
+    transform-origin: 16.5px 23px;
+    background: rgba(0, 0, 0, 0) url("../img/play-next.svg") no-repeat scroll 60% 50% / auto padding-box border-box;
+    border: 0px none rgba(0, 0, 0, 0);
+    font: normal normal normal normal 0px / 0px a;
+    list-style: none outside none;
+    outline: rgba(0, 0, 0, 0) none 0px;
 }
 
 .table {
-	background-color: #EEE;
+    background-color: #EEE;
 }
 
 .active {
-	background-color: #F6F6F6;
+    background-color: #F6F6F6;
 }
