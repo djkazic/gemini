@@ -8,7 +8,27 @@ $(document).ready(function() {
 	//Peer number update
 	peerCount();
 	setInterval(peerCount, 1500);
+
+	disableAndSetZoom();
 });
+
+function disableAndSetZoom() {
+
+	$(window).keydown(function(event) {
+	    if (event.ctrlKey==true && (event.which == '187'  || event.which == '189')) {
+	    	alert(event.which);
+			event.preventDefault();
+		}
+
+	    $(window).bind('mousewheel DOMMouseScroll', function(event) {
+	        if(event.ctrlKey == true) {
+	            event.preventDefault(); 
+	        }
+	    });
+	});
+
+	//window.parent.document.body.style.zoom = 1.20;
+}
 
 function processForms(formNames) {
 	getAllForms(formNames);

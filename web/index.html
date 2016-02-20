@@ -5,7 +5,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.5, maximum-scale=1.5, minimum-scale=1.5, user-scalable=no">
     <meta name="description" content="P2P music, simplified.">
 
     <title>Gemini | Streaming</title>
@@ -108,29 +108,30 @@
                 <!-- Footer -->
                 <div class="row">
 					<div class="navbar-fixed-bottom">
-						<div class="col-lg-8 text-right" style="padding-left: 25px">
-							<span id="playControls">
-								<button class="withripple" id="play-prev"></button>
-								<button class="withripple" id="play"></button>
-								<button class="withripple" id="play-next"></button>
+						<div class="row">
+                            <div class="col-md-12 text-right" style="padding-left: 40px">
+                                <span id="playControls">
+                                    <button id="play-prev"></button>
+                                    <button id="play"></button>
+                                    <button id="play-next"></button>
 
-								<span class="pull-left" id="playingTitle" style="padding-top: 12px; padding-left: 60px">
-									<p>Kanye West -- Life of Pablo</p>
-								</span>
-							</span>
-						</div>
+                                    <span class="pull-left" id="playingTitle" style="padding-top: 12px; padding-left: 60px">
+                                        <p>Kanye West -- Life of Pablo</p>
+                                    </span>
 
-						<div class="col-lg-4 text-right" style="padding-top: 10px">	
-							<span>
-								Port status: &nbsp;
-								<span id="status">
-									<span class="label label-default">- - - - - - -</span>
-								</span>
-								<span id="peerCount" style="padding-left: 10px">
-									<img src="img/connect0.png" width="20" height="20">
-								</span>
-							</span>
-						</div>
+                                    <span class="pull-right" style="margin-top: 12px; margin-right: 15px">
+                                        <p>Port status: &nbsp;
+                                            <span id="status">
+                                                <span class="label label-default">- - - - - - -</span>
+                                            </span>
+                                            <span id="peerCount" style="padding-left: 10px">
+                                                <img src="img/connect0.png" width="20" height="20">
+                                            </span>
+                                        </p>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
 					</div>
                 </div>
             </div>
