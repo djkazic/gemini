@@ -16,7 +16,6 @@ function disableAndSetZoom() {
 
 	$(window).keydown(function(event) {
 	    if (event.ctrlKey==true && (event.which == '187'  || event.which == '189')) {
-	    	alert(event.which);
 			event.preventDefault();
 		}
 

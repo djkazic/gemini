@@ -215,3 +215,11 @@ body {
 .active {
     background-color: #F6F6F6;
 }
+
+#serverIcon {
+	margin-left: -18px;
+}
+
+.form-group {
+	margin-top: 5px;
+}
