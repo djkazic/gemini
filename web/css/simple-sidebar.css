@@ -222,6 +222,18 @@ body {
 	margin-top: 5px;
 }
 
+.td-minus {
+	width: 35px;
+}
+
 .td-plus {
-	width: 45px;
+	width: 40px;
+}
+
+.td-plus a {
+	color: black;
+}
+
+.td-dubplus {
+	width: 60px;
 }
