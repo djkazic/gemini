@@ -221,3 +221,7 @@ body {
 .form-group {
 	margin-top: 5px;
 }
+
+.td-plus {
+	width: 45px;
+}
