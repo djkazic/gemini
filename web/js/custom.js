@@ -34,7 +34,7 @@ function disableZoom() {
 }
 
 function setHome() {
-	$('#page-text').html($('#home-page').html());
+	$('#page-text').html($('#home-page').html()).append($('#footer-page').html());
 }
 
 function sidebarOps() {
@@ -44,7 +44,7 @@ function sidebarOps() {
 			$('.active').removeClass('active');
 			opt.addClass('active');
 			var newText = $('#' + this.id + '-page');
-			$('#page-text').html(newText.html());
+			$('#page-text').html(newText.html()).append($('#footer-page').html());
 			event.preventDefault();
 		}
 	});
