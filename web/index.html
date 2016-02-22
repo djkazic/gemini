@@ -238,14 +238,14 @@
         <div class="hidden row" id="footer-page">
 			<div class="navbar-fixed-bottom">
 				<div class="row">
-                    <div class="col-md-12 text-right" style="padding-left: 40px">
-                        <span id="playControls">
-                            <button id="play-prev"></button>
-                            <button id="play"></button>
-                            <button id="play-next"></button>
-
-                            <span class="pull-left" id="playingTitle" style="padding-top: 12px; padding-left: 60px">
-                                <p>Kanye West -- Life of Pablo</p>
+                    <div class="col-md-12 text-left">
+                        <span id="play-controls">
+                        	<p class="playing playing-artist">Kanye West</p>
+                        	<p class="playing playing-title">Wolves OG</p>
+                            <div class="play-ctrl-box">
+	                            <button id="play-prev"></button>
+	                            <button id="play"></button>
+	                            <button id="play-next"></button>
                             </span>
 
                             <span class="pull-right" style="margin-top: 12px; margin-right: 15px">
@@ -280,14 +280,6 @@
 
     <!-- Custom JS -->
 	<script src="js/custom.js"></script>
-
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
 
 </body>
 

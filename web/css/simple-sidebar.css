@@ -12,6 +12,7 @@ body {
     width: auto !important;
     width: 1200px;
     font-size: 16px;
+    overflow: hidden;
 }
 
 .form-control:focus {
@@ -47,6 +48,7 @@ body {
     height: 100%;
     margin-left: -180px;
     overflow-y: auto;
+    overflow: hidden;
     background: #000;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -149,6 +151,31 @@ body {
     #play-next {
         -webkit-filter: invert(100%);
     }
+
+    .playing {
+    	color: #999999 !important;
+    }
+}
+
+.playing {
+	color: black;
+	width: 180px;
+	padding-left: 20px;
+	padding-right: 20px;
+	word-wrap: break-word;
+}
+
+.playing-artist {
+	font-size: 15px;
+	margin-bottom: 3px;
+}
+
+.playing-title {
+	font-size: 14px;
+}
+
+.play-ctrl-box {
+	padding-left: 25px;
 }
 
 #play-prev {
