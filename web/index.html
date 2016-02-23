@@ -43,7 +43,7 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="#">
+                    <a href="index.html">
                         GEMINI
                         <i class="fa fa-diamond" id="serverIcon"></i>
                     </a>
@@ -77,14 +77,16 @@
 		        	<!-- Search section -->
 		            <h2>SEARCH</h2>
 
-					<div class="input-group" style="padding-bottom: 5px">
-						<input type="text" class="form-control" placeholder="Search for a song...">
-						<span class="input-group-btn">
-							<button class="btn btn-default" type="button">
-								<i class="fa fa-search"></i>
-							</button>
-						</span>
-					</div>
+                    <form id="search">
+    					<div class="input-group" style="padding-bottom: 5px">
+                            <input type="text" class="form-control" id="search-query" placeholder="Search for a song...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+    					</div>
+                    </form>
 
 					<!-- Table section -->
                     <h4>SEARCH RESULTS</h4>

@@ -8,8 +8,8 @@ $(document).ready(function() {
 	// Sidebar listeners
 	sidebarOps();
 
-	var formNames = [];
-	processForms(formNames);
+	// Form hooks
+	hookAllForms();
 
 	// Port status update
 	pollStatus();
@@ -50,32 +50,29 @@ function sidebarOps() {
 	});
 }
 
-function processForms(formNames) {
-	getAllForms(formNames);
-
-	//Iterate through forms, attaching submit listeners
-	for (i = 0; i < formNames.length; i++) {
-		var thisForm = formNames[i];
-		var switcher = '#' + thisForm.id;
-
-		//Switcher
-		switch (switcher) {
-			case '#searchForm':
-				$(switcher).submit(function(event) {
-					console.log("Handler attch");
-					event.preventDefault();
-				});
-				break;
-
-			default:
-				//alert('default');
-		}
-	}
-}
-
-function getAllForms(forms) {
+function hookAllForms() {
+	var seen = {};
 	$('form').each(function() {
-		forms.push(this);
+		var id = this.id;
+		if (seen[id]) {
+			$(this).remove();
+		} else {
+			seen[id] = true;
+			var idObj = '#' + id;
+			switch (id) {
+				case 'search':
+					$(idObj).on('submit', function() {
+						$('#search-query').val('');
+						//alert("Handler triggered");
+						return false;
+					});
+					break;
+
+				default:
+					alert('default');
+					alert(this.id);
+			}
+		}
 	});
 }
 
