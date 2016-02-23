@@ -1,5 +1,8 @@
 package net.api;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.resource.Get;
@@ -7,6 +10,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import atrium.Core;
+import atrium.NetHandler;
 import atrium.Utilities;
 
 /**
@@ -39,6 +43,21 @@ public class Bridge extends ServerResource {
 
 						case "peer_count":
 							responseJSON.put("value", Core.peers.size());
+							break;
+							
+						case "search":
+							try {
+								String query = json.getString("query");
+								ArrayList<String[]> searchResults = NetHandler.doSearch(query);
+								JSONArray results = new JSONArray();
+								for(int i=0; i < searchResults.size(); i++) {
+									results.put(0, searchResults.get(i));
+								}
+								responseJSON.put("value", results);
+							} catch (Exception ex) {
+								Utilities.log(this, "rpc_search error: " + ex.getMessage(), false);
+								responseJSON.put("error", ex.getMessage());
+							}
 							break;
 
 						default:

@@ -14,6 +14,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import atrium.Core;
+import atrium.NetHandler;
 import atrium.Peer;
 import atrium.Utilities;
 import crypto.RSA;
@@ -444,10 +445,10 @@ public class DualListener extends Listener {
 												
 												if(metaScore != null) {
 													//TODO: row add
-													//Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, metaScore});
+													NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum, metaScore});
 												} else {
 													//TODO: row add
-													//Core.mainWindow.addRowToSearchModel(new String[] {name, sizeEstimate, checksum, "-"});
+													NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum, "-"});
 												}
 											}
 										}

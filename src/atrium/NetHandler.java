@@ -56,9 +56,10 @@ import com.esotericsoftware.kryonet.Server;
  */
 public class NetHandler {
 
-	public static String externalIp;             //External IP, as reported by web API
-	public static boolean extVisible;            //External visibility
-	public static List<InetAddress> foundHosts;  //Hosts discovered by LAN
+	public static String externalIp;                     //External IP, as reported by web API
+	public static boolean extVisible;                    //External visibility
+	public static List<InetAddress> foundHosts;          //Hosts discovered by LAN
+	public static ArrayList<String[]> searchResults;     //Temporary container for search res rows
 
 	//Instance variable for internal server
 	private Server server;
@@ -232,10 +233,17 @@ public class NetHandler {
 	 * Broadcasts a search request to connected peers
 	 * @param keyword Keyword string provided
 	 */
-	public static void doSearch(String keyword) {
-		for(Peer peer : Core.peers) {
-			peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
+	public static ArrayList<String[]> doSearch(String keyword) {
+		searchResults = new ArrayList<String[]> (); // TODO: optimize
+		try {
+			for(Peer peer : Core.peers) {
+				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
+			}
+			Thread.sleep(15 * 1000); // 15 second wait
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
+		return searchResults;
 	}
 
 	/**
