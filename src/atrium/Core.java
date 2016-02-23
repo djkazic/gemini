@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.api.APIRouter;
-import net.web.WebServer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -175,14 +174,6 @@ public class Core {
 		}
 		netHandler = new NetHandler();
 		
-		//Start webServer
-		Utilities.switchGui("Core", "Initializing internal server", false);
-		if(loadWindow != null) {
-			loadWindow.setProgress(90);
-		}
-		Thread webServerThread = new Thread(new WebServer());
-		webServerThread.start();
-		
 		//Start APIRouter
 		Utilities.switchGui("Core", "Initializing API router", false);
 		if(loadWindow != null) {
@@ -197,8 +188,11 @@ public class Core {
 		
 		//Open browser window (if this is not headless)
 		try {
+			File index = new File("web/index.html");
 			if(!Core.config.hubMode) {
-				Utilities.openWebpage(new URL("http://localhost:" + Core.config.webPort));
+				if(index.exists()) {
+					Utilities.openWebpage(new URL("file:///" + index.getAbsolutePath()));
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
