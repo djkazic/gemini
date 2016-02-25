@@ -50,15 +50,19 @@ function hookAllForms() {
 						// TODO: actually populating table
 						//
 
-						$.ajax({
-							url: 'http://localhost:8888/api',
-							method: 'POST',
-							data: JSON.stringify(dataPack)
-						}).done(function(result) {
-							$('#search-results').html(JSON.parse(result).value);
-							$('#search-results').removeClass('text-center');
-							console.log(result);
-						});
+						if(connected()) {
+							$.ajax({
+								url: 'http://localhost:8888/api',
+								method: 'POST',
+								data: JSON.stringify(dataPack)
+							}).done(function(result) {
+								$('#search-results').html(JSON.parse(result).value);
+								$('#search-results').removeClass('text-center');
+								console.log(result);
+							});
+						} else {
+							$('#search-results').html("No connection :(");
+						}
 						return false;
 					});
 					break;
