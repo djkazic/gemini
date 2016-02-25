@@ -56,6 +56,7 @@ function hookAllForms() {
 								method: 'POST',
 								data: JSON.stringify(dataPack)
 							}).done(function(result) {
+								lastOnline = Date.now();
 								$('#search-results').html(JSON.parse(result).value);
 								$('#search-results').removeClass('text-center');
 								console.log(result);
@@ -129,6 +130,7 @@ function peerCount() {
 			method: 'POST',
 			data: '{ "rpc": "peer_count" }'
 		}).done(function(result) {
+			lastOnline = Date.now();
 			result = JSON.parse(result);
 			var peerCount = Number(result.value);
 			var imageSrc;
@@ -151,10 +153,7 @@ function peerCount() {
 }
 
 function connected() {
-	var res = (lastOnline < 0 || ((lastOnline + 1000) > Date.now()))
-	if(lastOnline = -1) {
-		lastOnline = 0;
-	}
+	var res = (lastOnline < 0 || ((lastOnline + 2000) > Date.now()))
 	return res;
 }
 
