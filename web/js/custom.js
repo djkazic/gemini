@@ -112,9 +112,9 @@ function pollStatus() {
 			} else {
 				$('#status').html("<span class=\"label label-danger\">CLOSED</span>");
 			}
-		}).fail(function() {
-			$('#status').html("<span class=\"label label-default\">- - - - - - -</span>");
 		});
+	} else {
+		$('#status').html("<span class=\"label label-default\">- - - - - - -</span>");
 	}
 }
 
@@ -125,7 +125,6 @@ function peerCount() {
 			method: 'POST',
 			data: '{ "rpc": "peer_count" }'
 		}).done(function(result) {
-			lastOnline = Date.now();
 			result = JSON.parse(result);
 			var peerCount = Number(result.value);
 			var imageSrc;
@@ -141,14 +140,18 @@ function peerCount() {
 				imageSrc = 'img/connect4.png';
 			}
 			$('#peerCount').html("<img src=\"" + imageSrc + "\" width=20 height=20>");
-		}).fail(function() {
-			$('#peerCount').html("<img src=\"" + 'img/connect0.png' + "\" width=20 height=20>");
 		});
+	} else {
+		$('#peerCount').html("<img src=\"" + 'img/connect0.png' + "\" width=20 height=20>");
 	}
 }
 
 function connected() {
-	return (lastOnline < 0 || lastOnline + 1000 > Date.now());
+	var res = (lastOnline < 0 || ((lastOnline + 1000) > Date.now()))
+	if(lastOnline = -1) {
+		lastOnline = 0;
+	}
+	return res;
 }
 
 // Debug jQuery plugin for listing classes
