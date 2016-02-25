@@ -268,3 +268,7 @@ body {
 .search-panel {
     margin-top: 10px;
 }
+
+.loader {
+    margin-top: 125px;
+}

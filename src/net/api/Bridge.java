@@ -49,11 +49,42 @@ public class Bridge extends ServerResource {
 							try {
 								String query = json.getString("query");
 								ArrayList<String[]> searchResults = NetHandler.doSearch(query);
-								JSONArray results = new JSONArray();
-								for(int i=0; i < searchResults.size(); i++) {
-									results.put(0, searchResults.get(i));
-								}
-								responseJSON.put("value", results);
+								String tableHTML = "<h4>SEARCH RESULTS</h4><div class=\"panel panel-default search-panel\">"
+												+ "<table class=\"table table-hover\" style=color:#333>"
+													+ "<thead><tr><th>#<th><th>TRACK<th>ARTIST<th>TIME<th></thead>"
+													+ "</table>"
+												+ "</div>"
+												+ "<tbody>";
+
+												for(int i=0; i < searchResults.size(); i++) {
+													tableHTML += 
+															"<tr>"
+														   		+ "<td class=\"td-minus\">" + (i + 1) + "</td>"
+														   		+ "<td class=\"td-plus\">"
+														   			+ "<a href=\"#\">"
+														   				+ "<i class=\"fa fa-play-circle-o\"></i>"
+														   			+ "</a>"
+														   		+ "</td>"
+														   		+ "<td>"
+														   			+ "Test Title"
+														   		+ "</td>"
+														   		+ "<td>"
+														   			+ "Test Artist"
+														   		+ "</td>"
+														   		+ "<td class=\"td-dubplus\">"
+														   			+ "1:23"
+														   		+ "</td>"
+														   		+ "<td class=\"td-plus\">"
+														   			+ "<a href=\"#\""
+														   				+ "<i class=\"fa fa-check-circle-o\"></i>"
+														   			+ "</a"
+														   		+ "</td>"
+														   + "</tr>";
+												}
+								
+								     tableHTML += "</tbody>"
+												+ "</table>";
+								responseJSON.put("value", tableHTML);
 							} catch (Exception ex) {
 								Utilities.log(this, "rpc_search error: " + ex.getMessage(), false);
 								responseJSON.put("error", ex.getMessage());

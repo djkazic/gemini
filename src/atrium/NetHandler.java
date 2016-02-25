@@ -239,7 +239,8 @@ public class NetHandler {
 			for(Peer peer : Core.peers) {
 				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 			}
-			Thread.sleep(15 * 1000); // 15 second wait
+			Thread.sleep(4000); // 4 second wait
+			System.out.println("Returning data.");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
