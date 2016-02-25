@@ -1,6 +1,11 @@
+var lastOnline = -1;
+
 $(document).ready(function() {
 	// Set initial page as Home
 	setHome();
+
+	// Form hooks
+	hookAllForms();
 
 	// Disable user zoom
 	disableZoom();
@@ -8,16 +13,63 @@ $(document).ready(function() {
 	// Sidebar listeners
 	sidebarOps();
 
-	// Form hooks
-	hookAllForms();
-
 	// Port status update
-	pollStatus();
+	setInterval(pollStatus, 1500);
 	
 	// Peer number update
-	peerCount();
 	setInterval(peerCount, 1500);
 });
+
+function setHome() {
+	$('#page-text').html($('#home-page').html()).append($('#footer-page').html());
+}
+
+function hookAllForms() {
+	var seen = {};
+	$('form').each(function() {
+		var id = this.id;
+		if (seen[id]) {
+			$(this).remove();
+		} else {
+			seen[id] = true;
+			var idObj = '#' + id;
+			switch (id) {
+				case 'search':
+					$(idObj).on('submit', function() {
+						var query = $('#search-query').val();
+						var dataPack = {
+							"rpc": "search",
+							"query": query
+						};
+
+						$('#search-query').val('');
+						$('#search-results').removeClass('hidden');
+						var loadGif = "<img class=\"loader\" src=\"img/loading.gif\">";
+						$('#search-results').html(loadGif);
+						
+						// TODO: actually populating table
+						//
+
+						$.ajax({
+							url: 'http://localhost:8888/api',
+							method: 'POST',
+							data: JSON.stringify(dataPack)
+						}).done(function(result) {
+							$('#search-results').html(JSON.parse(result).value);
+							$('#search-results').removeClass('text-center');
+							console.log(result);
+						});
+						return false;
+					});
+					break;
+
+				default:
+					alert('default');
+					alert(this.id);
+			}
+		}
+	});
+}
 
 function disableZoom() {
 	$(window).keydown(function(event) {
@@ -33,10 +85,6 @@ function disableZoom() {
 	});
 }
 
-function setHome() {
-	$('#page-text').html($('#home-page').html()).append($('#footer-page').html());
-}
-
 function sidebarOps() {
 	$('.sidebar-nav li a').click(function(event) {
 		var opt = $(this);
@@ -50,68 +98,57 @@ function sidebarOps() {
 	});
 }
 
-function hookAllForms() {
-	var seen = {};
-	$('form').each(function() {
-		var id = this.id;
-		if (seen[id]) {
-			$(this).remove();
-		} else {
-			seen[id] = true;
-			var idObj = '#' + id;
-			switch (id) {
-				case 'search':
-					$(idObj).on('submit', function() {
-						$('#search-query').val('');
-						//alert("Handler triggered");
-						return false;
-					});
-					break;
-
-				default:
-					alert('default');
-					alert(this.id);
-			}
-		}
-	});
-}
-
 function pollStatus() {
-	$.ajax({
-		url: 'http://localhost:8888/api',
-		method: 'POST',
-		data: '{ "rpc": "port_check" }'
-	}).done(function(result) {
-		if (result.value) {
-			$('#status').html("<span class=\"label label-success\">OPEN</span>");
-		} else {
-			$('#status').html("<span class=\"label label-danger\">CLOSED</span>");
-		}
-	});
+	if(connected()) {
+		$.ajax({
+			url: 'http://localhost:8888/api',
+			timeout: 1000,
+			method: 'POST',
+			data: '{ "rpc": "port_check" }'
+		}).done(function(result) {
+			lastOnline = Date.now();
+			if (result.value) {
+				$('#status').html("<span class=\"label label-success\">OPEN</span>");
+			} else {
+				$('#status').html("<span class=\"label label-danger\">CLOSED</span>");
+			}
+		}).fail(function() {
+			$('#status').html("<span class=\"label label-default\">- - - - - - -</span>");
+		});
+	}
 }
 
 function peerCount() {
-	$.ajax({
-		url: 'http://localhost:8888/api',
-		method: 'POST',
-		data: '{ "rpc": "peer_count" }'
-	}).done(function(result) {
-		result = JSON.parse(result);
-		var peerCount = Number(result.value);
-		var imageSrc;
-		if(peerCount == 0) {
-			imageSrc = 'img/connect0.png';
-		} else if (peerCount > 0 && peerCount <= 2) {
-			imageSrc = 'img/connect1.png';
-		} else if (peerCount > 2 && peerCount <= 4) {
-			imageSrc = 'img/connect2.png';
-		} else if (peerCount > 4 && peerCount <= 6) {
-			imageSrc = 'img/connect3.png';
-		} else if (peerCount > 6) {
-			imageSrc = 'img/connect4.png';
-		}
-		$('#peerCount').html("<img src=\"" + imageSrc + "\" width=20 height=20>");
-	});
+	if(connected()) {
+		$.ajax({
+			url: 'http://localhost:8888/api',
+			method: 'POST',
+			data: '{ "rpc": "peer_count" }'
+		}).done(function(result) {
+			lastOnline = Date.now();
+			result = JSON.parse(result);
+			var peerCount = Number(result.value);
+			var imageSrc;
+			if(peerCount == 0) {
+				imageSrc = 'img/connect0.png';
+			} else if (peerCount > 0 && peerCount <= 2) {
+				imageSrc = 'img/connect1.png';
+			} else if (peerCount > 2 && peerCount <= 4) {
+				imageSrc = 'img/connect2.png';
+			} else if (peerCount > 4 && peerCount <= 6) {
+				imageSrc = 'img/connect3.png';
+			} else if (peerCount > 6) {
+				imageSrc = 'img/connect4.png';
+			}
+			$('#peerCount').html("<img src=\"" + imageSrc + "\" width=20 height=20>");
+		}).fail(function() {
+			$('#peerCount').html("<img src=\"" + 'img/connect0.png' + "\" width=20 height=20>");
+		});
+	}
+}
+
+function connected() {
+	return (lastOnline < 0 || lastOnline + 1000 > Date.now());
 }
 
 // Debug jQuery plugin for listing classes
