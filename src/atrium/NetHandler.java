@@ -240,7 +240,7 @@ public class NetHandler {
 				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 			}
 			Thread.sleep(4000); // 4 second wait
-			System.out.println("Returning data.");
+			Utilities.log("NetHandler", "Returning search data to API", false);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
