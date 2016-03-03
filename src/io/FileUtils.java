@@ -635,4 +635,15 @@ public class FileUtils {
 			return ((cached + estimatedAddition) <= nonCache);
 		}
 	}
+	
+	public static String getExtension(String input) {
+		int ind = input.lastIndexOf(".");
+		if(ind > 0) {
+			String extension = input.substring(ind + 1);
+			return extension.toLowerCase();
+		} else {
+			Utilities.log("filter.FilterUtils", "Rejected [" + input + "]", true);
+			return null;
+		}
+	}
 }

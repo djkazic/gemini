@@ -1,5 +1,7 @@
 package filter;
 
+import io.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,13 +53,12 @@ public class FilterUtils {
 				return false;
 			}
 		}
-		int ind = input.lastIndexOf(".");
-		if(ind > 0) {
-			String extension = input.substring(ind + 1);
-			return extensionFilter.contains(extension.toLowerCase());
-		} else {
-			Utilities.log("filter.FilterUtils", "Rejected [" + input + "]", true);
+		
+		String ext = FileUtils.getExtension(input);
+		if(ext == null) {
 			return false;
+		} else {
+			return extensionFilter.contains(ext.toLowerCase());
 		}
 	}
 	
