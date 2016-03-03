@@ -331,6 +331,14 @@ public class BlockedFile {
 		} 
 		return null;
 	}
+	
+	public String getSignature() {
+		return signature;
+	}
+	
+	public void setSignature(String in) {
+		signature = in;
+	}
 
 	/**
 	 * Converts this BlockedFile to SerialBlockedFile for serialization

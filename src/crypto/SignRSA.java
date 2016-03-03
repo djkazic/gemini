@@ -1,5 +1,7 @@
 package crypto;
 
+import io.block.BlockedFile;
+
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -32,12 +34,12 @@ public class SignRSA {
 	 * @param signature
 	 * @return
 	 */
-	public boolean verify(String in, String signature) {
+	public boolean verify(BlockedFile bf) {
 		try {
 			Signature sig = Signature.getInstance("SHA1WithRSA");
 			sig.initVerify(pubkey);
-			sig.update(in.getBytes("UTF8"));
-			return sig.verify(signature.getBytes("ISO-8859-1"));
+			sig.update(bf.getChecksum().getBytes("UTF8"));
+			return sig.verify(bf.getSignature().getBytes("ISO-8859-1"));
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}

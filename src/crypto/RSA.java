@@ -1,5 +1,7 @@
 package crypto;
 
+import io.block.BlockedFile;
+
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -88,19 +90,18 @@ public class RSA {
 	 * @param in
 	 * @return
 	 */
-	public String sign(String in) {
+	public void sign(BlockedFile bf) {
 		try {
-			byte[] data = in.getBytes("UTF8");
+			byte[] data = bf.getChecksum().getBytes("UTF8");
 
 	        Signature sig = Signature.getInstance("SHA1WithRSA");
 	        sig.initSign(myPair.getPrivate());
 	        sig.update(data);
 	        byte[] signatureBytes = sig.sign();
-	        return new String(signatureBytes, "ISO-8859-1");
+	        bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
-		return null;
 	}
 	
 	public PublicKey rawPublicKey() {

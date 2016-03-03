@@ -96,8 +96,8 @@ public class Core {
 		}
 		mutex = Utilities.getMutex();
 		
-		//Initialize crypto routines
-		Utilities.switchGui("Core", "Initializing RSA / AES", false);
+		//Initialize crypto RSA
+		Utilities.switchGui("Core", "Initializing RSA", false);
 		if(loadWindow != null) {
 			loadWindow.setProgress(10);
 		}
@@ -105,13 +105,11 @@ public class Core {
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
 		else 
 			rsa = new RSA();
-		
 		keySignRSA = new ArrayList<SignRSA> ();
 		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/signkeys");
 		if(!keyFolder.exists()) {
 			keyFolder.mkdir();
 		}
-
 		File[] files = keyFolder.listFiles();
 		if(files != null && files.length > 0) {
 			for(File file : files) {
@@ -127,9 +125,12 @@ public class Core {
 				}
 			}
 		}
+		
+		//Initialize crypto AES
+		Utilities.switchGui("Core", "Initializing AES", false);
 		aes = new AES(mutex);
 		if(loadWindow != null) {
-			loadWindow.setProgress(15);
+			loadWindow.setProgress(20);
 		}
 		
 		//File directory checks
