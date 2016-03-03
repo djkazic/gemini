@@ -31,7 +31,8 @@ public class BlockedFile {
 	private String progress;
 	private float blockRate;
 	private long lastChecked;
-	private boolean cache;
+	private boolean cacheStatus;
+	private long length;
 	
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -97,7 +98,7 @@ public class BlockedFile {
 		this.progress = progress;
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
-		this.cache = cache;
+		this.cacheStatus = cache;
 		if(!FileUtils.haveInBlockDex(pointer)) {
 			Core.blockDex.add(this);
 		}
@@ -308,12 +309,12 @@ public class BlockedFile {
 		progress = str;
 	}
 	
-	public boolean getCache() {
-		return cache;
+	public boolean getCacheStatus() {
+		return cacheStatus;
 	}
 	
-	public void setCache(boolean in) {
-		cache = in;
+	public void setCacheStatus(boolean in) {
+		cacheStatus = in;
 	}
 	
 	/**
@@ -335,7 +336,7 @@ public class BlockedFile {
 	 */
 	public SerialBlockedFile toSerialBlockedFile() {
 		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
-								     complete, progress, blockRate, lastChecked, cache);
+								     complete, progress, blockRate, lastChecked, cacheStatus);
 	}
 	
 	/**
@@ -359,6 +360,10 @@ public class BlockedFile {
 		return pointer.getName() + " | " + 
 			   blockList + " " + blackList + " | " + complete + " | " + progress 
 			   + " | " + blockRate + " | " + lastChecked;
+	}
+	
+	public long length() {
+		return length;
 	}
 	
 	public void reset() {

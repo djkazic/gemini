@@ -622,7 +622,7 @@ public class FileUtils {
 			long cached = 0;
 			
 			for(BlockedFile bf : Core.blockDex) {
-				if(bf.getCache()) {
+				if(bf.getCacheStatus()) {
 					cached += (bf.getBlacklist().size() * Core.blockSize);
 				} else {
 					nonCache += bf.getPointer().length();

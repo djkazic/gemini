@@ -92,7 +92,7 @@ public class Downloader implements Runnable {
 			}
 
 			download = false;
-			if(Core.config.hubMode || blockedFile.getCache()) {
+			if(Core.config.hubMode || blockedFile.getCacheStatus()) {
 				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
 			} else {
 				Utilities.log(this, "Assembling BlockedFile: " + blockedFile.getPointer().getName(), true);

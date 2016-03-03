@@ -464,7 +464,7 @@ public class DualListener extends Listener {
 									if(o instanceof StreamedBlockedFile) {
 										StreamedBlockedFile sbl = (StreamedBlockedFile) o;
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
-										intermediate.setCache(true);
+										intermediate.setCacheStatus(true);
 										
 										if(FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
 											BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
