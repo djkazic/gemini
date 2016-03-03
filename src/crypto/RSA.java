@@ -83,6 +83,11 @@ public class RSA {
 		return null;
 	}
 	
+	/**
+	 * Signs a file with this private key
+	 * @param in
+	 * @return
+	 */
 	public String sign(String in) {
 		try {
 			byte[] data = in.getBytes("UTF8");
@@ -98,6 +103,13 @@ public class RSA {
 		return null;
 	}
 	
+	/**
+	 * Verifies if a file has been signed by this key
+	 * @param in
+	 * @param pk
+	 * @param signature
+	 * @return
+	 */
 	public boolean verify(String in, PublicKey pk, String signature) {
 		try {
 			Signature sig = Signature.getInstance("SHA1WithRSA");
