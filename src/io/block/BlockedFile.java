@@ -58,7 +58,7 @@ public class BlockedFile {
 	}
 	
 	/**
-	 * Constructor for not yet existent BlockedFile
+	 * Constructor for StreamedBlockedFile conversion back
 	 * @param pointer string pointer for File
 	 * @param blockList ArrayList<String> of block names
 	 */
