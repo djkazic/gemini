@@ -29,7 +29,6 @@ import atrium.Core;
 import atrium.Utilities;
 import filter.FilterUtils;
 import io.block.BlockedFile;
-import io.block.Metadata;
 import io.serialize.SerialBlockedFile;
 
 public class FileUtils {
@@ -344,28 +343,6 @@ public class FileUtils {
 		}
 		return output;
 		
-	}
-	
-	public static void loadMetaIndex() {
-		File metaFile = new File(getConfigDir() + "/metadex.dat");
-		if(metaFile.exists()) {
-			try {
-				Utilities.log("FileUtils", "Attempting to read metadex cache", false);
-				Kryo kryo = new Kryo();
-				Input input = new Input(new FileInputStream(metaFile));
-				ArrayList<?> uMeta = kryo.readObject(input, ArrayList.class);
-				ArrayList<Metadata> finalList = new ArrayList<Metadata> ();
-				for(int i=0; i < uMeta.size(); i++) {
-					Object o = uMeta.get(i);
-					if(o instanceof Metadata) {
-						finalList.add((Metadata) o);
-					}
-				}
-				Core.metaDex = finalList;
-			} catch(Exception ex) {
-				ex.printStackTrace();
-			}
-		}
 	}
 	
 	private static void processDir(File preDef) throws InterruptedException, IOException {

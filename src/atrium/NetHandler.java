@@ -1,6 +1,5 @@
 package atrium;
 
-import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 
@@ -282,7 +281,6 @@ public class NetHandler {
 		kryo.register(Request.class);
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
-		kryo.register(Metadata.class);	
 	}
 
 	/**

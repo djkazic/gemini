@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import crypto.AES;
 import io.block.BlockedFile;
-import io.block.Metadata;
 
 /**
  * Representation of a BlockedFile for transmission
@@ -16,21 +15,18 @@ public class StreamedBlockedFile {
 	private String pointerName;
 	private String checksum;
 	private ArrayList<String> blockList;
-	private Metadata metadata;
 	
 	public StreamedBlockedFile() {
 		pointerName = null;
 		checksum = null;
 		blockList = null;
-		metadata = null;
 	}
 	
 	public StreamedBlockedFile(String encryptedPointerName, String encryptedChecksum, 
-							   ArrayList<String> encryptedBlockList, Metadata metadata) {
+							   ArrayList<String> encryptedBlockList) {
 		pointerName = encryptedPointerName;
 		checksum = encryptedChecksum;
 		blockList = encryptedBlockList;
-		this.metadata = metadata;
 	}
 	
 	public BlockedFile toBlockedFile(AES aes) {
@@ -38,13 +34,6 @@ public class StreamedBlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
-		if(hasMetadata()) {
-			metadata.metaDexCheck();
-		}
 		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, false);
-	}
-	
-	public boolean hasMetadata() {
-		return metadata != null;
 	}
 }

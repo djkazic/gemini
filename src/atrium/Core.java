@@ -21,8 +21,6 @@ import gui.LoadWindow;
 import io.FileUtils;
 import io.FileWatcher;
 import io.block.BlockedFile;
-import io.block.Metadata;
-
 /**
  * Holds centralized data (variables and instances)
  * @author Kevin Cai
@@ -35,7 +33,6 @@ public class Core {
 	public static NetHandler netHandler;
 	public static LoadWindow loadWindow;
 	public static ArrayList<BlockedFile> blockDex;
-	public static ArrayList<Metadata> metaDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 	
 	public static int blockSize = 256000;
@@ -147,37 +144,28 @@ public class Core {
 		if(loadWindow != null) {
 			loadWindow.setProgress(60);
 		}
-		metaDex = new ArrayList<Metadata> ();
 		blockDex = new ArrayList<BlockedFile> ();
 		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
 		peers = new ArrayList<Peer> ();
 		
-		//Load meta index
-		Utilities.switchGui("Core", "Loading metadata index", false);
-		if(loadWindow != null) {
-			loadWindow.setProgress(70);
-		}
-		FileUtils.loadMetaIndex();
-		Utilities.log("Core", "Number of metadata objects: " + Core.metaDex.size(), false);
-		
 		//Generate block index
 		Utilities.switchGui("Core", "Generating block index", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(75);
+			loadWindow.setProgress(65);
 		}
 		FileUtils.genBlockIndex();
 		
 		//Initialize NetHandler object
 		Utilities.switchGui("Core", "Initializing networking", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(85);
+			loadWindow.setProgress(70);
 		}
 		netHandler = new NetHandler();
 		
 		//Start APIRouter
 		Utilities.switchGui("Core", "Initializing API router", false);
 		if(loadWindow != null) {
-			loadWindow.setProgress(95);
+			loadWindow.setProgress(80);
 		}
 		APIRouter.init();
 		

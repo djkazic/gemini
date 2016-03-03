@@ -4,8 +4,6 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,7 +20,6 @@ import filter.FilterUtils;
 import io.Downloader;
 import io.FileUtils;
 import io.block.BlockedFile;
-import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 import packets.data.Data;
@@ -252,53 +249,6 @@ public class DualListener extends Listener {
 						}
 					});
 					break;
-					
-				case RequestTypes.METADATA:
-					Utilities.log(this, "Received request for metadata feed", false);
-					replyPool.execute(new Runnable() {
-						public void run() {
-							HashMap<String, Long> preMetas = new HashMap<String, Long> ();
-							for(Metadata md : Core.metaDex) {
-								preMetas.put(md.getChecksum(), md.getTime());
-							}
-							connection.sendTCP(new Data(DataTypes.METADATA, preMetas));
-							Utilities.log(this, "\tSent metadata search results back", false);
-						}
-					});
-					break;
-					
-				case RequestTypes.METAPULL:
-					Utilities.log(this, "Received request for metadata pull", false);
-					replyPool.execute(new Runnable() {
-						public void run() {
-							Object oMetaPull = request.getPayload();
-							
-							ArrayList<String> metasNeeded = new ArrayList<String> ();
-							if(oMetaPull instanceof ArrayList<?>) {
-								ArrayList<?> potentialMetas = (ArrayList<?>) oMetaPull;
-								for(Object o : potentialMetas) {
-									if(o instanceof String) {
-										metasNeeded.add((String) o);
-									}
-								}
-								
-								if(metasNeeded.size() > 0) {
-									ArrayList<Metadata> metasFinalSend = new ArrayList<Metadata> ();
-									for(Metadata md : Core.metaDex) {
-										String checksum = md.getChecksum();
-										if(metasNeeded.contains(checksum)) {
-											metasFinalSend.add(md.encrypted());
-										}
-									}
-									Utilities.log(this, "Sending back data for cache pull, package size " + metasFinalSend.size(), false);
-									foundPeer.getConnection().sendTCP(new Data(DataTypes.METAPULL, metasFinalSend));
-								} else {
-									Utilities.log(this, "No metadata available to send", false);
-								}
-							}
-						}
-					});
-					break;
 			}
 		} else if(object instanceof Data) {
 			final Data data = (Data) object;
@@ -414,16 +364,6 @@ public class DualListener extends Listener {
 										String name = intermediate.getPointer().getName();
 										if(FilterUtils.mandatoryFilter(name)) {
 											String checksum = intermediate.getChecksum();
-											String metaScore = null;
-											Metadata chosenMeta = null;
-											for(Metadata meta : Core.metaDex) {
-												if(meta.matchBf(intermediate.getChecksum())) {
-													chosenMeta = meta;
-												}
-											}
-											if(chosenMeta != null) {
-												metaScore = "" + chosenMeta.getScore();
-											}
 											
 											//TODO: URGENT [haveSearchAlready container]
 											//if(!Core.mainWindow.haveSearchAlready(checksum)) {
@@ -443,13 +383,7 @@ public class DualListener extends Listener {
 													sizeEstimate += estimateKb + "KB";
 												}
 												
-												if(metaScore != null) {
-													//TODO: row add
-													NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum, metaScore});
-												} else {
-													//TODO: row add
-													NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum, "-"});
-												}
+												NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum});
 											}
 										}
 									}
@@ -552,75 +486,6 @@ public class DualListener extends Listener {
 						public void run() {
 							int hostPortData = (Integer) data.getPayload();
 							foundPeer.setHostPort("" + hostPortData);
-						}
-					});
-					break;
-					
-				case DataTypes.METADATA:
-					Utilities.log(this, "Received metadata pre-sync data", false);
-					replyPool.execute(new Runnable() {
-						public void run() {
-							Object oMetaPull = data.getPayload();
-							ArrayList<String> metasNeeded = new ArrayList<String> ();
-							if(oMetaPull instanceof HashMap) {
-								HashMap<?, ?> potentialMetasToReq = (HashMap<?, ?>) oMetaPull;
-								for(Entry<?, ?> entry : potentialMetasToReq.entrySet()) {
-									String key = null;
-									long time = -1;
-									
-									if(entry.getKey() instanceof String) {
-										key = (String) entry.getKey();
-									}
-									if(entry.getValue() instanceof Long) {
-										time = ((Long) entry.getValue()).longValue();
-									}
-									
-									if(key != null && time != -1) {
-										boolean add = true;
-										//Searches metaDex for match, and sets continuation flag
-										for(Metadata md : Core.metaDex) {
-											if(md.getChecksum().equals(key)) {
-												//Fail if match is more recent
-												if(md.getTime() >= time) {
-													add = false;
-												}
-											}
-										}
-										if(add) {
-											metasNeeded.add(key);
-										}
-									}
-								}
-
-								if(metasNeeded.size() > 0) {
-									Utilities.log(this, "Sending request for meta pull, package size " + metasNeeded.size(), false);
-									foundPeer.getConnection().sendTCP(new Request(RequestTypes.METAPULL, metasNeeded));
-								} else {
-									Utilities.log(this, "No metadata requested", false);
-								}
-							}
-						}
-					});
-					break;
-					
-				case DataTypes.METAPULL:
-					Utilities.log(this, "Received meta pull data", false);
-					final Object ometaPullPayload = data.getPayload();
-					replyPool.execute(new Runnable() {
-						public void run() {
-							if(ometaPullPayload instanceof ArrayList<?>) {
-								ArrayList<?> potentialMetas = (ArrayList<?>) ometaPullPayload;
-								if(potentialMetas.size() > 0) {
-									Utilities.log(this, "\t" + potentialMetas.size() + " meta pull objects", false);
-									for(int i=0; i < potentialMetas.size(); i++) {
-										Object o = potentialMetas.get(i);
-										if(o instanceof Metadata) {
-											Metadata md = (Metadata) o;
-											md.decrypt(foundPeer.getAES());
-										}
-									}
-								}
-							}
 						}
 					});
 					break;
