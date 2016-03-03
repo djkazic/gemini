@@ -1,5 +1,6 @@
 package net.api;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
@@ -27,7 +28,7 @@ public class Bridge extends ServerResource {
 	public String process(JsonRepresentation entity) {
 		JSONObject json = null;
 		JSONObject responseJSON = new JSONObject();
-		String consoleOutput = "";
+		
 		try {
 			json = entity.getJsonObject();
 			if(json.length() > 0) {
@@ -107,9 +108,8 @@ public class Bridge extends ServerResource {
 				ex.printStackTrace();
 			}
 		}
-		consoleOutput = responseJSON.toString();
 		setHeaders();
-		return consoleOutput;
+		return responseJSON.toString();
 	}
 
 	@Get
