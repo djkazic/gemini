@@ -68,7 +68,7 @@ public class Core {
 		}
 		
 		Log.set(Log.LEVEL_INFO);
-		
+		boolean printPubKey = false;
 		for(String str : args) {
 			switch(str) {
 				case "-daemon":
@@ -77,6 +77,10 @@ public class Core {
 					
 				case "-debug":
 					Log.set(Log.LEVEL_DEBUG);
+					break;
+					
+				case "-getpubkey":
+					printPubKey = true;
 					break;
 			}
 		}
@@ -105,6 +109,12 @@ public class Core {
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
 		else 
 			rsa = new RSA();
+		if(printPubKey) {
+			Utilities.log("Core", "Pubkey dump: " + RSA.pubKey, false);
+		}
+		
+		//Initialize crypto SignRSA
+		Utilities.switchGui("Core", "Initializing SignRSA", false);
 		keySignRSA = new ArrayList<SignRSA> ();
 		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/signkeys");
 		if(!keyFolder.exists()) {
