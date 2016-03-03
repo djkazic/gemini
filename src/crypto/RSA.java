@@ -103,25 +103,6 @@ public class RSA {
 		return null;
 	}
 	
-	/**
-	 * Verifies if a file has been signed by this key
-	 * @param in
-	 * @param pk
-	 * @param signature
-	 * @return
-	 */
-	public boolean verify(String in, PublicKey pk, String signature) {
-		try {
-			Signature sig = Signature.getInstance("SHA1WithRSA");
-			sig.initVerify(pk);
-			sig.update(in.getBytes("UTF8"));
-			return sig.verify(signature.getBytes("ISO-8859-1"));
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		return false;
-	}
-	
 	public PublicKey rawPublicKey() {
 		return myPair.getPublic();
 	}
