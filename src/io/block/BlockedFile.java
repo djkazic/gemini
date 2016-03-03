@@ -33,7 +33,7 @@ public class BlockedFile {
 	private long lastChecked;
 	private boolean cacheStatus;
 	private long length;
-	private String signature;
+	private String signature = "";
 	
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -41,7 +41,6 @@ public class BlockedFile {
 	 */
 	public BlockedFile(File pointer, boolean finished) {
 		this.pointer = pointer;
-		this.signature = null;
 		if(finished) {
 			checksum = FileUtils.generateChecksum(pointer);
 			blockList = FileUtils.enumerateBlocks(this, Core.config.hubMode);
