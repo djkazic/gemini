@@ -38,7 +38,7 @@ public class SignRSA {
 		try {
 			Signature sig = Signature.getInstance("SHA1WithRSA");
 			sig.initVerify(pubkey);
-			sig.update(bf.getChecksum().getBytes("UTF8"));
+			sig.update((bf.getChecksum() + bf.getAlbumArt()).getBytes("UTF8"));
 			return sig.verify(bf.getSignature().getBytes("ISO-8859-1"));
 		} catch(Exception ex) {
 			ex.printStackTrace();

@@ -16,19 +16,17 @@ public class StreamedBlockedFile {
 	private String checksum;
 	private ArrayList<String> blockList;
 	private String signature;
+	private String albumArt;
 	
-	public StreamedBlockedFile() {
-		pointerName = null;
-		checksum = null;
-		blockList = null;
-	}
+	public StreamedBlockedFile() { }
 	
 	public StreamedBlockedFile(String encryptedPointerName, String encryptedChecksum, 
-							   ArrayList<String> encryptedBlockList, String encryptedSignature) {
+							   ArrayList<String> encryptedBlockList, String encryptedSignature, String encryptedAlbumArt) {
 		pointerName = encryptedPointerName;
 		checksum = encryptedChecksum;
 		blockList = encryptedBlockList;
 		signature = encryptedSignature;
+		albumArt = encryptedAlbumArt;
 	}
 	
 	public BlockedFile toBlockedFile(AES aes) {
@@ -36,6 +34,6 @@ public class StreamedBlockedFile {
 		for(int i=0; i < blockList.size(); i++) {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
-		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, aes.decrypt(signature), false);
+		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, aes.decrypt(signature), aes.decrypt(albumArt), false);
 	}
 }

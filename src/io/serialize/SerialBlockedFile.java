@@ -18,22 +18,13 @@ public class SerialBlockedFile {
 	private boolean cache;
 	private long length;
 	private String signature;
+	private String albumArt;
 	
-	public SerialBlockedFile() {
-		pointerPath = "";
-		checksum = "";
-		blockList = null;
-		blackList = null;
-		complete = false;
-		progress = "";
-		blockRate = 0;
-		lastChecked = 0;
-		cache = false;
-	}
+	public SerialBlockedFile() { }
 	
 	public SerialBlockedFile(String absolutePath, String checksum, ArrayList<String> blockList,
 			               ArrayList<String> blacklist, boolean complete, String progress, 
-			               float blockRate, long lastChecked, boolean cache, long length, String signature) {
+			               float blockRate, long lastChecked, boolean cache, long length, String signature, String albumArt) {
 		this.pointerPath = absolutePath;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -45,6 +36,7 @@ public class SerialBlockedFile {
 		this.cache = cache;
 		this.length = length;
 		this.signature = signature;
+		this.albumArt = albumArt;
 	}
 
 	public BlockedFile toBlockedFile() {
@@ -58,6 +50,7 @@ public class SerialBlockedFile {
 							   lastChecked,
 							   cache,
 							   length,
-							   signature);
+							   signature,
+							   albumArt);
 	}
 }

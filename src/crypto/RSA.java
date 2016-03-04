@@ -92,7 +92,7 @@ public class RSA {
 	 */
 	public void sign(BlockedFile bf) {
 		try {
-			byte[] data = bf.getChecksum().getBytes("UTF8");
+			byte[] data = (bf.getChecksum() + bf.getAlbumArt()).getBytes("UTF8");
 
 	        Signature sig = Signature.getInstance("SHA1WithRSA");
 	        sig.initSign(myPair.getPrivate());
