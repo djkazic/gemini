@@ -18,7 +18,76 @@ $(document).ready(function() {
 	
 	// Peer number update
 	setInterval(peerCount, 1500);
+
+	startAudio();
 });
+
+function pad(n, width, z) {
+	z = z || '0';
+	n = n + '';
+	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function startAudio() {
+	$('.progress').on("mousedown", scrubberMouseDownHandler);
+
+	var audio5js = new Audio5js({
+		swf_path: '/statics/swf/audio5js.swf',
+		throw_errors: true,
+		format_time: false,
+		ready: audioReady
+	});
+}
+
+function audioReady() {
+	this.firstPlay = 1;
+	this.load("file:///C:/Users/kevin/Documents/GitHub/Radiator/web/New Navy - Zimbabwe (Flume Remix).mp3");
+
+	$('#play').on("click", playPause.bind(this));
+	$('#play-prev').on("click", moveToStart.bind(this));
+	$('#progress-col').on("mousedown", moveToSeek.bind(this));
+
+	this.on('timeupdate', function (position, duration) {
+		console.log(position);
+		var nicePosition = pad(Math.floor(position / 60), 2);
+		var positionSecLeft = pad(Math.floor(position - (nicePosition * 60)), 2);
+
+		var niceDuration = Math.floor(duration / 60);
+		var secondsLeft = Math.floor(duration - (niceDuration * 60));
+		$('#play-time').html(nicePosition + ":" + positionSecLeft + "/" + niceDuration + ":" + secondsLeft);
+		$('#music-progress').css('width', ((position / duration) * 100) + "%");
+	});
+}
+
+var moveToStart = function () {
+	this.seek(0);
+}
+
+var moveToSeek = function() {
+	var percentSeek = (seekpoint) * this.duration;
+	this.seek(percentSeek);
+	if(!this.playing) {
+		$('#play').click();
+	}
+}
+
+function playPause() {
+	if(this.playing) {
+		this.pause();
+		$('#play').css('background-image', 'url(img/play.svg)');
+	} else {
+		this.play();
+		$('#play').css('background-image', 'url(img/pause.svg)');
+	}
+}
+
+function scrubberMouseDownHandler(e) {
+	var $this = $(this);
+	var x = e.pageX - $this.offset().left;
+	var percent = x / $this.width();
+	$('#music-progress').width((percent * 100) + "%");
+	seekpoint = percent;
+}
 
 function setHome() {
 	$('#page-text').html($('#home-page').html()).append($('#footer-page').html());
@@ -62,7 +131,7 @@ function hookAllForms() {
 								console.log(result);
 							});
 						} else {
-							$('#search-results').html("No connection :(");
+							$('#search-results').html("No connection was detected :(");
 						}
 						return false;
 					});
@@ -119,7 +188,7 @@ function pollStatus() {
 			}
 		});
 	} else {
-		$('#status').html("<span class=\"label label-default\">- - - - - - -</span>");
+		$('#status').html("<span class=\"label label-default\">- - - - - -</span>");
 	}
 }
 
@@ -153,7 +222,7 @@ function peerCount() {
 }
 
 function connected() {
-	var res = (lastOnline < 0 || ((lastOnline + 2000) > Date.now()))
+	var res = (lastOnline > 0 && ((lastOnline + 2000) > Date.now()))
 	return res;
 }
 
