@@ -1,4 +1,4 @@
-var lastOnline = -1;
+var lastOnline = -3; // 3 attempts before timeout
 
 $(document).ready(function() {
 	// Set initial page as Home
@@ -106,10 +106,8 @@ function hookAllForms() {
 				case 'search':
 					$(idObj).on('submit', function() {
 						var query = $('#search-query').val();
-						var dataPack = {
-							"rpc": "search",
-							"query": query
-						};
+						var dataPack = {};
+						dataPack.query = query;
 
 						$('#search-query').val('');
 						$('#search-results').removeClass('hidden');
@@ -120,15 +118,15 @@ function hookAllForms() {
 						//
 
 						if(connected()) {
+							$('#search-results').addClass('text-center');
 							$.ajax({
-								url: 'http://localhost:8888/api',
+								url: 'http://localhost:8888/api/search',
 								method: 'POST',
 								data: JSON.stringify(dataPack)
 							}).done(function(result) {
 								lastOnline = Date.now();
 								$('#search-results').html(JSON.parse(result).value);
 								$('#search-results').removeClass('text-center');
-								console.log(result);
 							});
 						} else {
 							$('#search-results').html("No connection was detected :(");
@@ -175,10 +173,9 @@ function sidebarOps() {
 function pollStatus() {
 	if(connected()) {
 		$.ajax({
-			url: 'http://localhost:8888/api',
+			url: 'http://localhost:8888/api/portcheck',
 			timeout: 1000,
-			method: 'POST',
-			data: '{ "rpc": "port_check" }'
+			method: 'GET'
 		}).done(function(result) {
 			lastOnline = Date.now();
 			if (result.value) {
@@ -195,9 +192,8 @@ function pollStatus() {
 function peerCount() {
 	if(connected()) {
 		$.ajax({
-			url: 'http://localhost:8888/api',
-			method: 'POST',
-			data: '{ "rpc": "peer_count" }'
+			url: 'http://localhost:8888/api/peers/count',
+			method: 'GET'
 		}).done(function(result) {
 			lastOnline = Date.now();
 			result = JSON.parse(result);
@@ -222,6 +218,11 @@ function peerCount() {
 }
 
 function connected() {
+	// First 3 attempts at connection is free
+	if(lastOnline < 0) {
+		lastOnline++;
+		return true;
+	}
 	var res = (lastOnline > 0 && ((lastOnline + 2000) > Date.now()))
 	return res;
 }
