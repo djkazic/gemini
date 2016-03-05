@@ -9,8 +9,6 @@
 body {
     background-color: #F6F6F6;
     min-width: 1200px;
-    width: auto !important;
-    width: 1200px;
     font-size: 16px;
     overflow: hidden;
 }
@@ -113,7 +111,7 @@ body {
     background: none;
 }
 
-@media(min-width: 1200px) {
+@media(min-width: 900px) {
     #wrapper {
         padding-left: 180px;
     }
@@ -155,6 +153,10 @@ body {
     .playing {
     	color: #999999 !important;
     }
+
+    .progress {
+        margin-left: 45px;
+    }
 }
 
 .playing {
@@ -174,14 +176,14 @@ body {
 }
 
 .play-ctrl-box {
-	padding-left: 25px;
+	padding-left: 10px;
 }
 
 #play-prev {
     background-position: 40% 50%;
     display: block;
     float: left;
-    height: 46px;
+    height: 44px;
     position: relative;
     width: 33px;
     z-index: 0;
@@ -198,9 +200,9 @@ body {
     cursor: pointer;
     display: block;
     float: left;
-    height: 46px;
+    height: 44px;
     position: relative;
-    width: 46px;
+    width: 44px;
     perspective-origin: 23px 23px;
     transform-origin: 23px 23px;
     background: rgba(0, 0, 0, 0) url("../img/play.svg") no-repeat scroll 55% 50% / auto padding-box border-box;
@@ -216,7 +218,7 @@ body {
     cursor: pointer;
     display: block;
     float: left;
-    height: 46px;
+    height: 44px;
     position: relative;
     width: 33px;
     perspective-origin: 16.5px 23px;

@@ -8,7 +8,7 @@ $(document).ready(function() {
 	hookAllForms();
 
 	// Disable user zoom
-	disableZoom();
+	//disableZoom();
 	
 	// Sidebar listeners
 	sidebarOps();
@@ -52,9 +52,13 @@ function audioReady() {
 		var nicePosition = pad(Math.floor(position / 60), 2);
 		var positionSecLeft = pad(Math.floor(position - (nicePosition * 60)), 2);
 
-		var niceDuration = Math.floor(duration / 60);
+		var niceDuration = pad(Math.floor(duration / 60), 2);
 		var secondsLeft = Math.floor(duration - (niceDuration * 60));
-		$('#play-time').html(nicePosition + ":" + positionSecLeft + "/" + niceDuration + ":" + secondsLeft);
+		if(window.innerWidth < 960) {
+			$('#play-time').html(nicePosition + ":" + positionSecLeft + " " + niceDuration + ":" + secondsLeft);
+		} else {
+			$('#play-time').html(nicePosition + ":" + positionSecLeft + " | " + niceDuration + ":" + secondsLeft);
+		}
 		$('#music-progress').css('width', ((position / duration) * 100) + "%");
 	});
 }
