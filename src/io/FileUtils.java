@@ -493,6 +493,35 @@ public class FileUtils {
 		}
 		return null;
 	}
+	
+	public static void unifyBlocksStream(BlockedFile bf) throws Exception {
+		String outputPath = bf.getStreamPath();
+		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputPath));
+		
+		for(String block : bf.getBlockList()) {
+			File thisBlockFile = new File(bf.getBlocksFolder() + "/" + block);
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(thisBlockFile));
+			int pointer;
+			while((pointer = in.read()) != -1) {
+				out.write(pointer);
+			}
+			in.close();
+		}
+		
+		out.close();
+		//Clear haveList, so progressBar doesn't show 200%
+		//bf.getBlacklist().clear();
+		//Reset progress
+		//bf.setProgress("0%");
+		//Delete contents then the block directory
+		File blocksDir = new File(bf.getBlocksFolder());
+		File[] blocksDirBlocks = blocksDir.listFiles();
+		if(blocksDirBlocks != null && blocksDirBlocks.length > 0) {
+			for(File file : blocksDirBlocks) {
+				file.delete();
+			}
+		}
+	}
 
 	public static void unifyBlocks(BlockedFile bf) throws Exception {
 		int numberParts = bf.getBlockList().size();

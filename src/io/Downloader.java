@@ -12,10 +12,12 @@ public class Downloader implements Runnable {
 	public static ArrayList<Downloader> downloaders = new ArrayList<Downloader> ();
 
 	private BlockedFile blockedFile;
+	private boolean stream = false;
 	private boolean download = true;
 
-	public Downloader(BlockedFile blockedFile) {
+	public Downloader(BlockedFile blockedFile, boolean stream) {
 		this.blockedFile = blockedFile;
+		this.stream = stream;
 	}
 
 	public void run() {
@@ -48,17 +50,17 @@ public class Downloader implements Runnable {
 			while(Core.peers.size() > 0 && !blockedFile.isComplete()) {
 				if(!download) {
 					Utilities.log(this, "Idling in pause", true);
-					//TODO: GUI update
-					/**
-					if(!Core.config.hubMode) {
-						Core.mainWindow.updateTime(blockedFile.getChecksum(), "Paused");
-					}
-					 */
+					//TODO: GUI update for Downloader pause
 					Thread.sleep(3000);
 					continue;
 				}
 
-				block = blockedFile.nextBlockNeeded();
+				if(stream) {
+					block = blockedFile.nextStreamBlock();
+				} else {
+					block = blockedFile.nextRandomBlock();
+				}
+				
 				if(block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);

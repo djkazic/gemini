@@ -127,6 +127,10 @@ public class BlockedFile {
 	public File getPointer() {
 		return pointer;
 	}
+	
+	public String getStreamPath() {
+		return FileUtils.getWorkspaceDir() + "/stream-" + pointer.getName();
+	}
 
 	/**
 	 * Returns path
@@ -192,7 +196,7 @@ public class BlockedFile {
 	 * Returns a randomly selected needed block
 	 * @return randomly selected needed block
 	 */
-	public String nextBlockNeeded() {
+	public String nextRandomBlock() {
 		ArrayList<String> qualified = new ArrayList<String> ();
 		for(int i=0; i < blockList.size(); i++) {
 			String thisBlock = blockList.get(i);
@@ -205,6 +209,25 @@ public class BlockedFile {
 		} else {
 			int ind = new SecureRandom().nextInt(qualified.size());
 			return qualified.get(ind);
+		}
+	}
+	
+	/**
+	 * Returns a randomly selected needed block
+	 * @return randomly selected needed block
+	 */
+	public String nextStreamBlock() {
+		ArrayList<String> qualified = new ArrayList<String> ();
+		for(int i=0; i < blockList.size(); i++) {
+			String thisBlock = blockList.get(i);
+			if(!blackList.contains(thisBlock)) {
+				qualified.add(thisBlock);
+			}
+		}
+		if(qualified.size() == 0) {
+			return null;
+		} else {
+			return qualified.get(0);
 		}
 	}
 	
