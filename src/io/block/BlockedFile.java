@@ -32,7 +32,6 @@ public class BlockedFile {
 	private float blockRate;
 	private long lastChecked;
 	private boolean cacheStatus;
-	private long length;
 	private String signature = "";
 	private String albumArt = "";
 	
@@ -91,7 +90,7 @@ public class BlockedFile {
 	 * @param cache 
 	 */
 	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
-					   boolean complete, String progress, float blockRate, long lastChecked, boolean cache, long length, String signature, String albumArt) {
+					   boolean complete, String progress, float blockRate, long lastChecked, boolean cache, String signature, String albumArt) {
 		this.pointer = file;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -356,7 +355,7 @@ public class BlockedFile {
 	 */
 	public SerialBlockedFile toSerialBlockedFile() {
 		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, 
-								     complete, progress, blockRate, lastChecked, cacheStatus, length, signature, albumArt);
+								     complete, progress, blockRate, lastChecked, cacheStatus, signature, albumArt);
 	}
 	
 	/**
@@ -382,10 +381,6 @@ public class BlockedFile {
 		return pointer.getName() + " | " + 
 			   blockList + " " + blackList + " | " + complete + " | " + progress 
 			   + " | " + blockRate + " | " + lastChecked;
-	}
-	
-	public long length() {
-		return length;
 	}
 	
 	public void reset() {
