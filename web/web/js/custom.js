@@ -1,4 +1,5 @@
 var lastOnline = -3; // 3 attempts before timeout
+var audioPlayer;
 
 $(document).ready(function() {
 	// Set initial page as Home
@@ -19,7 +20,8 @@ $(document).ready(function() {
 	// Peer number update
 	setInterval(peerCount, 1500);
 
-	startAudio();
+	audioPlayer = startAudio();
+	audioPlayer.load("file:///C:/Users/kevin/Documents/GitHub/Radiator/web/New Navy - Zimbabwe (Flume Remix).mp3");
 });
 
 function pad(n, width, z) {
@@ -35,13 +37,14 @@ function startAudio() {
 		swf_path: '/statics/swf/audio5js.swf',
 		throw_errors: true,
 		format_time: false,
-		ready: audioReady
+		ready: audioPlayerBindings
 	});
+
+	return audio5js;
 }
 
-function audioReady() {
+function audioPlayerBindings() {
 	this.firstPlay = 1;
-	this.load("file:///C:/Users/kevin/Documents/GitHub/Radiator/web/New Navy - Zimbabwe (Flume Remix).mp3");
 
 	$('#play').on("click", playPause.bind(this));
 	$('#play-prev').on("click", moveToStart.bind(this));
@@ -53,7 +56,7 @@ function audioReady() {
 		var positionSecLeft = pad(Math.floor(position - (nicePosition * 60)), 2);
 
 		var niceDuration = pad(Math.floor(duration / 60), 2);
-		var secondsLeft = Math.floor(duration - (niceDuration * 60));
+		var secondsLeft = pad(Math.floor(duration - (niceDuration * 60)), 2);
 		if(window.innerWidth < 960) {
 			$('#play-time').html(nicePosition + ":" + positionSecLeft + " " + niceDuration + ":" + secondsLeft);
 		} else {

@@ -1,14 +1,25 @@
 package atrium;
 
+import filter.FilterUtils;
+import gui.LoadWindow;
+import io.FileUtils;
+import io.FileWatcher;
+import io.block.BlockedFile;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import net.api.APIRouter;
 
@@ -19,11 +30,6 @@ import com.esotericsoftware.minlog.Log;
 import crypto.AES;
 import crypto.RSA;
 import crypto.SignRSA;
-import filter.FilterUtils;
-import gui.LoadWindow;
-import io.FileUtils;
-import io.FileWatcher;
-import io.block.BlockedFile;
 /**
  * Holds centralized data (variables and instances)
  * @author Kevin Cai
@@ -212,11 +218,40 @@ public class Core {
 		
 		//Open browser window (if this is not headless)
 		try {
-			File index = new File("web/index.html");
+			//Debug
+			File index = new File(FileUtils.getConfigDir() + "/web/index.html");
 			if(!Core.config.hubMode) {
-				if(index.exists()) {
-					Utilities.openWebpage(new URL("file:///" + index.getAbsolutePath()));
+				if(!index.exists()) {
+					JarFile file = new JarFile(new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
+					File webDir = new File(FileUtils.getConfigDir() + "/web");
+					if(!webDir.exists()) {
+						webDir.mkdir();
+					}
+					for(Enumeration<JarEntry> enume = file.entries(); 
+							enume.hasMoreElements();) {   
+					    JarEntry entry = enume.nextElement();   
+					    if(entry.getName().startsWith("web") && !entry.getName().equals("web/") && !entry.getName().endsWith(".wav")) {
+					    	try {
+							    File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
+							    if(!extLoc.exists()) {
+							    	if(entry.getName().endsWith("/")) {
+							    		extLoc.mkdirs();
+							    	} else {
+							    		extLoc.getParentFile().mkdirs();
+							    	}
+							    }
+							    InputStream is = file.getInputStream(entry);
+							    FileOutputStream fos = new FileOutputStream(extLoc);
+							    while(is.available() > 0) {
+							    	fos.write(is.read());
+							    }
+							    fos.close();
+					    	} catch (Exception ex) {}
+					    }
+					}
+					file.close();
 				}
+				Utilities.openWebpage(new URL("file:///" + index.getAbsolutePath()));
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
