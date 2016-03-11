@@ -91,12 +91,16 @@ public class Downloader implements Runnable {
 						Thread.sleep(defaultWait);
 					}
 				}
+				
+				if(stream) {
+					FileUtils.unifyBlocksStream(blockedFile);
+				}
 			}
 
 			download = false;
 			if(Core.config.hubMode || blockedFile.getCacheStatus()) {
 				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
-			} else {
+			} else if(!stream) {
 				Utilities.log(this, "Assembling BlockedFile: " + blockedFile.getPointer().getName(), true);
 				FileUtils.unifyBlocks(blockedFile);
 			}

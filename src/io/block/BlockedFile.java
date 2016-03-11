@@ -128,6 +128,10 @@ public class BlockedFile {
 		return pointer;
 	}
 	
+	/**
+	 * Returns path to where the streamed file should be saved (then passed to the front-end)
+	 * @return String pointer
+	 */
 	public String getStreamPath() {
 		return FileUtils.getWorkspaceDir() + "/stream-" + pointer.getName();
 	}
