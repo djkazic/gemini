@@ -92,11 +92,15 @@ public class Core {
 		}
 		
 		//GUI inits
+		try {
+			Utilities.log("Core", "Initializing front-end", false);	
+			loadWindow = new LoadWindow();
+		} catch (Exception ex) {
+			Core.config.hubMode = true;
+		}
+		
 		if(Core.config.hubMode) {
 			Utilities.log("Core", "Hub/headless mode engaged", false);
-		} else {
-			Utilities.log("Core", "Initializing front-end", false);
-			loadWindow = new LoadWindow();
 		}
 		
 		//Set mutex
