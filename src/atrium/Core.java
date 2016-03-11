@@ -216,9 +216,11 @@ public class Core {
 		APIRouter.init();
 		
 		Utilities.switchGui("Core", "Done being initialized", false);
-		loadWindow.setProgress(100);
-		loadWindow.setVisible(false);
-		loadWindow.dispose();
+		if(loadWindow != null) {
+			loadWindow.setProgress(100);
+			loadWindow.setVisible(false);
+			loadWindow.dispose();
+		}
 		
 		//Open browser window (if this is not headless)
 		try {
