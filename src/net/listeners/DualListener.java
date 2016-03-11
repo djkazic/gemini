@@ -348,7 +348,7 @@ public class DualListener extends Listener {
 					break;
 					
 				case DataTypes.SEARCH:
-					Utilities.log(this,  "Received search reply data", false);
+					Utilities.log(this, "Received search reply data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
 							Object searchPayload = data.getPayload();
