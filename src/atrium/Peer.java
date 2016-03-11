@@ -151,7 +151,7 @@ public class Peer {
 	 * @return string mutex of this peer
 	 */
 	public String getMutex() {
-		return mutex;
+		return mutex.substring(0, 5);
 	}
 
 	/**
