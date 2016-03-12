@@ -36,6 +36,8 @@ public class Search extends ServerResource {
 							return responseJSON.toString();
 						} else {
 							ArrayList<String[]> searchResults = NetHandler.doSearch(query);
+							//TODO: field count pre-flight check
+							//TODO: filter pre-flight checks
 							StringBuilder sb = new StringBuilder();
 											sb.append("<h4>SEARCH RESULTS</h4>");
 											sb.append("<div class=\"panel panel-default search-panel\">");
@@ -56,13 +58,13 @@ public class Search extends ServerResource {
 														sb.append(searchResults.get(i)[0]);
 													sb.append("</td>");
 													sb.append("<td>");
-														sb.append("Test Artist");
+														sb.append(searchResults.get(i)[1]);
 													sb.append("</td>");
 													sb.append("<td class=\"td-dubplus\">");
-														sb.append("1:23");
+														sb.append(searchResults.get(i)[2]);
 													sb.append("</td>");
 													sb.append("<td class=\"td-plus\">");
-														sb.append("<a href=\"#\">");
+														sb.append("<a id=\"" + searchResults.get(i)[3] + "\" href=\"#\">");
 															sb.append("<i class=\"fa fa-check-circle-o\"></i>");
 														sb.append("</a>");
 													sb.append("</td>");

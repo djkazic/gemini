@@ -360,31 +360,24 @@ public class DualListener extends Listener {
 										StreamedBlockedFile sbl = (StreamedBlockedFile) o;										
 										BlockedFile intermediate = sbl.toBlockedFile(foundPeer.getAES());
 										
-										//Store name + blockList in index in preparation for Download thread fetching from GUI
+										//Store title, artist, time, and checksum + blockList in index in preparation for Download thread fetching from GUI
 										String name = intermediate.getPointer().getName();
 										if(FilterUtils.mandatoryFilter(name)) {
 											String checksum = intermediate.getChecksum();
 											
 											//TODO: URGENT [haveSearchAlready container]
 											//if(!Core.mainWindow.haveSearchAlready(checksum)) {
-											if(true) {
-												ArrayList<String> blockList = intermediate.getBlockList();
-												ArrayList<String> dualStore = new ArrayList<String> ();
-												dualStore.add(name);
-												dualStore.add(checksum);
-												Core.index.put(dualStore, blockList);
-												
-												String sizeEstimate = "";
-												int estimateKb = (int) ((Core.blockSize * blockList.size()) / 1000);
-												if(estimateKb > 1000) {
-													int estimateMb = (int) (estimateKb / 1000D);
-													sizeEstimate += estimateMb + "MB";
-												} else {
-													sizeEstimate += estimateKb + "KB";
-												}
-												
-												NetHandler.searchResults.add(new String[] {name, sizeEstimate, checksum});
-											}
+											ArrayList<String> blockList = intermediate.getBlockList();
+											ArrayList<String> multiStore = new ArrayList<String> ();
+											multiStore.add(name);
+											multiStore.add(checksum);
+											Core.index.put(multiStore, blockList);
+											
+											//TODO: make placeholders friendlier
+											String artist = "?";
+											String time = "00:00";
+											
+											NetHandler.searchResults.add(new String[] {name, artist, time, checksum});
 										}
 									}
 								}
