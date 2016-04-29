@@ -40,9 +40,8 @@ public class Search extends ServerResource {
 							StringBuilder sb = new StringBuilder();
 							sb.append("<h4>SEARCH RESULTS</h4>");
 							sb.append("<div class=\"panel panel-default search-panel\">");
-							sb.append("  <table class=\"table table-hover\" style=color:#333>");
-							sb.append(
-									"  <thead><tr><th>#</th><th>TRACK</th><th>TITLE</th><th>ARTIST</th><th>TIME</th></tr></thead>");
+							sb.append("<table class=\"table table-hover\" style=color:#333>");
+							sb.append("<thead><tr><th>#</th><th>TRACK</th><th>FILENAME</th></tr></thead>");
 
 							sb.append("<tbody>");
 
@@ -57,16 +56,8 @@ public class Search extends ServerResource {
 								sb.append("<td>");
 								sb.append(searchResults.get(i)[0]);
 								sb.append("</td>");
-								sb.append("<td>");
+								sb.append("<td style=\"display: none\">");
 								sb.append(searchResults.get(i)[1]);
-								sb.append("</td>");
-								sb.append("<td class=\"td-dubplus\">");
-								sb.append(searchResults.get(i)[2]);
-								sb.append("</td>");
-								sb.append("<td class=\"td-plus\">");
-								sb.append("<a id=\"" + searchResults.get(i)[3] + "\" href=\"#\">");
-								sb.append("<i class=\"fa fa-check-circle-o\"></i>");
-								sb.append("</a>");
 								sb.append("</td>");
 								sb.append("</tr>");
 							}

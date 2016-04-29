@@ -393,12 +393,7 @@ public class DualListener extends Listener {
 											multiStore.add(checksum);
 											Core.index.put(multiStore, blockList);
 
-											// TODO: make placeholders
-											// friendlier
-											String artist = "?";
-											String time = "00:00";
-
-											NetHandler.searchResults.add(new String[] { name, artist, time, checksum });
+											NetHandler.searchResults.add(new String[] { name, checksum });
 										}
 									}
 								}
