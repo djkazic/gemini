@@ -6,18 +6,19 @@ import java.util.Scanner;
 
 /**
  * Debug class used to generate an internal "badlist"
+ * 
  * @author Kevin Cai
  */
 public class FilterGen {
 
 	public static void main(String[] args) {
 		System.out.println("Standing by to write badfile");
-		ArrayList<String> badFileArrayList = new ArrayList<String> ();
+		ArrayList<String> badFileArrayList = new ArrayList<String>();
 		Scanner in = new Scanner(System.in);
-		while(in.hasNext()) {
+		while (in.hasNext()) {
 			String got = in.nextLine();
-			if(got.length() > 0) {
-				if(got.equalsIgnoreCase("QUIT")) {
+			if (got.length() > 0) {
+				if (got.equalsIgnoreCase("QUIT")) {
 					System.out.println("Detected end of input");
 					break;
 				} else {
@@ -32,7 +33,7 @@ public class FilterGen {
 		System.out.println("Writing badfile to badfilter.dat");
 		try {
 			PrintWriter writer = new PrintWriter("badfilter.dat", "UTF-8");
-			for(String str : badFileArrayList) {
+			for (String str : badFileArrayList) {
 				writer.println(str);
 			}
 			writer.close();
@@ -44,9 +45,9 @@ public class FilterGen {
 
 	public static String toHexString(String strInput) {
 		byte[] ba = strInput.getBytes();
-	    StringBuilder str = new StringBuilder();
-	    for(int i = 0; i < ba.length; i++)
-	        str.append(String.format("%x", ba[i]));
-	    return str.toString();
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < ba.length; i++)
+			str.append(String.format("%x", ba[i]));
+		return str.toString();
 	}
 }

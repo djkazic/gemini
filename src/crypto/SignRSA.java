@@ -22,13 +22,14 @@ public class SignRSA {
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			PublicKey pk = kf.generatePublic(keySpec);
 			this.pubkey = pk;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Verifies if a file has been signed by this key
+	 * 
 	 * @param in
 	 * @param pk
 	 * @param signature
@@ -40,7 +41,7 @@ public class SignRSA {
 			sig.initVerify(pubkey);
 			sig.update((bf.getChecksum() + bf.getAlbumArt()).getBytes("UTF8"));
 			return sig.verify(bf.getSignature().getBytes("ISO-8859-1"));
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return false;

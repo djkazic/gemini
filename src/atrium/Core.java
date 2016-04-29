@@ -30,12 +30,14 @@ import com.esotericsoftware.minlog.Log;
 import crypto.AES;
 import crypto.RSA;
 import crypto.SignRSA;
+
 /**
  * Holds centralized data (variables and instances)
+ * 
  * @author Kevin Cai
  */
 public class Core {
-	
+
 	public static ArrayList<SignRSA> keySignRSA;
 	public static RSA rsa;
 	public static AES aes;
@@ -44,24 +46,26 @@ public class Core {
 	public static LoadWindow loadWindow;
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
-	
+
 	public static int blockSize = 256000;
 	public static Config config;
 	public static String mutex;
-	
+
 	/**
 	 * Entry point of application
-	 * @param args command-line arguments
+	 * 
+	 * @param args
+	 *            command-line arguments
 	 * @throws NoSuchAlgorithmException
 	 * @throws UnsupportedEncodingException
 	 */
 	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		
-		//Load config if exists
+
+		// Load config if exists
 		Utilities.log("Core", "Attempting to load configuration from file...", false);
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
-			if(configFile.exists()) {
+			if (configFile.exists()) {
 				Utilities.log("Core", "Loaded saved configuration", false);
 				Kryo kryo = new Kryo();
 				Input input = new Input(new FileInputStream(configFile));
@@ -72,68 +76,68 @@ public class Core {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 		Log.set(Log.LEVEL_INFO);
 		boolean printPubKey = false;
-		for(String str : args) {
-			switch(str) {
+		for (String str : args) {
+			switch (str) {
 				case "-daemon":
 					Core.config.hubMode = true;
 					break;
-					
+
 				case "-debug":
 					Log.set(Log.LEVEL_DEBUG);
 					break;
-					
+
 				case "-getpubkey":
 					printPubKey = true;
 					break;
 			}
 		}
-		
-		//GUI inits
+
+		// GUI inits
 		try {
-			Utilities.log("Core", "Initializing front-end", false);	
+			Utilities.log("Core", "Initializing front-end", false);
 			loadWindow = new LoadWindow();
 		} catch (Exception ex) {
 			Core.config.hubMode = true;
 		}
-		
-		if(Core.config.hubMode) {
+
+		if (Core.config.hubMode) {
 			Utilities.log("Core", "Hub/headless mode engaged", false);
 		}
-		
-		//Set mutex
+
+		// Set mutex
 		Utilities.switchGui("Core", "Calculating mutex", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(5);
 		}
 		mutex = Utilities.getMutex();
-		
-		//Initialize crypto RSA
+
+		// Initialize crypto RSA
 		Utilities.switchGui("Core", "Initializing RSA", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(10);
 		}
-		if(Core.config.rsaPub != null && Core.config.rsaPriv != null) 
+		if (Core.config.rsaPub != null && Core.config.rsaPriv != null)
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
-		else 
+		else
 			rsa = new RSA();
-		if(printPubKey) {
+		if (printPubKey) {
 			Utilities.log("Core", "Pubkey dump: " + RSA.pubKey, false);
 		}
-		
-		//Initialize crypto SignRSA
+
+		// Initialize crypto SignRSA
 		Utilities.switchGui("Core", "Initializing SignRSA", false);
-		keySignRSA = new ArrayList<SignRSA> ();
+		keySignRSA = new ArrayList<SignRSA>();
 		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/.signkeys");
-		if(!keyFolder.exists()) {
+		if (!keyFolder.exists()) {
 			keyFolder.mkdir();
 		}
 		File[] files = keyFolder.listFiles();
-		if(files != null && files.length > 0) {
-			for(File file : files) {
-				if(FileUtils.getExtension(file.getName()).equals("pub")) {
+		if (files != null && files.length > 0) {
+			for (File file : files) {
+				if (FileUtils.getExtension(file.getName()).equals("pub")) {
 					try {
 						FileInputStream fis = new FileInputStream(file);
 						BufferedReader br = new BufferedReader(new InputStreamReader(fis));
@@ -145,23 +149,23 @@ public class Core {
 				}
 			}
 		}
-		
-		//Initialize crypto AES
+
+		// Initialize crypto AES
 		Utilities.switchGui("Core", "Initializing AES", false);
 		aes = new AES(mutex);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(20);
 		}
-		
-		//File directory checks
+
+		// File directory checks
 		Utilities.switchGui("Core", "Checking for file structures", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(30);
 		}
 		FileUtils.initDirs();
-		
-		//ShutdownHook for config
-		if(loadWindow != null) {
+
+		// ShutdownHook for config
+		if (loadWindow != null) {
 			loadWindow.setProgress(35);
 		}
 		Thread shutHook = (new Thread(new Runnable() {
@@ -172,88 +176,90 @@ public class Core {
 		}));
 		shutHook.setName("Shutdown Hook");
 		Runtime.getRuntime().addShutdownHook(shutHook);
-		
-		//Filter loading
-		if(loadWindow != null) {
+
+		// Filter loading
+		if (loadWindow != null) {
 			loadWindow.setProgress(40);
 		}
 		FilterUtils.init();
-		
-		//FileWatcher initialization
+
+		// FileWatcher initialization
 		Utilities.switchGui("Core", "Registering file watcher", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(50);
 		}
 		(new Thread(new FileWatcher())).start();
-		
-		//Vars initialization
-		if(loadWindow != null) {
+
+		// Vars initialization
+		if (loadWindow != null) {
 			loadWindow.setProgress(60);
 		}
-		blockDex = new ArrayList<BlockedFile> ();
-		index = new HashMap<ArrayList<String>, ArrayList<String>> ();
-		peers = new ArrayList<Peer> ();
-		
-		//Generate block index
+		blockDex = new ArrayList<BlockedFile>();
+		index = new HashMap<ArrayList<String>, ArrayList<String>>();
+		peers = new ArrayList<Peer>();
+
+		// Generate block index
 		Utilities.switchGui("Core", "Generating block index", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(65);
 		}
 		FileUtils.genBlockIndex();
-		
-		//Initialize NetHandler object
+
+		// Initialize NetHandler object
 		Utilities.switchGui("Core", "Initializing networking", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(70);
 		}
 		netHandler = new NetHandler();
-		
-		//Start APIRouter
+
+		// Start APIRouter
 		Utilities.switchGui("Core", "Initializing API router", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(80);
 		}
 		APIRouter.init();
-		
+
 		Utilities.switchGui("Core", "Done being initialized", false);
-		if(loadWindow != null) {
+		if (loadWindow != null) {
 			loadWindow.setProgress(100);
 			loadWindow.setVisible(false);
 			loadWindow.dispose();
 		}
-		
-		//Open browser window (if this is not headless)
+
+		// Open browser window (if this is not headless)
 		try {
-			//Debug
+			// Debug
 			File index = new File(FileUtils.getConfigDir() + "/web/index.html");
-			if(!Core.config.hubMode) {
-				if(!index.exists()) {
-					JarFile file = new JarFile(new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
+			if (!Core.config.hubMode) {
+				if (!index.exists()) {
+					JarFile file = new JarFile(
+							new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
 					File webDir = new File(FileUtils.getConfigDir() + "/web");
-					if(!webDir.exists()) {
+					if (!webDir.exists()) {
 						webDir.mkdir();
 					}
-					for(Enumeration<JarEntry> enume = file.entries(); 
-							enume.hasMoreElements();) {   
-					    JarEntry entry = enume.nextElement();   
-					    if(entry.getName().startsWith("web") && !entry.getName().equals("web/") && !entry.getName().endsWith(".wav")) {
-					    	try {
-							    File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
-							    if(!extLoc.exists()) {
-							    	if(entry.getName().endsWith("/")) {
-							    		extLoc.mkdirs();
-							    	} else {
-							    		extLoc.getParentFile().mkdirs();
-							    	}
-							    }
-							    InputStream is = file.getInputStream(entry);
-							    FileOutputStream fos = new FileOutputStream(extLoc);
-							    while(is.available() > 0) {
-							    	fos.write(is.read());
-							    }
-							    fos.close();
-					    	} catch (Exception ex) {}
-					    }
+					for (Enumeration<JarEntry> enume = file.entries(); enume.hasMoreElements();) {
+						JarEntry entry = enume.nextElement();
+						if (entry.getName().startsWith("web") && !entry.getName().equals("web/")
+								&& !entry.getName().endsWith(".wav")) {
+							try {
+								File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
+								if (!extLoc.exists()) {
+									if (entry.getName().endsWith("/")) {
+										extLoc.mkdirs();
+									} else {
+										extLoc.getParentFile().mkdirs();
+									}
+								}
+								InputStream is = file.getInputStream(entry);
+								FileOutputStream fos = new FileOutputStream(extLoc);
+								while (is.available() > 0) {
+									fos.write(is.read());
+								}
+								fos.close();
+							} catch (Exception ex) {
+							}
+						}
 					}
 					file.close();
 				}
@@ -262,8 +268,8 @@ public class Core {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
-		//Do peer discovery
+
+		// Do peer discovery
 		netHandler.peerDiscovery();
 	}
 }

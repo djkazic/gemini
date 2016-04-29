@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import io.block.BlockedFile;
 
 public class SerialBlockedFile {
-	
+
 	private String pointerPath;
 	private String checksum;
 	private ArrayList<String> blockList;
@@ -18,12 +18,13 @@ public class SerialBlockedFile {
 	private boolean cache;
 	private String signature;
 	private String albumArt;
-	
-	public SerialBlockedFile() { }
-	
+
+	public SerialBlockedFile() {
+	}
+
 	public SerialBlockedFile(String absolutePath, String checksum, ArrayList<String> blockList,
-			               ArrayList<String> blacklist, boolean complete, String progress, 
-			               float blockRate, long lastChecked, boolean cache, String signature, String albumArt) {
+			ArrayList<String> blacklist, boolean complete, String progress, float blockRate, long lastChecked,
+			boolean cache, String signature, String albumArt) {
 		this.pointerPath = absolutePath;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -38,16 +39,7 @@ public class SerialBlockedFile {
 	}
 
 	public BlockedFile toBlockedFile() {
-		return new BlockedFile(new File(pointerPath), 
-							   checksum, 
-							   blockList, 
-							   blackList, 
-							   complete, 
-							   progress, 
-							   blockRate, 
-							   lastChecked,
-							   cache,
-							   signature,
-							   albumArt);
+		return new BlockedFile(new File(pointerPath), checksum, blockList, blackList, complete, progress, blockRate,
+				lastChecked, cache, signature, albumArt);
 	}
 }

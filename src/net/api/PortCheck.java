@@ -7,7 +7,7 @@ import org.restlet.resource.ServerResource;
 import atrium.Core;
 
 public class PortCheck extends ServerResource {
-	
+
 	@Get
 	public String process() {
 		this.getResponse().setAccessControlAllowOrigin("*");

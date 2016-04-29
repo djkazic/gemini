@@ -17,14 +17,15 @@ import javax.xml.bind.DatatypeConverter;
 
 /**
  * RSA cryptography helper class
+ * 
  * @author Kevin Cai
  */
 public class RSA {
-	
+
 	private KeyPairGenerator kpg;
 	public static String pubKey;
 	public KeyPair myPair;
-	
+
 	public RSA(byte[] pubBytes, byte[] privBytes) {
 		try {
 			KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -35,13 +36,14 @@ public class RSA {
 			myPair = new KeyPair(publicKey, privKey);
 			byte[] pubKeyBytes = publicKey.getEncoded();
 			RSA.pubKey = new String(DatatypeConverter.printBase64Binary(pubKeyBytes));
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
 	/**
 	 * Initializes a KeyPairGenerator, then stores it
+	 * 
 	 * @throws NoSuchAlgorithmException
 	 */
 	public RSA() throws NoSuchAlgorithmException {
@@ -50,11 +52,14 @@ public class RSA {
 		byte[] pubKeyBytes = myPair.getPublic().getEncoded();
 		RSA.pubKey = new String(DatatypeConverter.printBase64Binary(pubKeyBytes));
 	}
-	
+
 	/**
 	 * Encrypts a string using our public key
-	 * @param str input string
-	 * @param pk public key used to encrypt
+	 * 
+	 * @param str
+	 *            input string
+	 * @param pk
+	 *            public key used to encrypt
 	 * @return encrypted data
 	 */
 	public String encrypt(String str, PublicKey pk) {
@@ -67,10 +72,12 @@ public class RSA {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Decrypts an input string data using our public key
-	 * @param in input data
+	 * 
+	 * @param in
+	 *            input data
 	 * @return the decrypted string
 	 */
 	public String decrypt(String in) {
@@ -84,9 +91,10 @@ public class RSA {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Signs a file with this private key
+	 * 
 	 * @param in
 	 * @return
 	 */
@@ -94,25 +102,25 @@ public class RSA {
 		try {
 			byte[] data = (bf.getChecksum() + bf.getAlbumArt()).getBytes("UTF8");
 
-	        Signature sig = Signature.getInstance("SHA1WithRSA");
-	        sig.initSign(myPair.getPrivate());
-	        sig.update(data);
-	        byte[] signatureBytes = sig.sign();
-	        bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
-		} catch(Exception ex) {
+			Signature sig = Signature.getInstance("SHA1WithRSA");
+			sig.initSign(myPair.getPrivate());
+			sig.update(data);
+			byte[] signatureBytes = sig.sign();
+			bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public PublicKey rawPublicKey() {
 		return myPair.getPublic();
 	}
-	
+
 	public byte[] publicKeyBytes() {
 		X509EncodedKeySpec x509 = new X509EncodedKeySpec(myPair.getPublic().getEncoded());
 		return x509.getEncoded();
 	}
-	
+
 	public byte[] privateKeyBytes() {
 		PKCS8EncodedKeySpec pkc = new PKCS8EncodedKeySpec(myPair.getPrivate().getEncoded());
 		return pkc.getEncoded();
