@@ -9,8 +9,6 @@
 body {
     background-color: #F6F6F6;
     min-width: 1200px;
-    width: auto !important;
-    width: 1200px;
     font-size: 16px;
     overflow: hidden;
 }
@@ -113,7 +111,7 @@ body {
     background: none;
 }
 
-@media(min-width: 1200px) {
+@media(min-width: 900px) {
     #wrapper {
         padding-left: 180px;
     }
@@ -139,94 +137,6 @@ body {
         position: relative;
         margin-right: 0;
     }
-
-    #play-prev {
-        -webkit-filter: invert(100%);
-    }
-
-    #play {
-        -webkit-filter: invert(100%);
-    }
-    
-    #play-next {
-        -webkit-filter: invert(100%);
-    }
-
-    .playing {
-    	color: #999999 !important;
-    }
-}
-
-.playing {
-	color: black;
-	width: 180px;
-	padding-left: 20px;
-	padding-right: 20px;
-	word-wrap: break-word;
-}
-
-.playing-artist {
-	font-size: 15px;
-	margin-bottom: 3px;
-}
-
-.playing-title {
-	font-size: 14px;
-}
-
-.play-ctrl-box {
-	padding-left: 25px;
-}
-
-#play-prev {
-    background-position: 40% 50%;
-    display: block;
-    float: left;
-    height: 46px;
-    position: relative;
-    width: 33px;
-    z-index: 0;
-    perspective-origin: 16.5px 23px;
-    transform-origin: 16.5px 23px;
-    background: rgba(0, 0, 0, 0) url("../img/play-prev.svg") no-repeat scroll 40% 50% / auto padding-box border-box;
-    border: 0px none rgba(0, 0, 0, 0);
-    list-style: none outside none;
-    outline: rgba(0, 0, 0, 0) none 0px;
-}
-
-#play {
-    background-position: 55% 50%;
-    cursor: pointer;
-    display: block;
-    float: left;
-    height: 46px;
-    position: relative;
-    width: 46px;
-    perspective-origin: 23px 23px;
-    transform-origin: 23px 23px;
-    background: rgba(0, 0, 0, 0) url("../img/play.svg") no-repeat scroll 55% 50% / auto padding-box border-box;
-    border: 0px none rgba(0, 0, 0, 0);
-    font: normal normal normal normal 0px / 0px a;
-    list-style: none outside none;
-    margin: 0px 6px;
-    outline: rgba(0, 0, 0, 0) none 0px;
-}
-
-#play-next {
-    background-position: 60% 50%;
-    cursor: pointer;
-    display: block;
-    float: left;
-    height: 46px;
-    position: relative;
-    width: 33px;
-    perspective-origin: 16.5px 23px;
-    transform-origin: 16.5px 23px;
-    background: rgba(0, 0, 0, 0) url("../img/play-next.svg") no-repeat scroll 60% 50% / auto padding-box border-box;
-    border: 0px none rgba(0, 0, 0, 0);
-    font: normal normal normal normal 0px / 0px a;
-    list-style: none outside none;
-    outline: rgba(0, 0, 0, 0) none 0px;
 }
 
 .table {
@@ -272,3 +182,19 @@ body {
 .loader {
     margin-top: 125px;
 }
+
+.progress {
+    height: 8px;
+    background: #ddd;
+}
+
+.progress .progress-bar, .progress .progress-bar.progress-bar-default {
+    background-color: black;
+}
+
+#footer {
+	margin-left: 14px;
+	margin-bottom: 15px;
+}
+
+/** #009688 af **/

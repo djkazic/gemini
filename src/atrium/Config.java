@@ -9,29 +9,29 @@ import com.esotericsoftware.kryo.io.Output;
 import io.FileUtils;
 
 public class Config {
-	
-	//Networking
+
+	// Networking
 	public int tcpPort = 35500;
 	public int discoverPort = 35501;
 	public boolean cacheEnabled = false;
 	public String generatedMAC = null;
-	
-	//GUI
+
+	// GUI
 	public boolean hubMode = false;
 	public boolean clearBarAfterSearch = true;
 	public boolean notifiedPortForwarding = false;
 
-	//Crypto
+	// Crypto
 	public byte[] rsaPub;
 	public byte[] rsaPriv;
-	
+
 	/**
 	 * Writes configuration to disk (config.dat)
 	 */
 	public void writeConfig() {
 		try {
 			File configFile = new File(FileUtils.getConfigDir() + "/config.dat");
-			if(configFile.exists()) {
+			if (configFile.exists()) {
 				configFile.delete();
 			}
 			configFile.createNewFile();

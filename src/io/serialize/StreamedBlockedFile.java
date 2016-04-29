@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 import crypto.AES;
 import io.block.BlockedFile;
-import io.block.Metadata;
 
 /**
- * Representation of a BlockedFile for transmission
- * Currently is done by default; this may change in an update
+ * Representation of a BlockedFile for transmission Currently is done by default; this may change in an update
  *
  */
 public class StreamedBlockedFile {
@@ -16,35 +14,24 @@ public class StreamedBlockedFile {
 	private String pointerName;
 	private String checksum;
 	private ArrayList<String> blockList;
-	private Metadata metadata;
-	
+	private String signature;
+
 	public StreamedBlockedFile() {
-		pointerName = null;
-		checksum = null;
-		blockList = null;
-		metadata = null;
 	}
-	
-	public StreamedBlockedFile(String encryptedPointerName, String encryptedChecksum, 
-							   ArrayList<String> encryptedBlockList, Metadata metadata) {
+
+	public StreamedBlockedFile(String encryptedPointerName, String encryptedChecksum,
+			ArrayList<String> encryptedBlockList, String encryptedSignature) {
 		pointerName = encryptedPointerName;
 		checksum = encryptedChecksum;
 		blockList = encryptedBlockList;
-		this.metadata = metadata;
+		signature = encryptedSignature;
 	}
-	
+
 	public BlockedFile toBlockedFile(AES aes) {
-		ArrayList<String> decrypted = new ArrayList<String> ();
-		for(int i=0; i < blockList.size(); i++) {
+		ArrayList<String> decrypted = new ArrayList<String>();
+		for (int i = 0; i < blockList.size(); i++) {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
-		if(hasMetadata()) {
-			metadata.metaDexCheck();
-		}
-		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, false);
-	}
-	
-	public boolean hasMetadata() {
-		return metadata != null;
+		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, aes.decrypt(signature), false);
 	}
 }

@@ -1,6 +1,5 @@
 package atrium;
 
-import io.block.Metadata;
 import io.serialize.StreamedBlock;
 import io.serialize.StreamedBlockedFile;
 
@@ -52,32 +51,33 @@ import com.esotericsoftware.kryonet.Server;
 
 /**
  * Handles server, client, and discovery operations
+ * 
  * @author Kevin Cai
  */
 public class NetHandler {
 
-	public static String externalIp;                     //External IP, as reported by web API
-	public static boolean extVisible;                    //External visibility
-	public static List<InetAddress> foundHosts;          //Hosts discovered by LAN
-	public static ArrayList<String[]> searchResults;     //Temporary container for search res rows
+	public static String externalIp; // External IP, as reported by web API
+	public static boolean extVisible; // External visibility
+	public static List<InetAddress> foundHosts; // Hosts discovered by LAN
+	public static ArrayList<String[]> searchResults; // Temporary container for search res rows
 
-	//Instance variable for internal server
+	// Instance variable for internal server
 	private Server server;
 
 	/**
-	 * Creates instance of NetHandler, and retrieves external IP / visibility, 
-	 * peer, server, client, and discovery data
+	 * Creates instance of NetHandler, and retrieves external IP / visibility, peer, server, client, and discovery data
 	 */
 	public NetHandler() {
 		getExtIp();
 		registerServerListeners();
 		checkExtVisibility();
 		checkDestroyServer();
-		//TODO: replace checkAndStartMainwindow();
+		// TODO: replace checkAndStartMainwindow();
 	}
 
 	/**
 	 * Returns external IP
+	 * 
 	 * @returns string external IP
 	 */
 	private void getExtIp() {
@@ -100,7 +100,7 @@ public class NetHandler {
 			String finalStr = sb.toString();
 			Utilities.log(this, "External IP is: " + finalStr, true);
 			externalIp = finalStr;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			externalIp = null;
 			ex.printStackTrace();
 			Utilities.log(this, "Internet connection unstable, shutting down", false);
@@ -112,26 +112,26 @@ public class NetHandler {
 	 * Checks external visibility, and sets instance variable to result
 	 */
 	private void checkExtVisibility() {
-		if(externalIp != null) {
+		if (externalIp != null) {
 			try {
 				HttpClient httpclient = HttpClients.createDefault();
 				HttpPost httppost = new HttpPost("http://ping.eu/action.php?atype=5/");
 
-				//Request parameters and other properties.
-				List<NameValuePair> params = new ArrayList<NameValuePair> (3);
+				// Request parameters and other properties.
+				List<NameValuePair> params = new ArrayList<NameValuePair>(3);
 				params.add(new BasicNameValuePair("host", externalIp));
 				params.add(new BasicNameValuePair("port", "" + Core.config.tcpPort));
 				params.add(new BasicNameValuePair("go", "Go"));
 				httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-				//Execute and get the response.
+				// Execute and get the response.
 				HttpResponse response = httpclient.execute(httppost);
 				HttpEntity entity = response.getEntity();
 
-				if(entity != null) {
-				    InputStream instream = entity.getContent();
-				    try {
-				    	BufferedReader rd = new BufferedReader(new InputStreamReader(instream));
+				if (entity != null) {
+					InputStream instream = entity.getContent();
+					try {
+						BufferedReader rd = new BufferedReader(new InputStreamReader(instream));
 						StringBuilder sb = new StringBuilder();
 						String line;
 						while ((line = rd.readLine()) != null) {
@@ -140,21 +140,21 @@ public class NetHandler {
 						rd.close();
 
 						String finalStr = sb.toString();
-						if(finalStr != null) {
+						if (finalStr != null) {
 							boolean works = !finalStr.contains("color: red");
 							extVisible = Core.config.cacheEnabled = works;
 							Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"), false);
-							if(!Core.config.hubMode) {
-								if(!extVisible && !Core.config.notifiedPortForwarding) {
+							if (!Core.config.hubMode) {
+								if (!extVisible && !Core.config.notifiedPortForwarding) {
 									displayPortForwardWarning();
 								}
 							}
 						}
-				    } finally {
-				        instream.close();
-				    }
+					} finally {
+						instream.close();
+					}
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				ex.printStackTrace();
 				Utilities.log(this, "Internet connection unstable, shutting down", false);
 				System.exit(0);
@@ -164,6 +164,7 @@ public class NetHandler {
 
 	/**
 	 * Returns a new instance of a Client for forging out-bound connections
+	 * 
 	 * @return new instance of a Client for forging out-bound connections
 	 */
 	public Client getClient() {
@@ -197,14 +198,14 @@ public class NetHandler {
 	}
 
 	private void checkDestroyServer() {
-		if(!Core.config.hubMode && !extVisible) {
+		if (!Core.config.hubMode && !extVisible) {
 			destroyServerListeners();
 		}
 	}
 
 	private void destroyServerListeners() {
 		Utilities.log(this, "Deregistering server and its listeners", false);
-		for(Connection con : server.getConnections()) {
+		for (Connection con : server.getConnections()) {
 			con.close();
 		}
 		server.close();
@@ -212,7 +213,9 @@ public class NetHandler {
 
 	/**
 	 * Registers listeners for a client instance
-	 * @param client Client instance specified
+	 * 
+	 * @param client
+	 *            Client instance specified
 	 */
 	private void registerClientListeners(Client client) {
 		try {
@@ -231,12 +234,14 @@ public class NetHandler {
 
 	/**
 	 * Broadcasts a search request to connected peers
-	 * @param keyword Keyword string provided
+	 * 
+	 * @param keyword
+	 *            Keyword string provided
 	 */
 	public static ArrayList<String[]> doSearch(String keyword) {
-		searchResults = new ArrayList<String[]> (); // TODO: optimize
+		searchResults = new ArrayList<String[]>(); // TODO: optimize
 		try {
-			for(Peer peer : Core.peers) {
+			for (Peer peer : Core.peers) {
 				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
 			}
 			Thread.sleep(4000); // 4 second wait
@@ -249,68 +254,75 @@ public class NetHandler {
 
 	/**
 	 * Broadcasts a search request for a block to connected peers
-	 * @param originChecksum BlockedFile checksum
-	 * @param block BlockedFile block name (auto-hashed)
+	 * 
+	 * @param originChecksum
+	 *            BlockedFile checksum
+	 * @param block
+	 *            BlockedFile block name (auto-hashed)
 	 */
 	public static void requestBlock(String originChecksum, String block) {
 		/**
-		int ind = new SecureRandom().nextInt(Core.peers.size());
-		Peer chosenPeer = Core.peers.get(ind);
-		chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+		 * int ind = new SecureRandom().nextInt(Core.peers.size()); Peer chosenPeer = Core.peers.get(ind);
+		 * chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum),
+		 * Core.aes.encrypt(block)}));
 		 **/
-		for(int i=0; i < Core.peers.size(); i++) {
+		for (int i = 0; i < Core.peers.size(); i++) {
 			Peer peer = Core.peers.get(i);
-			if(peer != null) {
-				peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum), Core.aes.encrypt(block)}));
+			if (peer != null) {
+				peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK,
+						new String[] { Core.aes.encrypt(originChecksum), Core.aes.encrypt(block) }));
 			}
 		}
 	}
 
 	/**
 	 * Registers classes for serialization
-	 * @param kryo Kryo serializer instance provided
+	 * 
+	 * @param kryo
+	 *            Kryo serializer instance provided
 	 */
 	private void registerClasses(Kryo kryo) {
-		//Shared fields import
+		// Shared fields import
 		kryo.register(String[].class);
 		kryo.register(ArrayList.class);
 		kryo.register(byte[].class);
 		kryo.register(HashMap.class);
 
-		//Specifics import
+		// Specifics import
 		kryo.register(Data.class);
 		kryo.register(Request.class);
 		kryo.register(StreamedBlockedFile.class);
 		kryo.register(StreamedBlock.class);
-		kryo.register(Metadata.class);	
 	}
 
 	/**
 	 * Begins peer discovery routine
-	 * @param client Client instance provided
+	 * 
+	 * @param client
+	 *            Client instance provided
 	 */
 	public void peerDiscovery() {
 		try {
 			Utilities.log(this, "Locating peers...", true);
-			foundHosts = new ArrayList<InetAddress> ();
+			foundHosts = new ArrayList<InetAddress>();
 			bootstrapDiscovery();
 
-			//TODO: remove this debug section
+			// TODO: remove this debug section
 			foundHosts.clear();
 
-			//foundHosts.add(InetAddress.getByName("136.167.66.138"));
-			//foundHosts.add(InetAddress.getByName("192.3.165.112"));
+			// foundHosts.add(InetAddress.getByName("136.167.66.138"));
+			// foundHosts.add(InetAddress.getByName("192.3.165.112"));
 			foundHosts.add(InetAddress.getByName("192.227.251.74"));
-			//foundHosts.add(InetAddress.getByName("136.167.252.240"));
+			// foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			filterHosts();
-			if(foundHosts.size() == 0) {
+			if (foundHosts.size() == 0) {
 				Utilities.log(this, "No hosts found on LAN", false);
 			} else {
 				Utilities.log(this, "Found hosts: " + foundHosts, true);
 			}
 
-			//TODO: port randomization
+			// TODO: port randomization
 			attemptConnections();
 			startPeerCountListener();
 		} catch (Exception ex) {
@@ -328,42 +340,42 @@ public class NetHandler {
 			discoverClientThread.setName("Discovery Client Thread");
 			discoverClientThread.start();
 			long startTime = System.currentTimeMillis();
-			while(System.currentTimeMillis() < startTime + 3000L) {
+			while (System.currentTimeMillis() < startTime + 3000L) {
 				Thread.sleep(100);
 				continue;
 			}
 			discoveryClient.terminate();
 			discoverClientThread.interrupt();
 			Thread.sleep(150);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
 	private void filterHosts() {
 		try {
-			//Filter out local IP
+			// Filter out local IP
 			InetAddress localhost = InetAddress.getLocalHost();
 			foundHosts.remove(localhost);
 			InetAddress[] allLocalIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
-			if(allLocalIps != null && allLocalIps.length > 1) {
+			if (allLocalIps != null && allLocalIps.length > 1) {
 				Utilities.log(this, "Multiple local IPs detected", false);
-				for(int i=0; i < allLocalIps.length; i++) {
+				for (int i = 0; i < allLocalIps.length; i++) {
 					foundHosts.remove(allLocalIps[i]);
 				}
 			}
 
-			//Filter out loop-back interfaces
+			// Filter out loop-back interfaces
 			Enumeration<?> interfaces = NetworkInterface.getNetworkInterfaces();
 			while (interfaces.hasMoreElements()) {
 				NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-				Enumeration<InetAddress> addresses =  networkInterface.getInetAddresses();
-				while(addresses.hasMoreElements()) {
+				Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+				while (addresses.hasMoreElements()) {
 					InetAddress inetAddress = addresses.nextElement();
 					foundHosts.remove(inetAddress);
 				}
 			}
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -371,7 +383,7 @@ public class NetHandler {
 	private void attemptConnections() {
 		try {
 			Client newConnection = null;
-			for(InetAddress ia : foundHosts) {
+			for (InetAddress ia : foundHosts) {
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress(), false);
 					newConnection = getClient();
@@ -383,7 +395,7 @@ public class NetHandler {
 				}
 				Thread.sleep(1000);
 			}
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -411,21 +423,20 @@ public class NetHandler {
 				style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
 				style.append("font-size:" + font.getSize() + "pt;");
 				style.append("color: D1D0CE;");
-				JEditorPane ep = new JEditorPane(
-						"text/html", 
+				JEditorPane ep = new JEditorPane("text/html",
 						"<html><body style=\"" + style + "\">Please consider port forwarding " + Core.config.tcpPort
-						+ " TCP on your network. &nbsp; <br>"
-						+ "Not port forwarding leeches on the network :( <br><br>"
-						+ "<a style=\"color: #FFFFFF\" href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
-						+ "How to Port Forward</a></html>"
-						);
+								+ " TCP on your network. &nbsp; <br>"
+								+ "Not port forwarding leeches on the network :( <br><br>"
+								+ "<a style=\"color: #FFFFFF\" href=\"http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router\">"
+								+ "How to Port Forward</a></html>");
 				ep.addHyperlinkListener(new HyperlinkListener() {
 					@Override
 					public void hyperlinkUpdate(HyperlinkEvent he) {
-						if(he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+						if (he.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 							try {
-								Desktop.getDesktop().browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
-							} catch(Exception ex) {
+								Desktop.getDesktop()
+										.browse(new URI("http://www.wikihow.com/Set-Up-Port-Forwarding-on-a-Router"));
+							} catch (Exception ex) {
 								ex.printStackTrace();
 							}
 						}

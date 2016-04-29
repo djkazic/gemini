@@ -23,15 +23,15 @@ public class BlockListener extends TcpIdleSender {
 	private String blockName;
 
 	public BlockListener() {
-		if(sendQueue == null) {
-			sendQueue = new HashMap<Connection, Data> ();
+		if (sendQueue == null) {
+			sendQueue = new HashMap<Connection, Data>();
 		}
 	}
 
 	public void idle(Connection connection) {
-		if(!sendQueue.isEmpty()) {
+		if (!sendQueue.isEmpty()) {
 			Data sendObj = sendQueue.get(connection);
-			if(sendObj != null) {
+			if (sendObj != null) {
 				connection.sendTCP(sendObj);
 				sendQueue.remove(connection);
 			}
@@ -39,52 +39,56 @@ public class BlockListener extends TcpIdleSender {
 	}
 
 	public void received(final Connection connection, Object object) {
-		if(object instanceof Request) {
+		if (object instanceof Request) {
 			final Request request = (Request) object;
-			
-			if(request.getType() == (RequestTypes.BLOCK)) {
+
+			if (request.getType() == (RequestTypes.BLOCK)) {
 				Peer foundPeer = Peer.findPeer(connection);
 				String[] encryptedBlock = (String[]) request.getPayload();
 				blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
 				blockName = foundPeer.getAES().decrypt(encryptedBlock[1]);
 
-				//TODO: search for block
+				// TODO: search for block
 				BlockedFile foundBlock;
-				if((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
+				if ((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
 					int blockPosition;
-					if((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
+					if ((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
 
 						byte[] searchRes = null;
-						if(!foundBlock.isComplete() || Core.config.hubMode) {
-							//Attempt incomplete search
+						if (!foundBlock.isComplete() || Core.config.hubMode) {
+							// Attempt incomplete search
 							try {
-								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
+								searchRes = Files
+										.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
 							} catch (Exception ex) {
 								Utilities.log(this, "Received request for block we do not yet have", true);
 							}
 						} else {
-							if(foundBlock.isComplete()) {
-								//Attempt complete search
+							if (foundBlock.isComplete()) {
+								// Attempt complete search
 								searchRes = FileUtils.findBlockFromComplete(foundBlock, blockPosition);
 							}
 						}
 
-						if(searchRes != null) {
+						if (searchRes != null) {
 							Utilities.log(this, "\tReadying block " + blockName, true);
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
 							boolean dupe = sendQueue.containsValue(sb);
-							if(!dupe) {
+							if (!dupe) {
 								sendQueue.put(connection, new Data(DataTypes.BLOCK, sb));
 							} else {
 								Utilities.log(this, "Duplicate detected in BlockListener HashMap", true);
 							}
-							//blockConn.sendTCP(new Data(DataTypes.BLOCK, new StreamedBlock(blockOrigin, blockName, searchRes)));
+							// blockConn.sendTCP(new Data(DataTypes.BLOCK, new
+							// StreamedBlock(blockOrigin, blockName,
+							// searchRes)));
 						} else {
 							Utilities.log(this, "\tFailure: could not find block " + blockName, true);
 						}
 					} else {
-						Utilities.log(this, "\tFailure: BlockedFile block mismatch; blockList: " 
-								      + foundBlock.getBlockList(), false);
+						Utilities.log(this,
+								"\tFailure: BlockedFile block mismatch; blockList: " + foundBlock.getBlockList(),
+								false);
 					}
 				} else {
 					Utilities.log(this, "\tFailure: don't have origin BlockedFile", true);
@@ -94,5 +98,7 @@ public class BlockListener extends TcpIdleSender {
 	}
 
 	@Override
-	protected Object next() { return null; }
+	protected Object next() {
+		return null;
+	}
 }

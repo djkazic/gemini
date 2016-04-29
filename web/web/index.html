@@ -25,7 +25,7 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -79,7 +79,7 @@
 
                     <form id="search">
     					<div class="input-group" style="padding-bottom: 5px">
-                            <input type="text" class="form-control" id="search-query" placeholder="Search for a song...">
+                            <input type="text" class="form-control" id="search-query" placeholder="Search for a song..." autocomplete="off">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">
                                     <i class="fa fa-search"></i>
@@ -88,7 +88,7 @@
     					</div>
                     </form>
 
-					<div class="text-center hidden" id="search-results">
+					<div class="hidden" id="search-results">
                         <!-- Table section -->
                         <h4>SEARCH RESULTS</h4>
 
@@ -237,25 +237,13 @@
         <div class="hidden row" id="footer-page">
 			<div class="navbar-fixed-bottom">
 				<div class="row">
-                    <div class="col-md-12 text-left">
-                        <span id="play-controls">
-                        	<p class="playing playing-artist">Kanye West</p>
-                        	<p class="playing playing-title">Wolves OG</p>
-                            <div class="play-ctrl-box">
-	                            <button id="play-prev"></button>
-	                            <button id="play"></button>
-	                            <button id="play-next"></button>
+                    <div class="col-xs-12" id="footer">
+                        <span class="pull-right" style="margin-left: 15px; margin-right: 30px">
+                            <span id="status">
+                                <span class="label label-default">- - - - - -</span>
                             </span>
-
-                            <span class="pull-right" style="margin-top: 12px; margin-right: 15px">
-                                <p>Port status: &nbsp;
-                                    <span id="status">
-                                        <span class="label label-default">- - - - - - -</span>
-                                    </span>
-                                    <span id="peerCount" style="padding-left: 10px">
-                                        <img src="img/connect0.png" width="20" height="20">
-                                    </span>
-                                </p>
+                            <span id="peerCount" style="padding-left: 10px">
+                                <img src="img/connect0.png" width="20" height="20">
                             </span>
                         </span>
                     </div>

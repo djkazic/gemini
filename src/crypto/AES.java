@@ -10,18 +10,22 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * AES cryptography helper class.
+ * 
  * @author Kevin Cai
  */
 public class AES {
-	
+
 	private SecretKeySpec key;
-	
+
 	/**
 	 * Instantiates a new instance of the AES object
 	 *
-	 * @param mutex mutex value
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @param mutex
+	 *            mutex value
+	 * @throws UnsupportedEncodingException
+	 *             the unsupported encoding exception
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
 	 */
 	public AES(String mutex) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		byte[] keyBytes = mutex.getBytes("ISO-8859-1");
@@ -30,11 +34,12 @@ public class AES {
 		keyBytes = Arrays.copyOf(keyBytes, 16);
 		key = new SecretKeySpec(keyBytes, "AES");
 	}
-	
+
 	/**
 	 * Encrypts a string
 	 *
-	 * @param in value provided
+	 * @param in
+	 *            value provided
 	 * @return encrypted string
 	 */
 	public String encrypt(String in) {
@@ -45,11 +50,12 @@ public class AES {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Encrypts a byte array
 	 *
-	 * @param in value provided
+	 * @param in
+	 *            value provided
 	 * @return encrypted byte[]
 	 */
 	public byte[] encrypt(byte[] in) {
@@ -62,11 +68,12 @@ public class AES {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Decrypts a string
 	 *
-	 * @param in value provided
+	 * @param in
+	 *            value provided
 	 * @return decrypted string
 	 */
 	public String decrypt(String in) {
@@ -77,11 +84,12 @@ public class AES {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Decrypts a byte array
 	 *
-	 * @param in value provided
+	 * @param in
+	 *            value provided
 	 * @return decrypted byte[]
 	 */
 	public byte[] decrypt(byte[] in) {
@@ -94,18 +102,19 @@ public class AES {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets an instance of the AES cipher object
 	 *
-	 * @param enc toggle for encryption or decryption
+	 * @param enc
+	 *            toggle for encryption or decryption
 	 * @return cipher instance
 	 */
 	public Cipher getCipher(boolean enc) {
 		Cipher cipher = null;
 		try {
 			cipher = Cipher.getInstance("AES");
-			if(enc) {
+			if (enc) {
 				cipher.init(Cipher.ENCRYPT_MODE, key);
 			} else {
 				cipher.init(Cipher.DECRYPT_MODE, key);
