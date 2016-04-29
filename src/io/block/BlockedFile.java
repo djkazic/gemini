@@ -33,7 +33,6 @@ public class BlockedFile {
 	private long lastChecked;
 	private boolean cacheStatus;
 	private String signature = "";
-	private String albumArt = "";
 
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -66,8 +65,7 @@ public class BlockedFile {
 	 * @param blockList
 	 *            ArrayList<String> of block names
 	 */
-	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, String signature, String albumArt,
-			boolean searchConstructed) {
+	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, String signature, boolean searchConstructed) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -104,8 +102,7 @@ public class BlockedFile {
 	 * @param cache
 	 */
 	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
-			boolean complete, String progress, float blockRate, long lastChecked, boolean cache, String signature,
-			String albumArt) {
+			boolean complete, String progress, float blockRate, long lastChecked, boolean cache, String signature) {
 		this.pointer = file;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -116,7 +113,6 @@ public class BlockedFile {
 		this.lastChecked = lastChecked;
 		this.cacheStatus = cache;
 		this.signature = signature;
-		this.albumArt = albumArt;
 		if (!FileUtils.haveInBlockDex(pointer)) {
 			Core.blockDex.add(this);
 		}
@@ -411,14 +407,6 @@ public class BlockedFile {
 		signature = in;
 	}
 
-	public String getAlbumArt() {
-		return albumArt;
-	}
-
-	public void setAlbumArt(String in) {
-		albumArt = in;
-	}
-
 	/**
 	 * Converts this BlockedFile to SerialBlockedFile for serialization
 	 * 
@@ -426,7 +414,7 @@ public class BlockedFile {
 	 */
 	public SerialBlockedFile toSerialBlockedFile() {
 		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, complete, progress,
-				blockRate, lastChecked, cacheStatus, signature, albumArt);
+				blockRate, lastChecked, cacheStatus, signature);
 	}
 
 	/**
@@ -440,7 +428,7 @@ public class BlockedFile {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
 		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList,
-				Core.aes.encrypt(signature), Core.aes.encrypt(albumArt));
+				Core.aes.encrypt(signature));
 	}
 
 	/**

@@ -100,11 +100,9 @@ public class RSA {
 	 */
 	public void sign(BlockedFile bf) {
 		try {
-			byte[] data = (bf.getChecksum() + bf.getAlbumArt()).getBytes("UTF8");
-
 			Signature sig = Signature.getInstance("SHA1WithRSA");
 			sig.initSign(myPair.getPrivate());
-			sig.update(data);
+			sig.update(bf.getChecksum().getBytes());
 			byte[] signatureBytes = sig.sign();
 			bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
 		} catch (Exception ex) {
