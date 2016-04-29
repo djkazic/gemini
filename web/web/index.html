@@ -25,7 +25,7 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -237,26 +237,7 @@
         <div class="hidden row" id="footer-page">
 			<div class="navbar-fixed-bottom">
 				<div class="row">
-                        
-                    <div class="col-xs-12" style="margin-left: 14px">
-                        <span id="play-controls">
-                            <p class="playing playing-artist">Kanye West</p>
-                            <p class="playing playing-title">Wolves OG</p>
-                            <div class="play-ctrl-box">
-                                <button id="play-prev"></button>
-                                <button id="play"></button>
-                                <button id="play-next"></button>
-                            </div>
-                        </span>
-
-                        <div id="progress-col" class="col-xs-9" style="margin-left: 10px; margin-right: -20px; margin-top: 10px">
-                            <div class="progress" style="margin-right: 30px; color: black">
-                                <div id="music-progress" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                                </div>
-                            </div>
-                        </div>
-                        <span id="play-time">00:00 | 00:00</span>
-
+                    <div class="col-xs-12" id="footer">
                         <span class="pull-right" style="margin-left: 15px; margin-right: 30px">
                             <span id="status">
                                 <span class="label label-default">- - - - - -</span>
@@ -283,9 +264,6 @@
     <script>
     	$.material.init();
     </script>
-
-    <!-- Audio5js -->
-    <script src="js/audio5.js"></script>
 
     <!-- Custom JS -->
 	<script src="js/custom.js"></script>
