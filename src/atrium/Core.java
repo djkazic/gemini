@@ -126,7 +126,7 @@ public class Core {
 		//Initialize crypto SignRSA
 		Utilities.switchGui("Core", "Initializing SignRSA", false);
 		keySignRSA = new ArrayList<SignRSA> ();
-		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/signkeys");
+		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/.signkeys");
 		if(!keyFolder.exists()) {
 			keyFolder.mkdir();
 		}
