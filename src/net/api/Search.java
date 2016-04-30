@@ -48,16 +48,13 @@ public class Search extends ServerResource {
 							for (int i = 0; i < searchResults.size(); i++) {
 								sb.append("<tr>");
 								sb.append("<td class=\"td-minus\">" + (i + 1) + "</td>");
-								sb.append("<td class=\"td-plus\">");
+								sb.append("<td class=\"td-plus res-play\" id=\"" + searchResults.get(i)[1] + "\">");
 								sb.append("<a href=\"#\">");
 								sb.append("<i class=\"fa fa-play-circle-o\"></i>");
 								sb.append("</a>");
 								sb.append("</td>");
 								sb.append("<td>");
 								sb.append(searchResults.get(i)[0]);
-								sb.append("</td>");
-								sb.append("<td style=\"display: none\">");
-								sb.append(searchResults.get(i)[1]);
 								sb.append("</td>");
 								sb.append("</tr>");
 							}

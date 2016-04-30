@@ -31,6 +31,7 @@ public class APIRouter extends Application {
 		router.attach("/api/peers/count", PeerCount.class);
 		router.attach("/api/portcheck", PortCheck.class);
 		router.attach("/api/search", Search.class);
+		router.attach("/api/play", Play.class);
 		return router;
 	}
 }
