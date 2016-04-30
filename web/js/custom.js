@@ -49,14 +49,12 @@ function hookAllForms() {
 	var seen = {};
 	$('form').each(function() {
 		var id = this.id;
-		if (seen[id]) {
-			$(this).remove();
-		} else {
-			seen[id] = true;
+		if (!seen[id]) {
+			seen[id] = id;
 			var idObj = '#' + id;
 			switch (id) {
-				case 'search':
-					$(idObj).on('submit', function() {
+				case 'search-form':
+					$(idObj).on('submit', function(event) {
 						var query = $('#search-query').val();
 						var dataPack = {};
 						dataPack.query = query;
@@ -87,18 +85,18 @@ function hookAllForms() {
 									}
 								}
 							});
+							event.preventDefault();
+							return false;
 						} else if (peerCountTrack == 0) {
 							$('#search-results').html("No peers are connected :(");
 						} else {
 							$('#search-results').html("No connection was detected :(");
 						}
-						return false;
 					});
 					break;
 
 				default:
-					alert('default');
-					alert(this.id);
+					console.log('default: ' + this.id);
 			}
 		}
 	});
