@@ -240,8 +240,7 @@ public class Core {
 					}
 					for (Enumeration<JarEntry> enume = file.entries(); enume.hasMoreElements();) {
 						JarEntry entry = enume.nextElement();
-						if (entry.getName().startsWith("web") && !entry.getName().equals("web/")
-								&& !entry.getName().endsWith(".wav")) {
+						if (entry.getName().startsWith("web") && !entry.getName().equals("web/")) {
 							try {
 								File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
 								if (!extLoc.exists()) {
