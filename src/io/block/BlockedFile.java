@@ -65,7 +65,8 @@ public class BlockedFile {
 	 * @param blockList
 	 *            ArrayList<String> of block names
 	 */
-	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, String signature, boolean searchConstructed) {
+	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, String signature,
+			boolean searchConstructed) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -113,6 +114,7 @@ public class BlockedFile {
 		this.lastChecked = lastChecked;
 		this.cacheStatus = cache;
 		this.signature = signature;
+
 		if (!FileUtils.haveInBlockDex(pointer)) {
 			Core.blockDex.add(this);
 		}

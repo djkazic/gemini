@@ -32,6 +32,6 @@ public class StreamedBlockedFile {
 		for (int i = 0; i < blockList.size(); i++) {
 			decrypted.add(aes.decrypt(blockList.get(i)));
 		}
-		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, aes.decrypt(signature), false);
+		return new BlockedFile(aes.decrypt(pointerName), aes.decrypt(checksum), decrypted, aes.decrypt(signature), true);
 	}
 }
