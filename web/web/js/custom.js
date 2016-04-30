@@ -1,4 +1,5 @@
 var lastOnline = -3; // 3 attempts before timeout
+var peerCountTrack = 0;
 
 $(document).ready(function() {
 	// Set initial page as Home
@@ -67,7 +68,7 @@ function hookAllForms() {
 						
 						// TODO: actually populating table
 
-						if (connected() && peerCount(false) > 0) {
+						if (connected() && peerCountTrack > 0) {
 							$('#search-results').addClass('text-center');
 							$.ajax({
 								url: 'http://localhost:8888/api/search',
@@ -78,6 +79,7 @@ function hookAllForms() {
 									lastOnline = Date.now();
 									$('#search-results').html(JSON.parse(result).value);
 									$('#search-results').removeClass('text-center');
+									hookAllPlays();
 								},
 								error: function(XMLHttpRequest, textStatus, errorThrown) {
 									if (XMLHttpRequest.readyState == 0) {
@@ -85,7 +87,7 @@ function hookAllForms() {
 									}
 								}
 							});
-						} else if (peerCount(false) == 0) {
+						} else if (peerCountTrack == 0) {
 							$('#search-results').html("No peers are connected :(");
 						} else {
 							$('#search-results').html("No connection was detected :(");
@@ -99,6 +101,41 @@ function hookAllForms() {
 					alert(this.id);
 			}
 		}
+	});
+}
+
+function hookAllPlays() {
+	$('.res-play').each(function() {
+		$(this).on('click', function() {
+			//TODO: ajax
+			var dataPack = {};
+			dataPack.query = this.id;
+
+			if (connected()) {
+				var playIcon = $('#' + this.id);
+				playIcon.html("<a href=\"#\">"
+								+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
+								+ "</a>");
+				$.ajax({
+					url: 'http://localhost:8888/api/play',
+					timeout: 15000,
+					method: 'POST',
+					data: JSON.stringify(dataPack),
+					success: function(result) {
+						lastOnline = Date.now();
+						playIcon.html("<a href=\"#\">"
+								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
+								+ "</a>");
+						window.open(result);
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						if (XMLHttpRequest.readyState == 0) {
+							console.log("Disconnected af");
+						}
+					}
+				});
+			}
+		});
 	});
 }
 
@@ -152,6 +189,7 @@ function peerCount(setLabel) {
 					lastOnline = Date.now();
 					result = JSON.parse(result);
 					peerCount = Number(result.value);
+					peerCountTrack = peerCount;
 					var imageSrc;
 					if (peerCount == 0) {
 						imageSrc = 'img/connect0.png';
@@ -176,7 +214,6 @@ function peerCount(setLabel) {
 			$('#peerCount').html("<img src=\"" + 'img/connect0.png' + "\" width=20 height=20>");
 		}
 	}
-	return peerCount;
 }
 
 function connected() {
