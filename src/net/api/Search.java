@@ -10,6 +10,8 @@ import org.restlet.resource.ServerResource;
 import atrium.NetHandler;
 import atrium.Utilities;
 import filter.FilterUtils;
+import io.FileUtils;
+import io.block.BlockedFile;
 
 public class Search extends ServerResource {
 
@@ -46,11 +48,20 @@ public class Search extends ServerResource {
 							sb.append("<tbody>");
 
 							for (int i = 0; i < searchResults.size(); i++) {
+								String id = searchResults.get(i)[1];
+								
 								sb.append("<tr>");
 								sb.append("<td class=\"td-minus\">" + (i + 1) + "</td>");
-								sb.append("<td class=\"td-plus res-play\" id=\"" + searchResults.get(i)[1] + "\">");
+								sb.append("<td class=\"td-plus res-play\" id=\"" + id + "\">");
 								sb.append("<a href=\"#\">");
-								sb.append("<i class=\"fa fa-play-circle-o\"></i>");
+								
+								BlockedFile resBf = FileUtils.getBlockedFile(id);
+								String icon = "fa fa-play-circle-o";
+								if (!resBf.isComplete()) {
+									icon = "fa fa-download";
+								}
+
+								sb.append("<i class=\"" + icon + "\"></i>");
 								sb.append("</a>");
 								sb.append("</td>");
 								sb.append("<td>");
