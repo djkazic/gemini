@@ -36,7 +36,11 @@ public class Play extends ServerResource {
 				                  .replaceAll("\\%28", "(")
 				                  .replaceAll("\\%29", ")")
 				                  .replaceAll("\\%7E", "~");
-				responseJSON.put("value", path);
+				
+				String audioEmbed = "<audio id=\"player\" controls=\"\" autoplay=\"\" name=\"media\" style=\"width: 100%\">"
+								  + "<source src=\"" + path + "\" type=\"audio/mp3\"></audio>";
+				responseJSON.put("value", audioEmbed);
+				responseJSON.put("title", "<p>" + FileUtils.removeExtension(testBf.getPointer().getName()) + "</p>");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

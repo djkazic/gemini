@@ -682,4 +682,24 @@ public class FileUtils {
 			return null;
 		}
 	}
+	
+	public static String removeExtension(String str) {
+	    String separator = System.getProperty("file.separator");
+	    String filename;
+
+	    // Remove the path upto the filename.
+	    int lastSeparatorIndex = str.lastIndexOf(separator);
+	    if (lastSeparatorIndex == -1) {
+	        filename = str;
+	    } else {
+	        filename = str.substring(lastSeparatorIndex + 1);
+	    }
+
+	    // Remove the extension.
+	    int extensionIndex = filename.lastIndexOf(".");
+	    if (extensionIndex == -1)
+	        return filename;
+
+	    return filename.substring(0, extensionIndex);
+	}
 }
