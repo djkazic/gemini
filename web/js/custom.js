@@ -146,6 +146,9 @@ function sidebarOps() {
 			opt.addClass('active');
 			var newText = $('#' + this.id + '-page');
 			$('#page-text').html(newText.html()).append($('#footer-page').html());
+			if (this.id == "home") {
+				hookAllForms();
+			}
 			event.preventDefault();
 		}
 	});
