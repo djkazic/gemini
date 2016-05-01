@@ -138,6 +138,8 @@ function hookAllPlays() {
 								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
 								+ "</a>");
 						$('#embed-player').html(JSON.parse(result).value);
+						var regxp = new RegExp('#([^\\s]*)','g');
+						var rawTitle = JSON.parse(result).title.replace(/<(?:.|\n)*?>/gm, '').replace(regxp, '');
 						var title = JSON.parse(result).title;
 						if (title.length > 40) {
 							title = "<marquee>" + title + "</marquee>";
@@ -145,6 +147,21 @@ function hookAllPlays() {
 						$('#song-data').animate({'opacity': 0}, 800, function () {
 						    $(this).html(title);
 						}).animate({'opacity': 1}, 800);
+						
+						$.ajax({
+							url: 'https://api.spotify.com/v1/search?q=' + rawTitle + '&type=track',
+							timeout: 5000,
+							method: 'GET',
+							success: function(alresult) {
+								var albumArt = alresult['tracks']['items'][0]['album']['images'][1]['url'];
+								$('#song-cover').html('<img src=\"' + albumArt + "\">");
+							},
+							error: function(XMLHttpRequest, textStatus, errorThrown) {
+								if (XMLHttpRequest.readyState == 0) {
+									console.log("Disconnected af");
+								}
+							}
+						});
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
