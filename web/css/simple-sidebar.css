@@ -35,16 +35,17 @@ body {
 }
 
 #wrapper.toggled {
-    padding-left: 180px;
+    padding-left: 300px;
 }
 
 #sidebar-wrapper {
     z-index: 1000;
     position: fixed;
-    left: 180px;
+    left: 300px;
     width: 0;
     height: 100%;
-    margin-left: -180px;
+    margin-left: -300px;
+    overflow: hidden;
     overflow-y: auto;
     background: #000;
     -webkit-transition: all 0.5s ease;
@@ -54,7 +55,7 @@ body {
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    width: 180;
+    width: 300;
 }
 
 #page-content-wrapper {
@@ -65,7 +66,7 @@ body {
 
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
-    margin-right: -180px;
+    margin-right: -300px;
 }
 
 /* Sidebar Styles */
@@ -73,7 +74,7 @@ body {
 .sidebar-nav {
     position: absolute;
     top: 0;
-    width: 180px;
+    width: 300px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -110,9 +111,9 @@ body {
     background: none;
 }
 
-@media(min-width: 900px) {
+@media(min-width: 1200px) {
     #wrapper {
-        padding-left: 180px;
+        padding-left: 300px;
     }
 
     #wrapper.toggled {
@@ -120,7 +121,7 @@ body {
     }
 
     #sidebar-wrapper {
-        width: 180px;
+        width: 300px;
     }
 
     #wrapper.toggled #sidebar-wrapper {
@@ -198,6 +199,21 @@ body {
 #footer {
 	margin-left: 14px;
 	margin-bottom: 15px;
+}
+
+#embed-player {
+	position: absolute; 
+	bottom: 0; 
+	width: 100%;
+	margin-bottom: 40px;
+}
+
+#song-data {
+	color: white;
+	margin-left: 15px;
+	position: absolute; 
+	bottom: 0; 
+	white-space: nowrap;
 }
 
 /** #009688 af **/

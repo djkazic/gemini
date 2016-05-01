@@ -10,6 +10,14 @@ $(document).ready(function() {
 
 	// Disable user zoom
 	//disableZoom();
+
+	// Hook play / pause events
+	document.onkeypress = function(e) {
+		if((e || window.event).keyCode === 32){
+			var player = document.getElementById('player');
+			player.paused ? player.play() : player.pause();
+		}
+	};
 	
 	// Sidebar listeners
 	sidebarOps();
@@ -92,6 +100,8 @@ function hookAllForms() {
 						} else {
 							$('#search-results').html("No connection was detected :(");
 						}
+						event.preventDefault();
+						return false;
 					});
 					break;
 
@@ -105,7 +115,7 @@ function hookAllForms() {
 function hookAllPlays() {
 	$('.res-play').each(function() {
 		$(this).on('click', function(event) {
-			//TODO: ajax
+
 			var dataPack = {};
 			dataPack.query = this.id;
 
@@ -124,7 +134,8 @@ function hookAllPlays() {
 						playIcon.html("<a href=\"#\">"
 								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
 								+ "</a>");
-						window.open(JSON.parse(result).value);
+						$('#embed-player').html(JSON.parse(result).value);
+						$('#song-data').html(JSON.parse(result).title);
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
