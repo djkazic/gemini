@@ -22,6 +22,9 @@ $(document).ready(function() {
 	// Sidebar listeners
 	sidebarOps();
 
+	// Library hook
+	hookLibrary();
+
 	// Port status update
 	setInterval(pollStatus, 1200);
 	
@@ -126,7 +129,7 @@ function hookAllPlays() {
 								+ "</a>");
 				$.ajax({
 					url: 'http://localhost:8888/api/play',
-					timeout: 15000,
+					timeout: 40000,
 					method: 'POST',
 					data: JSON.stringify(dataPack),
 					success: function(result) {
@@ -139,9 +142,9 @@ function hookAllPlays() {
 						if (title.length > 40) {
 							title = "<marquee>" + title + "</marquee>";
 						}
-						$('#song-data').animate({'opacity': 0}, 1000, function () {
+						$('#song-data').animate({'opacity': 0}, 800, function () {
 						    $(this).html(title);
-						}).animate({'opacity': 1}, 1000);
+						}).animate({'opacity': 1}, 800);
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
@@ -152,6 +155,34 @@ function hookAllPlays() {
 			}
 			event.preventDefault();
 		});
+	});
+}
+
+function hookLibrary() {
+	$('#library').click(function(event) {
+		if (connected()) {
+			var query = 'query';
+			var dataPack = {};
+			dataPack.query = query;
+			$.ajax({
+				url: 'http://localhost:8888/api/library',
+				timeout: 5000,
+				method: 'POST',
+				data: JSON.stringify(dataPack),
+				success: function(result) {
+					lastOnline = Date.now();
+					$('#library-results').html(JSON.parse(result).value);
+					hookAllPlays();
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					if (XMLHttpRequest.readyState == 0) {
+						console.log("Disconnected af");
+					}
+				}
+			});
+			event.preventDefault();
+			return false;
+		}
 	});
 }
 
