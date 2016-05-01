@@ -50,12 +50,14 @@ public class FileWatcher implements Runnable {
 			for (final WatchEvent<?> we : events) {
 				if (we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 					try {
+						//System.out.println("File watch: pre-creation hook");
 						createHook(we.context().toString(), null);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 				}
 				if (we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+					//System.out.println("File watch: pre-deletion hook");
 					deleteHook(we.context().toString());
 				}
 			}
