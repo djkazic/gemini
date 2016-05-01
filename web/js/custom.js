@@ -15,10 +15,10 @@ $(document).ready(function() {
 	sidebarOps();
 
 	// Port status update
-	setInterval(pollStatus, 1500);
+	setInterval(pollStatus, 1200);
 	
 	// Peer number update
-	setInterval(peerCount, 1500, true);
+	setInterval(peerCount, 1200, true);
 });
 
 function disableZoom() {
@@ -104,7 +104,7 @@ function hookAllForms() {
 
 function hookAllPlays() {
 	$('.res-play').each(function() {
-		$(this).on('click', function() {
+		$(this).on('click', function(event) {
 			//TODO: ajax
 			var dataPack = {};
 			dataPack.query = this.id;
@@ -133,6 +133,7 @@ function hookAllPlays() {
 					}
 				});
 			}
+			event.preventDefault();
 		});
 	});
 }
@@ -220,7 +221,7 @@ function connected() {
 		lastOnline++;
 		return true;
 	}
-	var res = (lastOnline > 0 && ((lastOnline + 2000) > Date.now()))
+	var res = (lastOnline > 0 && ((lastOnline + 3000) > Date.now()))
 	return res;
 }
 

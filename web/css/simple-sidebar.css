@@ -10,7 +10,7 @@ body {
     background-color: #F6F6F6;
     min-width: 1200px;
     font-size: 16px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .form-control:focus {
@@ -40,13 +40,11 @@ body {
 
 #sidebar-wrapper {
     z-index: 1000;
-    position: absolute;
+    position: fixed;
     left: 180px;
     width: 0;
     height: 100%;
     margin-left: -180px;
-    overflow-y: auto;
-    overflow: hidden;
     background: #000;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -177,6 +175,10 @@ body {
 
 .search-panel {
     margin-top: 10px;
+}
+
+#search-results {
+	overflow: auto;
 }
 
 .loader {
