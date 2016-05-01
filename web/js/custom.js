@@ -124,7 +124,7 @@ function hookAllPlays() {
 						playIcon.html("<a href=\"#\">"
 								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
 								+ "</a>");
-						window.open(result);
+						window.open(JSON.parse(result).value);
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
