@@ -480,7 +480,7 @@ public class DualListener extends Listener {
 
 										if (FilterUtils.mandatoryFilter(intermediate.getPointer().getName())) {
 											BlockedFile testBf = FileUtils.getBlockedFile(intermediate.getChecksum());
-											if (testBf == null) {
+											if (!testBf.isComplete()) {
 												// Silently download this
 												// BlockedFile (complete)
 												fetchCache(intermediate, true);
