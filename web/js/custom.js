@@ -135,7 +135,13 @@ function hookAllPlays() {
 								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
 								+ "</a>");
 						$('#embed-player').html(JSON.parse(result).value);
-						$('#song-data').html(JSON.parse(result).title);
+						var title = JSON.parse(result).title;
+						if (title.length > 40) {
+							title = "<marquee>" + title + "</marquee>";
+						}
+						$('#song-data').animate({'opacity': 0}, 1000, function () {
+						    $(this).html(title);
+						}).animate({'opacity': 1}, 1000);
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
