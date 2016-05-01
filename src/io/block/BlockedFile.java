@@ -479,7 +479,7 @@ public class BlockedFile {
 				protoBlockDexCache.delete();
 			}
 		} catch (Exception ex) {
-			Utilities.log("io.block.BlockedFile", "Attempted write to blockdex, lock detected", false);
+			Utilities.log("io.block.BlockedFile", "Attempted write to blockdex, lock detected", true);
 		}
 	}
 }
