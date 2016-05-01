@@ -65,7 +65,7 @@ public class Search extends ServerResource {
 								sb.append("</a>");
 								sb.append("</td>");
 								sb.append("<td>");
-								sb.append(searchResults.get(i)[0]);
+								sb.append(removeExtension(searchResults.get(i)[0]));
 								sb.append("</td>");
 								sb.append("</tr>");
 							}
@@ -89,5 +89,25 @@ public class Search extends ServerResource {
 			ex.printStackTrace();
 		}
 		return responseJSON.toString();
+	}
+	
+	private String removeExtension(String str) {
+	    String separator = System.getProperty("file.separator");
+	    String filename;
+
+	    // Remove the path upto the filename.
+	    int lastSeparatorIndex = str.lastIndexOf(separator);
+	    if (lastSeparatorIndex == -1) {
+	        filename = str;
+	    } else {
+	        filename = str.substring(lastSeparatorIndex + 1);
+	    }
+
+	    // Remove the extension.
+	    int extensionIndex = filename.lastIndexOf(".");
+	    if (extensionIndex == -1)
+	        return filename;
+
+	    return filename.substring(0, extensionIndex);
 	}
 }
