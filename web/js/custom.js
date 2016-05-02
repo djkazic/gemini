@@ -1,4 +1,5 @@
 var lastOnline = -3; // 3 attempts before timeout
+var timeout = 0;
 var peerCountTrack = 0;
 
 $(document).ready(function() {
@@ -26,10 +27,10 @@ $(document).ready(function() {
 	hookLibrary();
 
 	// Port status update
-	setInterval(pollStatus, 1200);
+	setInterval(pollStatus, 1300);
 	
 	// Peer number update
-	setInterval(peerCount, 1200, true);
+	setInterval(peerCount, 1000, true);
 });
 
 function disableZoom() {
@@ -290,7 +291,21 @@ function connected() {
 		lastOnline++;
 		return true;
 	}
-	var res = (lastOnline > 0 && ((lastOnline + 3000) > Date.now()))
+	var res = (lastOnline > 0 && ((lastOnline + 3000) > Date.now()));
+	
+	if (res == 0) {
+		timeout++;
+	}
+
+	if (timeout == 4) {
+		window.confirm("No connection detected to Gemini client. Click OK to retry.");
+		timeout = 0;
+		lastOnline = -3;
+		onlineTrack = 0;
+		setTimeout(function() {
+			location.reload(true);
+		}, 5000);
+	}
 	return res;
 }
 
