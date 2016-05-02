@@ -383,7 +383,8 @@ public class NetHandler {
 	private void attemptConnections() {
 		try {
 			Client newConnection = null;
-			for (InetAddress ia : foundHosts) {
+			for (int i=0; i < foundHosts.size(); i++) {
+				InetAddress ia = foundHosts.get(i);
 				try {
 					Utilities.log(this, "Attempting connect to " + ia.getHostAddress(), false);
 					newConnection = getClient();
