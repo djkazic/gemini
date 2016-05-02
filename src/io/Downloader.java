@@ -51,7 +51,6 @@ public class Downloader implements Runnable {
 			while (Core.peers.size() > 0 && !blockedFile.isComplete()) {
 				if (!download) {
 					Utilities.log(this, "Idling in pause", true);
-					// TODO: GUI update for Downloader pause
 					Thread.sleep(3000);
 					continue;
 				}

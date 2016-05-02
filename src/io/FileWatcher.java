@@ -33,8 +33,7 @@ public class FileWatcher implements Runnable {
 		Path regDir = Paths.get(FileUtils.getWorkspaceDir());
 		try {
 			WatchService fileWatcher = regDir.getFileSystem().newWatchService();
-			watchKey = regDir.register(fileWatcher, StandardWatchEventKinds.ENTRY_CREATE,
-					StandardWatchEventKinds.ENTRY_DELETE);
+			watchKey = regDir.register(fileWatcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -50,21 +49,36 @@ public class FileWatcher implements Runnable {
 			for (final WatchEvent<?> we : events) {
 				if (we.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
 					try {
-						//System.out.println("File watch: pre-creation hook");
-						createHook(we.context().toString(), null);
+						(new Thread(new Runnable() {
+							public void run() {
+								try {
+									createHook(we.context().toString(), null);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						})).start();
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 				}
 				if (we.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-					//System.out.println("File watch: pre-deletion hook");
-					deleteHook(we.context().toString());
+					(new Thread(new Runnable() {
+						public void run() {
+							deleteHook(we.context().toString());
+						}
+					})).start();
 				}
 			}
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
+			}
+			boolean valid = watchKey.reset();
+			if (!valid) {
+				Utilities.log(this, "Failure to reset FileWatcher key!", false);
+				break;
 			}
 		}
 	}
@@ -152,7 +166,8 @@ public class FileWatcher implements Runnable {
 	private void deleteHook(String we) {
 		final String relevantFileName = we;
 		final File bfs = new File(FileUtils.getWorkspaceDir() + "/" + relevantFileName);
-		if (bfs.isFile()) {
+
+		if (bfs.isFile() || !bfs.exists()) {
 			if (!Core.config.hubMode) {
 				Utilities.log(this, "Deletion detected in workspace: " + we, false);
 			}

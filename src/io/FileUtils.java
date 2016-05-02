@@ -516,11 +516,7 @@ public class FileUtils {
 		}
 
 		out.close();
-		// Clear haveList, so progressBar doesn't show 200%
-		// bf.getBlacklist().clear();
-		// Reset progress
-		// bf.setProgress("0%");
-		// Delete contents then the block directory
+
 		File blocksDir = new File(bf.getBlocksFolder());
 		File[] blocksDirBlocks = blocksDir.listFiles();
 		if (blocksDirBlocks != null && blocksDirBlocks.length > 0) {
