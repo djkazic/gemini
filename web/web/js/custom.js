@@ -148,7 +148,9 @@ function hookAllPlays() {
 						$('#song-data').animate({'opacity': 0}, 800, function () {
 						    $(this).html(title);
 						}).animate({'opacity': 1}, 800);
-						
+
+						document.title = "Gemini | " + rawTitle;
+
 						$.ajax({
 							url: 'https://api.spotify.com/v1/search?q=' + rawTitle + '&type=track',
 							timeout: 5000,
