@@ -6,12 +6,10 @@ import io.FileUtils;
 import io.FileWatcher;
 import io.block.BlockedFile;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -29,7 +27,6 @@ import com.esotericsoftware.minlog.Log;
 
 import crypto.AES;
 import crypto.RSA;
-import crypto.SignRSA;
 
 /**
  * Holds centralized data (variables and instances)
@@ -38,7 +35,6 @@ import crypto.SignRSA;
  */
 public class Core {
 
-	public static ArrayList<SignRSA> keySignRSA;
 	public static RSA rsa;
 	public static AES aes;
 	public static ArrayList<Peer> peers;
@@ -125,29 +121,6 @@ public class Core {
 			rsa = new RSA();
 		if (printPubKey) {
 			Utilities.log("Core", "Pubkey dump: " + RSA.pubKey, false);
-		}
-
-		// Initialize crypto SignRSA
-		Utilities.switchGui("Core", "Initializing SignRSA", false);
-		keySignRSA = new ArrayList<SignRSA>();
-		File keyFolder = new File(FileUtils.getWorkspaceDir() + "/.signkeys");
-		if (!keyFolder.exists()) {
-			keyFolder.mkdir();
-		}
-		File[] files = keyFolder.listFiles();
-		if (files != null && files.length > 0) {
-			for (File file : files) {
-				if (FileUtils.getExtension(file.getName()).equals("pub")) {
-					try {
-						FileInputStream fis = new FileInputStream(file);
-						BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-						keySignRSA.add(new SignRSA(br.readLine()));
-						br.close();
-					} catch (Exception ex) {
-						Utilities.log("Core", "Could not format sign key file " + file.getName() + "... ", false);
-					}
-				}
-			}
 		}
 
 		// Initialize crypto AES

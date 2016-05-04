@@ -103,8 +103,8 @@ public class RSA {
 			Signature sig = Signature.getInstance("SHA1WithRSA");
 			sig.initSign(myPair.getPrivate());
 			sig.update(bf.getChecksum().getBytes());
-			byte[] signatureBytes = sig.sign();
-			bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
+			//byte[] signatureBytes = sig.sign();
+			//bf.setSignature(new String(signatureBytes, "ISO-8859-1"));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

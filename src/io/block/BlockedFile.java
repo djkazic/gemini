@@ -32,7 +32,6 @@ public class BlockedFile {
 	private float blockRate;
 	private long lastChecked;
 	private boolean cacheStatus;
-	private String signature = "";
 
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -65,8 +64,7 @@ public class BlockedFile {
 	 * @param blockList
 	 *            ArrayList<String> of block names
 	 */
-	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, String signature,
-			boolean searchConstructed) {
+	public BlockedFile(String pointer, String checksum, ArrayList<String> blockList, boolean searchConstructed) {
 		this.pointer = new File(FileUtils.getWorkspaceDir() + "/" + pointer);
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -103,7 +101,7 @@ public class BlockedFile {
 	 * @param cache
 	 */
 	public BlockedFile(File file, String checksum, ArrayList<String> blockList, ArrayList<String> blackList,
-			boolean complete, String progress, float blockRate, long lastChecked, boolean cache, String signature) {
+			boolean complete, String progress, float blockRate, long lastChecked, boolean cache) {
 		this.pointer = file;
 		this.checksum = checksum;
 		this.blockList = blockList;
@@ -113,7 +111,6 @@ public class BlockedFile {
 		this.blockRate = blockRate;
 		this.lastChecked = lastChecked;
 		this.cacheStatus = cache;
-		this.signature = signature;
 
 		if (!FileUtils.haveInBlockDex(pointer)) {
 			Core.blockDex.add(this);
@@ -401,14 +398,6 @@ public class BlockedFile {
 		return null;
 	}
 
-	public String getSignature() {
-		return signature;
-	}
-
-	public void setSignature(String in) {
-		signature = in;
-	}
-
 	/**
 	 * Converts this BlockedFile to SerialBlockedFile for serialization
 	 * 
@@ -416,7 +405,7 @@ public class BlockedFile {
 	 */
 	public SerialBlockedFile toSerialBlockedFile() {
 		return new SerialBlockedFile(pointer.getAbsolutePath(), checksum, blockList, blackList, complete, progress,
-				blockRate, lastChecked, cacheStatus, signature);
+				blockRate, lastChecked, cacheStatus);
 	}
 
 	/**
@@ -429,8 +418,7 @@ public class BlockedFile {
 		for (int i = 0; i < blockList.size(); i++) {
 			encryptedList.add(Core.aes.encrypt(blockList.get(i)));
 		}
-		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList,
-				Core.aes.encrypt(signature));
+		return new StreamedBlockedFile(Core.aes.encrypt(pointer.getName()), Core.aes.encrypt(checksum), encryptedList);
 	}
 
 	/**
