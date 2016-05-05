@@ -1,7 +1,7 @@
 package atrium;
 
 import filter.FilterUtils;
-import gui.LoadWindow;
+import gui.TrayHandler;
 import io.FileUtils;
 import io.FileWatcher;
 import io.block.BlockedFile;
@@ -39,7 +39,6 @@ public class Core {
 	public static AES aes;
 	public static ArrayList<Peer> peers;
 	public static NetHandler netHandler;
-	public static LoadWindow loadWindow;
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 
@@ -92,9 +91,10 @@ public class Core {
 		}
 
 		// GUI inits
+		Utilities.log("Core", "Attempting automatic hubmode detection...", false);
 		try {
 			Utilities.log("Core", "Initializing front-end", false);
-			loadWindow = new LoadWindow();
+			TrayHandler.init();
 		} catch (Exception ex) {
 			Core.config.hubMode = true;
 		}
@@ -104,17 +104,11 @@ public class Core {
 		}
 
 		// Set mutex
-		Utilities.switchGui("Core", "Calculating mutex", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(5);
-		}
+		Utilities.log("Core", "Calculating mutex", false);
 		mutex = Utilities.getMutex();
 
 		// Initialize crypto RSA
-		Utilities.switchGui("Core", "Initializing RSA", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(10);
-		}
+		Utilities.log("Core", "Initializing RSA", false);
 		if (Core.config.rsaPub != null && Core.config.rsaPriv != null)
 			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
 		else
@@ -124,23 +118,14 @@ public class Core {
 		}
 
 		// Initialize crypto AES
-		Utilities.switchGui("Core", "Initializing AES", false);
+		Utilities.log("Core", "Initializing AES", false);
 		aes = new AES(mutex);
-		if (loadWindow != null) {
-			loadWindow.setProgress(20);
-		}
 
 		// File directory checks
-		Utilities.switchGui("Core", "Checking for file structures", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(30);
-		}
+		Utilities.log("Core", "Checking for file structures", false);
 		FileUtils.initDirs();
 
 		// ShutdownHook for config
-		if (loadWindow != null) {
-			loadWindow.setProgress(35);
-		}
 		Thread shutHook = (new Thread(new Runnable() {
 			public void run() {
 				Utilities.log(this, "Writing config before shutting down", false);
@@ -151,53 +136,32 @@ public class Core {
 		Runtime.getRuntime().addShutdownHook(shutHook);
 
 		// Filter loading
-		if (loadWindow != null) {
-			loadWindow.setProgress(40);
-		}
 		FilterUtils.init();
 
 		// FileWatcher initialization
-		Utilities.switchGui("Core", "Registering file watcher", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(50);
-		}
+		Utilities.log("Core", "Registering file watcher", false);
 		(new Thread(new FileWatcher())).start();
 
 		// Vars initialization
-		if (loadWindow != null) {
-			loadWindow.setProgress(60);
-		}
 		blockDex = new ArrayList<BlockedFile>();
 		index = new HashMap<ArrayList<String>, ArrayList<String>>();
 		peers = new ArrayList<Peer>();
 
 		// Generate block index
-		Utilities.switchGui("Core", "Generating block index", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(65);
-		}
+		Utilities.log("Core", "Generating block index", false);
 		FileUtils.genBlockIndex();
 
 		// Initialize NetHandler object
-		Utilities.switchGui("Core", "Initializing networking", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(70);
-		}
+		Utilities.log("Core", "Initializing networking", false);
 		netHandler = new NetHandler();
 
 		// Start APIRouter
-		if (loadWindow != null) {
-			Utilities.switchGui("Core", "Initializing API router", false);
-			loadWindow.setProgress(80);
+		if (!Core.config.hubMode) {
+			Utilities.log("Core", "Initializing API router", false);
 			APIRouter.init();
 		}
 
-		Utilities.switchGui("Core", "Done being initialized", false);
-		if (loadWindow != null) {
-			loadWindow.setProgress(100);
-			loadWindow.setVisible(false);
-			loadWindow.dispose();
-		}
+		Utilities.log("Core", "Done being initialized", false);
 
 		// Open browser window (if this is not headless)
 		try {

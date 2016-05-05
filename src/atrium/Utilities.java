@@ -54,21 +54,6 @@ public class Utilities {
 	}
 
 	/**
-	 * Secondary dynamic switching method for debug; if headless, no GUI out
-	 * 
-	 * @param someClass
-	 *            origin class of debug
-	 * @param msg
-	 *            debug message
-	 */
-	public static void switchGui(String someClass, String msg, boolean debug) {
-		if (Core.loadWindow != null) {
-			Core.loadWindow.out(msg);
-		}
-		log(someClass, msg, debug);
-	}
-
-	/**
 	 * Calculates a mutex for duplicate connection avoidance
 	 * 
 	 * @return the mutex data generated
