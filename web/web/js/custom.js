@@ -133,9 +133,11 @@ function hookAllPlays() {
 
 				if (connected()) {
 					var playIcon = $('#' + this.id);
-					playIcon.html("<a>"
+					if (playIcon.html().indexOf("fa-play-circle-o") == -1) {
+						playIcon.html("<a>"
 									+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
 									+ "</a>");
+					}
 
 					$.ajax({
 						url: 'http://localhost:8888/api/play',
@@ -233,7 +235,6 @@ function updateLibrary() {
 					libTracks.push(trackId);
 				}
 			});
-			console.log("Libtracks: " + libTracks);
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
 			if (XMLHttpRequest.readyState == 0) {
