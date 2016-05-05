@@ -19,6 +19,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -33,6 +34,7 @@ import io.serialize.SerialBlockedFile;
 
 public class FileUtils {
 
+	public static Comparator<BlockedFile> bfComparator;
 	private static ArrayList<File> filterPassed;
 
 	public static void initDirs() {
@@ -582,7 +584,8 @@ public class FileUtils {
 	}
 
 	public static BlockedFile getBlockedFile(String checksum) {
-		for (BlockedFile block : Core.blockDex) {
+		for (int i=0; i < Core.blockDex.size(); i++) {
+			BlockedFile block = Core.blockDex.get(i);
 			if (block.getChecksum().equals(checksum)) {
 				return block;
 			}

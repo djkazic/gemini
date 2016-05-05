@@ -1,12 +1,14 @@
 package net.api;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
+import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
 import filter.FilterUtils;
@@ -14,6 +16,8 @@ import io.FileUtils;
 import io.block.BlockedFile;
 
 public class Search extends ServerResource {
+	
+	private Comparator<String[]> searchResComparator;
 
 	@Post("application/text")
 	public String process(JsonRepresentation entity) {
@@ -37,8 +41,18 @@ public class Search extends ServerResource {
 							return responseJSON.toString();
 						} else {
 							ArrayList<String[]> searchResults = NetHandler.doSearch(query);
-							// TODO: field count pre-flight check
-							// TODO: filter pre-flight checks
+							
+							if (searchResComparator == null) {
+								searchResComparator = new Comparator<String[]>() {
+									@Override
+									public int compare(String[] o1, String[] o2) {
+										// TODO Auto-generated method stub
+										return FileUtils.removeExtension(o1[0]).compareTo(FileUtils.removeExtension(o2[0]));
+									}
+								};
+							}
+							searchResults.sort(searchResComparator);
+
 							StringBuilder sb = new StringBuilder();
 							sb.append("<h4>SEARCH RESULTS</h4>");
 							sb.append("<div class=\"panel panel-default search-panel\">");
@@ -53,7 +67,7 @@ public class Search extends ServerResource {
 								sb.append("<tr>");
 								sb.append("<td class=\"td-minus\">" + (i + 1) + "</td>");
 								sb.append("<td class=\"td-plus res-play\" id=\"" + id + "\">");
-								sb.append("<a href=\"#\">");
+								sb.append("<a>");
 								
 								BlockedFile resBf = FileUtils.getBlockedFile(id);
 								String icon = "fa fa-play-circle-o";

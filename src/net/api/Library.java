@@ -1,5 +1,7 @@
 package net.api;
 
+import java.util.Comparator;
+
 import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.resource.Post;
@@ -19,6 +21,16 @@ public class Library extends ServerResource {
 			JSONObject json = entity.getJsonObject();
 			if (json.length() > 0) {
 				try {
+					if (FileUtils.bfComparator == null) {
+						FileUtils.bfComparator = new Comparator<BlockedFile>() {
+							@Override
+							public int compare(BlockedFile b1, BlockedFile b2) {
+								return b1.getPointer().getName().compareTo(b2.getPointer().getName());
+							}
+						};
+					}
+					Core.blockDex.sort(FileUtils.bfComparator);
+					
 					StringBuilder sb = new StringBuilder();
 					sb.append("<div class=\"panel panel-default lib-panel\">");
 					sb.append("<table class=\"table table-hover\" style=color:#333>");
@@ -32,7 +44,7 @@ public class Library extends ServerResource {
 							sb.append("<tr>");
 							sb.append("<td class=\"td-minus\">" + (i + 1) + "</td>");
 							sb.append("<td class=\"td-plus res-play\" id=\"" + bf.getChecksum() + "\">");
-							sb.append("<a href=\"#\">");
+							sb.append("<a>");
 							sb.append("<i class=\"fa fa-play-circle-o\"></i>");
 							sb.append("</a>");
 							sb.append("</td>");

@@ -27,6 +27,10 @@ public class Play extends ServerResource {
 					downloadThread.start();
 					downloadThread.join();
 				}
+				
+				// Allow time for block assembly
+				Thread.sleep(100);
+				
 				String path = testBf.getPath();
 				path = path.replace("#", "%23");
 				URLEncoder.encode(path, "UTF-8")
