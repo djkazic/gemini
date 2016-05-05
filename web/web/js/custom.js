@@ -1,6 +1,7 @@
 var lastOnline = -3; // 3 attempts before timeout
 var timeout = 0;
 var peerCountTrack = 0;
+var libTracks = [];
 
 $(document).ready(function() {
 	// Set initial page as Home
@@ -14,7 +15,7 @@ $(document).ready(function() {
 
 	// Hook play / pause events
 	document.onkeypress = function(e) {
-		if((e || window.event).keyCode === 32){
+		if((e || window.event).keyCode === 32) {
 			var player = document.getElementById('player');
 			player.paused ? player.play() : player.pause();
 		}
@@ -125,9 +126,14 @@ function hookAllPlays() {
 
 			if (connected()) {
 				var playIcon = $('#' + this.id);
-				playIcon.html("<a href=\"#\">"
+				playIcon.html("<a>"
 								+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
 								+ "</a>");
+				var popArr = function(id) {
+					if (libTracks.indexOf(id) == 0) {
+						libTracks.shift();
+					}
+				}
 				$.ajax({
 					url: 'http://localhost:8888/api/play',
 					timeout: 40000,
@@ -135,9 +141,10 @@ function hookAllPlays() {
 					data: JSON.stringify(dataPack),
 					success: function(result) {
 						lastOnline = Date.now();
-						playIcon.html("<a href=\"#\">"
-								+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
-								+ "</a>");
+						playIcon.html("<a>"
+										+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
+										+ "</a>");
+						popArr(dataPack.query);
 						$('#embed-player').html(JSON.parse(result).value);
 						var regxp = new RegExp('#([^\\s]*)','g');
 						var rawTitle = JSON.parse(result).title.replace(/<(?:.|\n)*?>/gm, '').replace(regxp, '');
@@ -165,6 +172,14 @@ function hookAllPlays() {
 								}
 							}
 						});
+
+						// Hook loop
+						var player = document.getElementById('player');
+						player.onended = function() {
+							if (libTracks.length > 0) {
+								$('#' + libTracks[0]).click();
+							}
+						};
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown) {
 						if (XMLHttpRequest.readyState == 0) {
@@ -193,6 +208,10 @@ function hookLibrary() {
 					lastOnline = Date.now();
 					$('#library-results').html(JSON.parse(result).value);
 					hookAllPlays();
+					libTracks.length = 0;
+					$('.res-play').each(function() { 
+						libTracks.push($(this).get(0).id);
+					});
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					if (XMLHttpRequest.readyState == 0) {
