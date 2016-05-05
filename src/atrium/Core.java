@@ -186,11 +186,11 @@ public class Core {
 		netHandler = new NetHandler();
 
 		// Start APIRouter
-		Utilities.switchGui("Core", "Initializing API router", false);
 		if (loadWindow != null) {
+			Utilities.switchGui("Core", "Initializing API router", false);
 			loadWindow.setProgress(80);
+			APIRouter.init();
 		}
-		APIRouter.init();
 
 		Utilities.switchGui("Core", "Done being initialized", false);
 		if (loadWindow != null) {
