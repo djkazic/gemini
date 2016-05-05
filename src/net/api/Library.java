@@ -40,8 +40,8 @@ public class Library extends ServerResource {
 							sb.append(FileUtils.removeExtension(bf.getPointer().getName()));
 							sb.append("</td>");
 							sb.append("</tr>");
+							i++;
 						}
-						i++;
 					}
 
 					sb.append("</tbody>");
