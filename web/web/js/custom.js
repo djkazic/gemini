@@ -156,34 +156,20 @@ function hookAllPlays() {
 							// Set trackPos
 							trackPos = libTracks.indexOf(dataPack.query);
 
+							// Fetch album art
 							$.ajax({
 								url: 'https://api.spotify.com/v1/search?q=' + rawTitle + '&type=track',
 								timeout: 5000,
 								method: 'GET',
 								success: function(alresult) {
-									var albumArt = alresult['tracks']['items'][0]['album']['images'][1]['url'];
+									var intermediary = alresult['tracks']['items'][0];
+									var albumArt;
+									if (intermediary) {
+										albumArt = intermediary['album']['images'][1]['url'];
+									} else {
+										albumArt = "img/404.jpg";
+									}
 									$('#song-cover').html('<img src=\"' + albumArt + "\">");
-
-									$('#embed-player').html(JSON.parse(result).value);
-									playIcon.html("<a>"
-													+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
-													+ "</a>");
-									$('#song-data').animate({'opacity': 0}, 800, function () {
-									    $(this).html(title);
-									}).animate({'opacity': 1}, 800);
-
-									document.title = "Gemini | " + rawTitle;
-
-									// Hook loop
-									var player = document.getElementById('player');
-									player.onended = function() {
-										if (libTracks.length > 0) {
-											trackPos++;
-											if (trackPos < libTracks.length) {
-												$('#' + libTracks[trackPos]).click();
-											}
-										}
-									};
 								},
 								error: function(XMLHttpRequest, textStatus, errorThrown) {
 									if (XMLHttpRequest.readyState == 0) {
@@ -191,6 +177,28 @@ function hookAllPlays() {
 									}
 								}
 							});
+
+							// Inject player
+							$('#embed-player').html(JSON.parse(result).value);
+							playIcon.html("<a>"
+											+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
+											+ "</a>");
+							$('#song-data').animate({'opacity': 0}, 800, function () {
+							    $(this).html(title);
+							}).animate({'opacity': 1}, 800);
+
+							document.title = "Gemini | " + rawTitle;
+
+							// Hook loop
+							var player = document.getElementById('player');
+							player.onended = function() {
+								if (libTracks.length > 0) {
+									trackPos++;
+									if (trackPos < libTracks.length) {
+										$('#' + libTracks[trackPos]).click();
+									}
+								}
+							};
 						},
 						error: function(XMLHttpRequest, textStatus, errorThrown) {
 							if (XMLHttpRequest.readyState == 0) {
