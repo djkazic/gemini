@@ -137,9 +137,6 @@ function hookAllPlays() {
 									+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
 									+ "</a>");
 
-					// Ensure updated library pull
-					updateLibrary();
-
 					$.ajax({
 						url: 'http://localhost:8888/api/play',
 						timeout: 40000,
@@ -150,6 +147,9 @@ function hookAllPlays() {
 							var regxp = new RegExp('#([^\\s]*)','g');
 							var rawTitle = JSON.parse(result).title.replace(/<(?:.|\n)*?>/gm, '').replace(regxp, '');
 							var title = JSON.parse(result).title;
+
+							// Ensure updated library pull
+							updateLibrary();
 
 							// Set trackPos
 							trackPos = libTracks.indexOf(dataPack.query);
@@ -166,9 +166,6 @@ function hookAllPlays() {
 									playIcon.html("<a>"
 													+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
 													+ "</a>");
-									if (title.length > 40) {
-										title = "<marquee>" + title + "</marquee>";
-									}
 									$('#song-data').animate({'opacity': 0}, 800, function () {
 									    $(this).html(title);
 									}).animate({'opacity': 1}, 800);

@@ -13,6 +13,10 @@ body {
     overflow: auto;
 }
 
+.marquee-p {
+    margin: 3px;
+}
+
 .form-control:focus {
     border-color: #cccccc;
     -webkit-box-shadow: none;

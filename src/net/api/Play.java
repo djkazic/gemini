@@ -44,7 +44,14 @@ public class Play extends ServerResource {
 				String audioEmbed = "<audio id=\"player\" controls=\"\" autoplay=\"\" name=\"media\" style=\"width: 100%\">"
 								  + "<source src=\"" + path + "\" type=\"audio/mp3\"></audio>";
 				responseJSON.put("value", audioEmbed);
-				responseJSON.put("title", "<p>" + FileUtils.removeExtension(testBf.getPointer().getName()) + "</p>");
+				
+				String title = FileUtils.removeExtension(testBf.getPointer().getName());
+				if (title.length() >= 40) {
+					title = "<marquee><p class=\"marquee-p\">" + title + "</p></marquee>";
+				} else {
+					title = "<p>" + title + "</p>";
+				}	
+				responseJSON.put("title", title);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
