@@ -1,6 +1,6 @@
 package net.api;
 
-import java.util.Comparator;
+import net.api.util.BlockedFileComparator;
 
 import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
@@ -22,12 +22,7 @@ public class Library extends ServerResource {
 			if (json.length() > 0) {
 				try {
 					if (FileUtils.bfComparator == null) {
-						FileUtils.bfComparator = new Comparator<BlockedFile>() {
-							@Override
-							public int compare(BlockedFile b1, BlockedFile b2) {
-								return b1.getPointer().getName().compareTo(b2.getPointer().getName());
-							}
-						};
+						FileUtils.bfComparator = new BlockedFileComparator();
 					}
 					Core.blockDex.sort(FileUtils.bfComparator);
 					

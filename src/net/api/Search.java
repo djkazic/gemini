@@ -3,12 +3,13 @@ package net.api;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import net.api.util.SearchResComparator;
+
 import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
-import atrium.Core;
 import atrium.NetHandler;
 import atrium.Utilities;
 import filter.FilterUtils;
@@ -43,13 +44,7 @@ public class Search extends ServerResource {
 							ArrayList<String[]> searchResults = NetHandler.doSearch(query);
 							
 							if (searchResComparator == null) {
-								searchResComparator = new Comparator<String[]>() {
-									@Override
-									public int compare(String[] o1, String[] o2) {
-										// TODO Auto-generated method stub
-										return FileUtils.removeExtension(o1[0]).compareTo(FileUtils.removeExtension(o2[0]));
-									}
-								};
+								searchResComparator = new SearchResComparator();
 							}
 							searchResults.sort(searchResComparator);
 
