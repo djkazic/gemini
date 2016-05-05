@@ -178,7 +178,7 @@ public class FileWatcher implements Runnable {
 				}
 			}
 			if (!Core.config.hubMode && bf != null) {
-				Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+				Utilities.log(this, "Reset: " + bf.getPointer().getName(), false);
 				bf.reset();
 				BlockedFile.serializeAll();
 				// TODO: deleteHook
@@ -190,12 +190,12 @@ public class FileWatcher implements Runnable {
 			for (BlockedFile bf : Core.blockDex) {
 				if (Core.config.hubMode) {
 					if (!(new File(bf.getBlocksFolder())).exists()) {
-						Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+						Utilities.log(this, "Reset: " + bf.getPointer().getName(), false);
 						bf.reset();
 					}
 				} else {
 					if (!bf.getPointer().exists()) {
-						Utilities.log(this, "Reset: " + bf.getPointer().getName(), true);
+						Utilities.log(this, "Reset: " + bf.getPointer().getName(), false);
 						bf.reset();
 					}
 				}
