@@ -2,6 +2,7 @@ var lastOnline = -3; // 3 attempts before timeout
 var timeout = 0;
 var peerCountTrack = 0;
 var libTracks = [];
+var trackPos = 0;
 
 $(document).ready(function() {
 	// Set initial page as Home
@@ -17,7 +18,9 @@ $(document).ready(function() {
 	document.onkeypress = function(e) {
 		if((e || window.event).keyCode === 32) {
 			var player = document.getElementById('player');
-			player.paused ? player.play() : player.pause();
+			if (player) {
+				player.paused ? player.play() : player.pause();
+			}
 		}
 	};
 	
@@ -26,6 +29,9 @@ $(document).ready(function() {
 
 	// Library hook
 	hookLibrary();
+
+	// Initial library pull
+	updateLibrary();
 
 	// Port status update
 	setInterval(pollStatus, 1300);
@@ -119,108 +125,123 @@ function hookAllForms() {
 
 function hookAllPlays() {
 	$('.res-play').each(function() {
-		$(this).on('click', function(event) {
+		var ev = $._data($(this), 'events');
+		if (typeof ev === "undefined" || !ev.click) {
+			$(this).on('click', function(event) {
+				var dataPack = {};
+				dataPack.query = this.id;
 
-			var dataPack = {};
-			dataPack.query = this.id;
+				if (connected()) {
+					var playIcon = $('#' + this.id);
+					playIcon.html("<a>"
+									+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
+									+ "</a>");
 
-			if (connected()) {
-				var playIcon = $('#' + this.id);
-				playIcon.html("<a>"
-								+ "<i class=\"fa fa-cog fa-spin\" aria-hidden=\"true\"></i>"
-								+ "</a>");
-				var popArr = function(id) {
-					if (libTracks.indexOf(id) == 0) {
-						libTracks.shift();
-					}
-				}
-				$.ajax({
-					url: 'http://localhost:8888/api/play',
-					timeout: 40000,
-					method: 'POST',
-					data: JSON.stringify(dataPack),
-					success: function(result) {
-						lastOnline = Date.now();
-						playIcon.html("<a>"
-										+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
-										+ "</a>");
-						popArr(dataPack.query);
-						$('#embed-player').html(JSON.parse(result).value);
-						var regxp = new RegExp('#([^\\s]*)','g');
-						var rawTitle = JSON.parse(result).title.replace(/<(?:.|\n)*?>/gm, '').replace(regxp, '');
-						var title = JSON.parse(result).title;
-						if (title.length > 40) {
-							title = "<marquee>" + title + "</marquee>";
-						}
-						$('#song-data').animate({'opacity': 0}, 800, function () {
-						    $(this).html(title);
-						}).animate({'opacity': 1}, 800);
+					// Ensure updated library pull
+					updateLibrary();
 
-						document.title = "Gemini | " + rawTitle;
+					$.ajax({
+						url: 'http://localhost:8888/api/play',
+						timeout: 40000,
+						method: 'POST',
+						data: JSON.stringify(dataPack),
+						success: function(result) {
+							lastOnline = Date.now();
+							var regxp = new RegExp('#([^\\s]*)','g');
+							var rawTitle = JSON.parse(result).title.replace(/<(?:.|\n)*?>/gm, '').replace(regxp, '');
+							var title = JSON.parse(result).title;
 
-						$.ajax({
-							url: 'https://api.spotify.com/v1/search?q=' + rawTitle + '&type=track',
-							timeout: 5000,
-							method: 'GET',
-							success: function(alresult) {
-								var albumArt = alresult['tracks']['items'][0]['album']['images'][1]['url'];
-								$('#song-cover').html('<img src=\"' + albumArt + "\">");
-							},
-							error: function(XMLHttpRequest, textStatus, errorThrown) {
-								if (XMLHttpRequest.readyState == 0) {
-									console.log("Disconnected af");
+							// Set trackPos
+							trackPos = libTracks.indexOf(dataPack.query);
+
+							$.ajax({
+								url: 'https://api.spotify.com/v1/search?q=' + rawTitle + '&type=track',
+								timeout: 5000,
+								method: 'GET',
+								success: function(alresult) {
+									var albumArt = alresult['tracks']['items'][0]['album']['images'][1]['url'];
+									$('#song-cover').html('<img src=\"' + albumArt + "\">");
+
+									$('#embed-player').html(JSON.parse(result).value);
+									playIcon.html("<a>"
+													+ "<i class=\"fa fa-play-circle-o\" aria-hidden=\"true\"></i>"
+													+ "</a>");
+									if (title.length > 40) {
+										title = "<marquee>" + title + "</marquee>";
+									}
+									$('#song-data').animate({'opacity': 0}, 800, function () {
+									    $(this).html(title);
+									}).animate({'opacity': 1}, 800);
+
+									document.title = "Gemini | " + rawTitle;
+
+									// Hook loop
+									var player = document.getElementById('player');
+									player.onended = function() {
+										if (libTracks.length > 0) {
+											trackPos++;
+											if (trackPos < libTracks.length) {
+												$('#' + libTracks[trackPos]).click();
+											}
+										}
+									};
+								},
+								error: function(XMLHttpRequest, textStatus, errorThrown) {
+									if (XMLHttpRequest.readyState == 0) {
+										console.log("Disconnected af");
+									}
 								}
+							});
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							if (XMLHttpRequest.readyState == 0) {
+								console.log("Disconnected af");
 							}
-						});
-
-						// Hook loop
-						var player = document.getElementById('player');
-						player.onended = function() {
-							if (libTracks.length > 0) {
-								$('#' + libTracks[0]).click();
-							}
-						};
-					},
-					error: function(XMLHttpRequest, textStatus, errorThrown) {
-						if (XMLHttpRequest.readyState == 0) {
-							console.log("Disconnected af");
 						}
-					}
-				});
-			}
-			event.preventDefault();
-		});
+					});
+				}
+				event.preventDefault();
+			});
+		}
 	});
 }
 
 function hookLibrary() {
 	$('#library').click(function(event) {
 		if (connected()) {
-			var query = 'query';
-			var dataPack = {};
-			dataPack.query = query;
-			$.ajax({
-				url: 'http://localhost:8888/api/library',
-				timeout: 5000,
-				method: 'POST',
-				data: JSON.stringify(dataPack),
-				success: function(result) {
-					lastOnline = Date.now();
-					$('#library-results').html(JSON.parse(result).value);
-					hookAllPlays();
-					libTracks.length = 0;
-					$('.res-play').each(function() { 
-						libTracks.push($(this).get(0).id);
-					});
-				},
-				error: function(XMLHttpRequest, textStatus, errorThrown) {
-					if (XMLHttpRequest.readyState == 0) {
-						console.log("Disconnected af");
-					}
-				}
-			});
+			updateLibrary();
 			event.preventDefault();
 			return false;
+		}
+	});
+}
+
+function updateLibrary() {
+	var query = 'query';
+	var dataPack = {};
+	dataPack.query = query;
+	$.ajax({
+		url: 'http://localhost:8888/api/library',
+		timeout: 5000,
+		method: 'POST',
+		data: JSON.stringify(dataPack),
+		success: function(result) {
+			lastOnline = Date.now();
+			$('#library-results').html(JSON.parse(result).value);
+			hookAllPlays();
+			libTracks.length = 0;
+			$('.res-play').each(function() {
+				var trackId = $(this).get(0).id;
+				if (libTracks.indexOf(trackId) == -1) {
+					libTracks.push(trackId);
+				}
+			});
+			console.log("Libtracks: " + libTracks);
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			if (XMLHttpRequest.readyState == 0) {
+				console.log("Disconnected af");
+			}
 		}
 	});
 }
