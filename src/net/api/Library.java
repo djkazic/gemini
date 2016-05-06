@@ -1,5 +1,7 @@
 package net.api;
 
+import java.util.Collections;
+
 import net.api.util.BlockedFileComparator;
 
 import org.json.JSONObject;
@@ -24,7 +26,7 @@ public class Library extends ServerResource {
 					if (FileUtils.bfComparator == null) {
 						FileUtils.bfComparator = new BlockedFileComparator();
 					}
-					Core.blockDex.sort(FileUtils.bfComparator);
+					Collections.sort(Core.blockDex, FileUtils.bfComparator);
 					
 					StringBuilder sb = new StringBuilder();
 					sb.append("<div class=\"panel panel-default lib-panel\">");

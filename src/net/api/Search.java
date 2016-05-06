@@ -1,6 +1,7 @@
 package net.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 import net.api.util.SearchResComparator;
@@ -46,7 +47,7 @@ public class Search extends ServerResource {
 							if (searchResComparator == null) {
 								searchResComparator = new SearchResComparator();
 							}
-							searchResults.sort(searchResComparator);
+							Collections.sort(searchResults, searchResComparator);
 
 							StringBuilder sb = new StringBuilder();
 							sb.append("<h4>SEARCH RESULTS</h4>");
