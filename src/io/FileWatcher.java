@@ -85,12 +85,12 @@ public class FileWatcher implements Runnable {
 
 	private void createHook(String we, File preDef) throws InterruptedException, IOException {
 		Utilities.log(this, "Creation detected in workspace: " + we, false);
-		final String relevantFileName = we;
+		final String relevantsearchSploitFileName = we;
 		File preFinal = null;
 		if (preDef != null) {
 			preFinal = preDef;
 		} else {
-			preFinal = new File(FileUtils.getWorkspaceDir() + "/" + relevantFileName);
+			preFinal = new File(FileUtils.getWorkspaceDir() + "/" + relevantsearchSploitFileName);
 		}
 		final File bfs = preFinal;
 
@@ -98,7 +98,7 @@ public class FileWatcher implements Runnable {
 			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
-					Utilities.log(this, "Visiting file " + file.getFileName(), false);
+					Utilities.log(this, "Visiting file " + file.getsearchSploitFileName(), false);
 					try {
 						createHook(file.toFile().getName(), file.toFile());
 					} catch (Exception ex) {
@@ -124,7 +124,7 @@ public class FileWatcher implements Runnable {
 				// Second to last exception
 			}
 		} else {
-			if (FilterUtils.mandatoryFilter(relevantFileName)) {
+			if (FilterUtils.mandatoryFilter(relevantsearchSploitFileName)) {
 				while (true) {
 					try {
 						// TODO: Extension and name filtering done here
@@ -133,7 +133,7 @@ public class FileWatcher implements Runnable {
 							continue;
 						}
 						if (FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
-							Utilities.log(this, "Created BlockedFile: " + relevantFileName, true);
+							Utilities.log(this, "Created BlockedFile: " + relevantsearchSploitFileName, true);
 							new BlockedFile(bfs, true);
 						}
 
@@ -153,19 +153,19 @@ public class FileWatcher implements Runnable {
 				 */
 			} else {
 				if (!bfs.getName().endsWith(".filepart")) {
-					Utilities.log(this, "Rejected file by filter: [" + relevantFileName + "]", false);
+					Utilities.log(this, "Rejected file by filter: [" + relevantsearchSploitFileName + "]", false);
 					FileUtils.deleteRecursive(bfs);
 					FileUtils.removeFileAndParentsIfEmpty(bfs.toPath());
 				} else {
-					Utilities.log(this, "Detected filepart upload: [" + relevantFileName + "]", false);
+					Utilities.log(this, "Detected filepart upload: [" + relevantsearchSploitFileName + "]", false);
 				}
 			}
 		}
 	}
 
 	private void deleteHook(String we) {
-		final String relevantFileName = we;
-		final File bfs = new File(FileUtils.getWorkspaceDir() + "/" + relevantFileName);
+		final String relevantsearchSploitFileName = we;
+		final File bfs = new File(FileUtils.getWorkspaceDir() + "/" + relevantsearchSploitFileName);
 
 		if (bfs.isFile() || !bfs.exists()) {
 			if (!Core.config.hubMode) {

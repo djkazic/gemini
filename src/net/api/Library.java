@@ -31,7 +31,7 @@ public class Library extends ServerResource {
 					StringBuilder sb = new StringBuilder();
 					sb.append("<div class=\"panel panel-default lib-panel\">");
 					sb.append("<table class=\"table table-hover\" style=color:#333>");
-					sb.append("<thead><tr><th>#</th><th>TRACK</th><th>FILENAME</th></tr></thead>");
+					sb.append("<thead><tr><th>#</th><th>TRACK</th><th>searchSploitFileName</th></tr></thead>");
 
 					sb.append("<tbody>");
 

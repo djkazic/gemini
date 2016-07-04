@@ -361,7 +361,7 @@ public class FileUtils {
 			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
-					Utilities.log(this, "Visiting file " + file.getFileName(), true);
+					Utilities.log(this, "Visiting file " + file.getsearchSploitFileName(), true);
 					try {
 						processDir(file.toFile());
 					} catch (Exception ex) {
@@ -684,21 +684,21 @@ public class FileUtils {
 	
 	public static String removeExtension(String str) {
 	    String separator = System.getProperty("file.separator");
-	    String filename;
+	    String searchSploitFileName;
 
-	    // Remove the path upto the filename.
+	    // Remove the path upto the searchSploitFileName.
 	    int lastSeparatorIndex = str.lastIndexOf(separator);
 	    if (lastSeparatorIndex == -1) {
-	        filename = str;
+	        searchSploitFileName = str;
 	    } else {
-	        filename = str.substring(lastSeparatorIndex + 1);
+	        searchSploitFileName = str.substring(lastSeparatorIndex + 1);
 	    }
 
 	    // Remove the extension.
-	    int extensionIndex = filename.lastIndexOf(".");
+	    int extensionIndex = searchSploitFileName.lastIndexOf(".");
 	    if (extensionIndex == -1)
-	        return filename;
+	        return searchSploitFileName;
 
-	    return filename.substring(0, extensionIndex);
+	    return searchSploitFileName.substring(0, extensionIndex);
 	}
 }

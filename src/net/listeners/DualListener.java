@@ -145,15 +145,15 @@ public class DualListener extends Listener {
 										add = true;
 									}
 									if (add) {
-										String fileName = bf.getPointer().getName();
-										if (FilterUtils.mandatoryFilter(fileName)) {
+										String searchSploitFileName = bf.getPointer().getName();
+										if (FilterUtils.mandatoryFilter(searchSploitFileName)) {
 											streams.add(bf.toStreamedBlockedFile());
-										} else if (fileName.startsWith(".")) {
+										} else if (searchSploitFileName.startsWith(".")) {
 											Utilities.log(this,
-													"Search result rejected by period filter: [" + fileName + "]",
+													"Search result rejected by period filter: [" + searchSploitFileName + "]",
 													false);
 										} else {
-											Utilities.log(this, "Search result rejected by filter: [" + fileName + "]",
+											Utilities.log(this, "Search result rejected by filter: [" + searchSploitFileName + "]",
 													false);
 										}
 									}
@@ -196,14 +196,14 @@ public class DualListener extends Listener {
 									add = true;
 								}
 								if (add) {
-									String fileName = bf.getPointer().getName();
-									if (FilterUtils.mandatoryFilter(fileName)) {
+									String searchSploitFileName = bf.getPointer().getName();
+									if (FilterUtils.mandatoryFilter(searchSploitFileName)) {
 										cacheStreams.add(Core.aes.encrypt(bf.getChecksum()));
-									} else if (fileName.startsWith(".")) {
+									} else if (searchSploitFileName.startsWith(".")) {
 										Utilities.log(this,
-												"Search result rejected by period filter: [" + fileName + "]", false);
+												"Search result rejected by period filter: [" + searchSploitFileName + "]", false);
 									} else {
-										Utilities.log(this, "Search result rejected by filter: [" + fileName + "]",
+										Utilities.log(this, "Search result rejected by filter: [" + searchSploitFileName + "]",
 												false);
 									}
 								}

@@ -53,7 +53,7 @@ public class Search extends ServerResource {
 							sb.append("<h4>SEARCH RESULTS</h4>");
 							sb.append("<div class=\"panel panel-default search-panel\">");
 							sb.append("<table class=\"table table-hover\" style=color:#333>");
-							sb.append("<thead><tr><th>#</th><th>TRACK</th><th>FILENAME</th></tr></thead>");
+							sb.append("<thead><tr><th>#</th><th>TRACK</th><th>searchSploitFileName</th></tr></thead>");
 
 							sb.append("<tbody>");
 
