@@ -361,7 +361,7 @@ public class FileUtils {
 			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
-					Utilities.log(this, "Visiting file " + file.getsearchSploitFileName(), true);
+					Utilities.log(this, "Visiting file " + file.getFileName(), true);
 					try {
 						processDir(file.toFile());
 					} catch (Exception ex) {

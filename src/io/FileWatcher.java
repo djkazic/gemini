@@ -98,7 +98,7 @@ public class FileWatcher implements Runnable {
 			FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes atts) throws IOException {
-					Utilities.log(this, "Visiting file " + file.getsearchSploitFileName(), false);
+					Utilities.log(this, "Visiting file " + file.getFileName(), false);
 					try {
 						createHook(file.toFile().getName(), file.toFile());
 					} catch (Exception ex) {
