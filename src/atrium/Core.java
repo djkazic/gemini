@@ -35,10 +35,17 @@ import crypto.RSA;
  */
 public class Core {
 
+	// Crypto instance variables
 	public static RSA rsa;
 	public static AES aes;
+
+	// Peers container
 	public static ArrayList<Peer> peers;
+
+	// NetHandler local instance
 	public static NetHandler netHandler;
+
+	// Local block index
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 
@@ -169,35 +176,41 @@ public class Core {
 			File index = new File(FileUtils.getConfigDir() + "/web/index.html");
 			if (!Core.config.hubMode) {
 				if (!index.exists()) {
-					JarFile file = new JarFile(
-							new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
-					File webDir = new File(FileUtils.getConfigDir() + "/web");
-					if (!webDir.exists()) {
-						webDir.mkdir();
-					}
-					for (Enumeration<JarEntry> enume = file.entries(); enume.hasMoreElements();) {
-						JarEntry entry = enume.nextElement();
-						if (entry.getName().startsWith("web") && !entry.getName().equals("web/")) {
-							try {
-								File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
-								if (!extLoc.exists()) {
-									if (entry.getName().endsWith("/")) {
-										extLoc.mkdirs();
-									} else {
-										extLoc.getParentFile().mkdirs();
+					File preFile = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+					if (preFile.exists()) {
+						try {
+							JarFile file = new JarFile(preFile);
+							File webDir = new File(FileUtils.getConfigDir() + "/web");
+							if (!webDir.exists()) {
+								webDir.mkdir();
+							}
+							for (Enumeration<JarEntry> enume = file.entries(); enume.hasMoreElements();) {
+								JarEntry entry = enume.nextElement();
+								if (entry.getName().startsWith("web") && !entry.getName().equals("web/")) {
+									try {
+										File extLoc = new File(FileUtils.getConfigDir() + "/" + entry.getName());
+										if (!extLoc.exists()) {
+											if (entry.getName().endsWith("/")) {
+												extLoc.mkdirs();
+											} else {
+												extLoc.getParentFile().mkdirs();
+											}
+										}
+										InputStream is = file.getInputStream(entry);
+										FileOutputStream fos = new FileOutputStream(extLoc);
+										while (is.available() > 0) {
+											fos.write(is.read());
+										}
+										fos.close();
+									} catch (Exception ex) {
 									}
 								}
-								InputStream is = file.getInputStream(entry);
-								FileOutputStream fos = new FileOutputStream(extLoc);
-								while (is.available() > 0) {
-									fos.write(is.read());
-								}
-								fos.close();
-							} catch (Exception ex) {
 							}
+							file.close();
+						} catch (Exception ex) {
+							Utilities.log("Core", "ZipFile not found: [" + preFile + "]", false);
 						}
 					}
-					file.close();
 				}
 				Utilities.openWebpage(new URL("file:///" + index.getAbsolutePath()));
 			}
