@@ -77,22 +77,22 @@ public class DualListener extends Listener {
 			switch (type) {
 				// Requests below are non-encrypted
 
-				case RequestTypes.PUBKEY:
+				case RequestTypes.PUBKEY_REQS:
 					Utilities.log(this, "Received request for pubkey", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
+							connection.sendTCP(new Data(DataTypes.PUBKEY_DATA, RSA.pubKey));
 							Utilities.log(this, "\tSent pubkey back", false);
 						}
 					});
 					break;
 
-				case RequestTypes.MUTEX:
+				case RequestTypes.MUTEX_REQS:
 					Utilities.log(this, "Received request for mutex", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
 							connection.sendTCP(
-									new Data(DataTypes.MUTEX, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
+									new Data(DataTypes.MUTEX_DATA, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
 							Utilities.log(this, "\tSent mutex back", false);
 						}
 					});
@@ -100,7 +100,7 @@ public class DualListener extends Listener {
 
 				// Requests below are symmetrically encrypted
 
-				case RequestTypes.PEERLIST:
+				case RequestTypes.PEERLIST_REQS:
 					Utilities.log(this, "Received request for peerlist", false);
 					// TODO: more refined peerList filtering
 					replyPool.execute(new Runnable() {
@@ -113,7 +113,7 @@ public class DualListener extends Listener {
 									refinedPeerList.add(Core.aes.encrypt(peerData));
 								}
 							}
-							connection.sendTCP(new Data(DataTypes.PEERLIST, refinedPeerList));
+							connection.sendTCP(new Data(DataTypes.PEERLIST_DATA, refinedPeerList));
 							Utilities.log(this, "\tSent peerlist back, len " + refinedPeerList.size(), false);
 							if (foundPeer.getInOut() == 0) {
 								foundPeer.getDeferredLatch().countDown();
@@ -122,7 +122,7 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case RequestTypes.SEARCH:
+				case RequestTypes.SEARCH_REQS:
 					Utilities.log(this, "Received request for search", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -159,7 +159,7 @@ public class DualListener extends Listener {
 									}
 								}
 							}
-							connection.sendTCP(new Data(DataTypes.SEARCH, streams));
+							connection.sendTCP(new Data(DataTypes.SEARCH_REQS, streams));
 							Utilities.log(this, "\tSent search results back", false);
 						}
 					});
@@ -167,17 +167,17 @@ public class DualListener extends Listener {
 					// have encrypted name + onboard encrypted blockList
 					break;
 
-				case RequestTypes.EXTVIS:
+				case RequestTypes.EXTVIS_REQS:
 					Utilities.log(this, "Received request for external visibility", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							connection.sendTCP(new Data(DataTypes.EXTVIS, Core.config.cacheEnabled));
+							connection.sendTCP(new Data(DataTypes.EXTVIS_DATA, Core.config.cacheEnabled));
 							Utilities.log(this, "\tSent external visibility data back", false);
 						}
 					});
 					break;
 
-				case RequestTypes.CACHE:
+				case RequestTypes.CACHE_REQS:
 					Utilities.log(this, "Received request for cache feed", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -208,13 +208,13 @@ public class DualListener extends Listener {
 									}
 								}
 							}
-							connection.sendTCP(new Data(DataTypes.CACHE, cacheStreams));
+							connection.sendTCP(new Data(DataTypes.CACHE_DATA, cacheStreams));
 							Utilities.log(this, "\tSent cache search results back", false);
 						}
 					});
 					break;
 
-				case RequestTypes.CACHEPULL:
+				case RequestTypes.CACHEPULL_REQS:
 					Utilities.log(this, "Received request for cache pull", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -240,7 +240,7 @@ public class DualListener extends Listener {
 									Utilities.log(this,
 											"Sending back data for cache pull, package size " + streamsToSend.size(),
 											false);
-									foundPeer.getConnection().sendTCP(new Data(DataTypes.CACHEPULL, streamsToSend));
+									foundPeer.getConnection().sendTCP(new Data(DataTypes.CACHEPULL_DATA, streamsToSend));
 								} else {
 									Utilities.log(this, "No cache available to send", false);
 								}
@@ -249,12 +249,12 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case RequestTypes.HOSTPORT:
+				case RequestTypes.HOSTPORT_REQS:
 					Utilities.log(this, "Received request for hosting port", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
 							Utilities.log(this, "\tSent back hostport", false);
-							foundPeer.getConnection().sendTCP(new Data(DataTypes.HOSTPORT, Core.config.tcpPort));
+							foundPeer.getConnection().sendTCP(new Data(DataTypes.HOSTPORT_DATA, Core.config.tcpPort));
 						}
 					});
 					break;
@@ -266,7 +266,7 @@ public class DualListener extends Listener {
 			switch (type) {
 				// Data below are encryption keys, mutex is encrypted via RSA
 
-				case DataTypes.PUBKEY:
+				case DataTypes.PUBKEY_DATA:
 					Utilities.log(this, "Received pubkey data: ", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -278,7 +278,7 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case DataTypes.MUTEX:
+				case DataTypes.MUTEX_DATA:
 					Utilities.log(this, "Received mutex data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -310,7 +310,7 @@ public class DualListener extends Listener {
 				// encryption
 				// TODO: symmetric encryption for peerlist and on
 
-				case DataTypes.PEERLIST:
+				case DataTypes.PEERLIST_DATA:
 					Utilities.log(this, "Received peerlist data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -362,7 +362,7 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case DataTypes.SEARCH:
+				case DataTypes.SEARCH_REQS:
 					Utilities.log(this, "Received search reply data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -402,13 +402,13 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case DataTypes.BLOCK:
+				case DataTypes.BLOCK_REQS:
 					Utilities.log(this, "Received block data", true);
 					StreamedBlock streamedBlock = (StreamedBlock) data.getPayload();
 					streamedBlock.insertSelf(foundPeer.getAES());
 					break;
 
-				case DataTypes.EXTVIS:
+				case DataTypes.EXTVIS_DATA:
 					Utilities.log(this, "Received external visibility data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
@@ -418,7 +418,7 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case DataTypes.CACHE:
+				case DataTypes.CACHE_DATA:
 					Utilities.log(this, "Received cache pre-sync data", true);
 					if (!Core.config.cacheEnabled) {
 						Utilities.log(this, "Garbage cache data received, discarded", false);
@@ -455,7 +455,7 @@ public class DualListener extends Listener {
 									Utilities.log(this, "Requesting " + cacheDataRes.size() + " BlockedFiles from peer "
 											+ foundPeer.getMutex(), false);
 									foundPeer.getConnection()
-											.sendTCP(new Request(RequestTypes.CACHEPULL, cacheDataRes));
+											.sendTCP(new Request(RequestTypes.CACHEPULL_REQS, cacheDataRes));
 								} else {
 									Utilities.log(this, "No new data found from peer " + foundPeer.getMutex(), false);
 								}
@@ -464,7 +464,7 @@ public class DualListener extends Listener {
 					}
 					break;
 
-				case DataTypes.CACHEPULL:
+				case DataTypes.CACHEPULL_DATA:
 					Utilities.log(this, "Received cache pull data", false);
 					final Object cachePullPayload = data.getPayload();
 					replyPool.execute(new Runnable() {
@@ -493,7 +493,7 @@ public class DualListener extends Listener {
 					});
 					break;
 
-				case DataTypes.HOSTPORT:
+				case DataTypes.HOSTPORT_DATA:
 					Utilities.log(this, "Received hostport data", false);
 					replyPool.execute(new Runnable() {
 						public void run() {

@@ -71,21 +71,21 @@ public class Peer {
 					if (inOut == 1) {
 						// Pro-active request approach to this (in)peer
 						Utilities.log(this, "Sending our pubkey first", true);
-						connection.sendTCP(new Data(DataTypes.PUBKEY, RSA.pubKey));
+						connection.sendTCP(new Data(DataTypes.PUBKEY_DATA, RSA.pubKey));
 						Utilities.log(this, "Requesting peer's pubkey", true);
-						connection.sendTCP(new Request(RequestTypes.PUBKEY, null));
+						connection.sendTCP(new Request(RequestTypes.PUBKEY_REQS, null));
 						Utilities.log(this, "Awaiting peer's pubkey", true);
 						pubkeyDone.await();
 						Utilities.log(this, "Requesting peer's mutex", true);
-						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
+						connection.sendTCP(new Request(RequestTypes.MUTEX_REQS, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist", true);
-						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
+						connection.sendTCP(new Request(RequestTypes.PEERLIST_REQS, null));
 						Utilities.log(this, "Requesting extVisible data", true);
-						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
+						connection.sendTCP(new Request(RequestTypes.EXTVIS_REQS, null));
 						Utilities.log(this, "Requesting peer's hostPort", true);
-						connection.sendTCP(new Request(RequestTypes.HOSTPORT, null));
+						connection.sendTCP(new Request(RequestTypes.HOSTPORT_REQS, null));
 					} else {
 						// When we've received both a pubkey and sent our
 						// peerlist out,
@@ -93,15 +93,15 @@ public class Peer {
 						pubkeyDone.await();
 						deferredRequesting.await();
 						Utilities.log(this, "Requesting peer's mutex", true);
-						connection.sendTCP(new Request(RequestTypes.MUTEX, null));
+						connection.sendTCP(new Request(RequestTypes.MUTEX_REQS, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist", true);
-						connection.sendTCP(new Request(RequestTypes.PEERLIST, null));
+						connection.sendTCP(new Request(RequestTypes.PEERLIST_REQS, null));
 						Utilities.log(this, "Requesting extVisible data", true);
-						connection.sendTCP(new Request(RequestTypes.EXTVIS, null));
+						connection.sendTCP(new Request(RequestTypes.EXTVIS_REQS, null));
 						Utilities.log(this, "Requesting peer's hostPort", true);
-						connection.sendTCP(new Request(RequestTypes.HOSTPORT, null));
+						connection.sendTCP(new Request(RequestTypes.HOSTPORT_REQS, null));
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();

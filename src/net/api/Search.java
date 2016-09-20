@@ -50,7 +50,7 @@ public class Search extends ServerResource {
 							Collections.sort(searchResults, searchResComparator);
 
 							StringBuilder sb = new StringBuilder();
-							sb.append("<h4>SEARCH RESULTS</h4>");
+							sb.append("<h4>SEARCH_REQS RESULTS</h4>");
 							sb.append("<div class=\"panel panel-default search-panel\">");
 							sb.append("<table class=\"table table-hover\" style=color:#333>");
 							sb.append("<thead><tr><th>#</th><th>TRACK</th><th>searchSploitFileName</th></tr></thead>");

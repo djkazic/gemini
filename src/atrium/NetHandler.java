@@ -242,7 +242,7 @@ public class NetHandler {
 		searchResults = new ArrayList<String[]>(); // TODO: optimize
 		try {
 			for (Peer peer : Core.peers) {
-				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH, Core.aes.encrypt(keyword)));
+				peer.getConnection().sendTCP(new Request(RequestTypes.SEARCH_REQS, Core.aes.encrypt(keyword)));
 			}
 			Thread.sleep(4000); // 4 second wait
 			Utilities.log("NetHandler", "Returning search data to API", false);
@@ -263,13 +263,13 @@ public class NetHandler {
 	public static void requestBlock(String originChecksum, String block) {
 		/**
 		 * int ind = new SecureRandom().nextInt(Core.peers.size()); Peer chosenPeer = Core.peers.get(ind);
-		 * chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK, new String[] {Core.aes.encrypt(originChecksum),
+		 * chosenPeer.getConnection().sendTCP(new Request(RequestTypes.BLOCK_REQS, new String[] {Core.aes.encrypt(originChecksum),
 		 * Core.aes.encrypt(block)}));
 		 **/
 		for (int i = 0; i < Core.peers.size(); i++) {
 			Peer peer = Core.peers.get(i);
 			if (peer != null) {
-				peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK,
+				peer.getConnection().sendTCP(new Request(RequestTypes.BLOCK_REQS,
 						new String[] { Core.aes.encrypt(originChecksum), Core.aes.encrypt(block) }));
 			}
 		}

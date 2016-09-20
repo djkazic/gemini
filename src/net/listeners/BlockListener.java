@@ -42,7 +42,7 @@ public class BlockListener extends TcpIdleSender {
 		if (object instanceof Request) {
 			final Request request = (Request) object;
 
-			if (request.getType() == (RequestTypes.BLOCK)) {
+			if (request.getType() == (RequestTypes.BLOCK_REQS)) {
 				Peer foundPeer = Peer.findPeer(connection);
 				String[] encryptedBlock = (String[]) request.getPayload();
 				blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
@@ -75,11 +75,11 @@ public class BlockListener extends TcpIdleSender {
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
 							boolean dupe = sendQueue.containsValue(sb);
 							if (!dupe) {
-								sendQueue.put(connection, new Data(DataTypes.BLOCK, sb));
+								sendQueue.put(connection, new Data(DataTypes.BLOCK_REQS, sb));
 							} else {
 								Utilities.log(this, "Duplicate detected in BlockListener HashMap", true);
 							}
-							// blockConn.sendTCP(new Data(DataTypes.BLOCK, new
+							// blockConn.sendTCP(new Data(DataTypes.BLOCK_REQS, new
 							// StreamedBlock(blockOrigin, blockName,
 							// searchRes)));
 						} else {
