@@ -13,8 +13,6 @@ import io.block.BlockedFile;
 import io.serialize.StreamedBlock;
 import packets.data.Data;
 import packets.data.DataTypes;
-import packets.requests.Request;
-import packets.requests.RequestTypes;
 
 public class BlockListener extends TcpIdleSender {
 
@@ -39,10 +37,10 @@ public class BlockListener extends TcpIdleSender {
 	}
 
 	public void received(final Connection connection, Object object) {
-		if (object instanceof Request) {
-			final Request request = (Request) object;
+		if (object instanceof Data) {
+			final Data request = (Data) object;
 
-			if (request.getType() == (RequestTypes.BLOCK_REQS)) {
+			if (request.getType() == (DataTypes.BLOCK_REQS)) {
 				Peer foundPeer = Peer.findPeer(connection);
 				String[] encryptedBlock = (String[]) request.getPayload();
 				blockOriginChecksum = foundPeer.getAES().decrypt(encryptedBlock[0]);
@@ -75,13 +73,10 @@ public class BlockListener extends TcpIdleSender {
 							StreamedBlock sb = new StreamedBlock(blockOriginChecksum, blockName, searchRes);
 							boolean dupe = sendQueue.containsValue(sb);
 							if (!dupe) {
-								sendQueue.put(connection, new Data(DataTypes.BLOCK_REQS, sb));
+								sendQueue.put(connection, new Data(DataTypes.BLOCK_DATA, sb));
 							} else {
 								Utilities.log(this, "Duplicate detected in BlockListener HashMap", true);
 							}
-							// blockConn.sendTCP(new Data(DataTypes.BLOCK_REQS, new
-							// StreamedBlock(blockOrigin, blockName,
-							// searchRes)));
 						} else {
 							Utilities.log(this, "\tFailure: could not find block " + blockName, true);
 						}

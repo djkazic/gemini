@@ -3,8 +3,8 @@ package net.poll;
 import atrium.Core;
 import atrium.Peer;
 import atrium.Utilities;
-import packets.requests.Request;
-import packets.requests.RequestTypes;
+import packets.data.Data;
+import packets.data.DataTypes;
 
 public class CachePoller implements Runnable {
 
@@ -19,7 +19,7 @@ public class CachePoller implements Runnable {
 							continue;
 						}
 						Utilities.log(this, "Polling peer " + peer.getMutex() + " for cache", false);
-						peer.getConnection().sendTCP(new Request(RequestTypes.CACHE_REQS, null));
+						peer.getConnection().sendTCP(new Data(DataTypes.CACHE_REQS, null));
 					}
 				}
 				Thread.sleep(90000);

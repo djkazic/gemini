@@ -14,8 +14,6 @@ import crypto.RSA;
 import net.poll.CachePoller;
 import packets.data.Data;
 import packets.data.DataTypes;
-import packets.requests.Request;
-import packets.requests.RequestTypes;
 
 /**
  * Representation of a incoming or outgoing peer. Handles data storage and abstract data exchange for P2P communication.
@@ -73,19 +71,19 @@ public class Peer {
 						Utilities.log(this, "Sending our pubkey first", true);
 						connection.sendTCP(new Data(DataTypes.PUBKEY_DATA, RSA.pubKey));
 						Utilities.log(this, "Requesting peer's pubkey", true);
-						connection.sendTCP(new Request(RequestTypes.PUBKEY_REQS, null));
+						connection.sendTCP(new Data(DataTypes.PUBKEY_REQS, null));
 						Utilities.log(this, "Awaiting peer's pubkey", true);
 						pubkeyDone.await();
 						Utilities.log(this, "Requesting peer's mutex", true);
-						connection.sendTCP(new Request(RequestTypes.MUTEX_REQS, null));
+						connection.sendTCP(new Data(DataTypes.MUTEX_REQS, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist", true);
-						connection.sendTCP(new Request(RequestTypes.PEERLIST_REQS, null));
+						connection.sendTCP(new Data(DataTypes.PEERLIST_REQS, null));
 						Utilities.log(this, "Requesting extVisible data", true);
-						connection.sendTCP(new Request(RequestTypes.EXTVIS_REQS, null));
+						connection.sendTCP(new Data(DataTypes.EXTVIS_REQS, null));
 						Utilities.log(this, "Requesting peer's hostPort", true);
-						connection.sendTCP(new Request(RequestTypes.HOSTPORT_REQS, null));
+						connection.sendTCP(new Data(DataTypes.HOSTPORT_REQS, null));
 					} else {
 						// When we've received both a pubkey and sent our
 						// peerlist out,
@@ -93,15 +91,15 @@ public class Peer {
 						pubkeyDone.await();
 						deferredRequesting.await();
 						Utilities.log(this, "Requesting peer's mutex", true);
-						connection.sendTCP(new Request(RequestTypes.MUTEX_REQS, null));
+						connection.sendTCP(new Data(DataTypes.MUTEX_REQS, null));
 						cryptoDone.await();
 						aes = new AES(mutex);
 						Utilities.log(this, "Requesting peer's peerlist", true);
-						connection.sendTCP(new Request(RequestTypes.PEERLIST_REQS, null));
+						connection.sendTCP(new Data(DataTypes.PEERLIST_REQS, null));
 						Utilities.log(this, "Requesting extVisible data", true);
-						connection.sendTCP(new Request(RequestTypes.EXTVIS_REQS, null));
+						connection.sendTCP(new Data(DataTypes.EXTVIS_REQS, null));
 						Utilities.log(this, "Requesting peer's hostPort", true);
-						connection.sendTCP(new Request(RequestTypes.HOSTPORT_REQS, null));
+						connection.sendTCP(new Data(DataTypes.HOSTPORT_REQS, null));
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
