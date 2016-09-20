@@ -49,3 +49,4 @@ $RECYCLE.BIN/
 
 # IntelliJ
 .idea/
+out/artifacts/gemini_jar/gemini.jar
