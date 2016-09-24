@@ -197,7 +197,7 @@ public class NetHandler {
 	}
 
 	private void checkDestroyServer() {
-		if (!Core.config.hubMode && !extVisible) {
+		if (!Core.config.hubMode && !extVisible && !Core.config.serverDestroyBypass) {
 			destroyServerListeners();
 		}
 	}
@@ -307,7 +307,7 @@ public class NetHandler {
 
 			// foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			// foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			foundHosts.add(InetAddress.getByName("52.11.190.28"));
+			foundHosts.add(InetAddress.getByName("192.168.1.116"));
 			// foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			filterHosts();

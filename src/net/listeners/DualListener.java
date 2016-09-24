@@ -88,8 +88,7 @@ public class DualListener extends Listener {
 					Utilities.log(this, "Received request for mutex", false);
 					replyPool.execute(new Runnable() {
 						public void run() {
-							connection.sendTCP(
-									new Data(DataTypes.MUTEX_DATA, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
+							connection.sendTCP(new Data(DataTypes.MUTEX_DATA, Core.rsa.encrypt(Core.mutex, foundPeer.getPubkey())));
 							Utilities.log(this, "\tSent mutex back", false);
 						}
 					});
