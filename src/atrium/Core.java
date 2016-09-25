@@ -111,8 +111,8 @@ public class Core {
 		}
 
 		// Set mutex
-		Utilities.log("Core", "Calculating mutex", false);
 		mutex = Utilities.getMutex();
+		Utilities.log("Core", "Calculated mutex: " + mutex, false);
 
 		// Initialize crypto RSA
 		Utilities.log("Core", "Initializing RSA", false);
