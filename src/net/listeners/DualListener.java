@@ -503,11 +503,11 @@ public class DualListener extends Listener {
 			if (complete) {
 				Utilities.log(this, "Beginning request for cache sync [C] on BlockedFile " + intermediate.getChecksum(),
 						true);
-				(new Thread(new Downloader(intermediate, false))).start();
+				(new Thread(new Downloader(intermediate))).start();
 			} else {
 				Utilities.log(this,
 						"Beginning request for cache sync [IC] on BlockedFile " + intermediate.getChecksum(), true);
-				(new Thread(new Downloader(intermediate, false))).start();
+				(new Thread(new Downloader(intermediate))).start();
 			}
 		} else {
 			Utilities.log(this, "Non-compliance with cache readiness, deleting cachepull data", false);

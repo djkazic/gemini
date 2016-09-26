@@ -22,7 +22,7 @@ public class BlockListener extends TcpIdleSender {
 
 	public BlockListener() {
 		if (sendQueue == null) {
-			sendQueue = new HashMap<Connection, Data>();
+			sendQueue = new HashMap<Connection, Data> ();
 		}
 	}
 
@@ -51,13 +51,11 @@ public class BlockListener extends TcpIdleSender {
 				if ((foundBlock = FileUtils.getBlockedFile(blockOriginChecksum)) != null) {
 					int blockPosition;
 					if ((blockPosition = foundBlock.getBlockList().indexOf(blockName)) != -1) {
-
 						byte[] searchRes = null;
 						if (!foundBlock.isComplete() || Core.config.hubMode) {
 							// Attempt incomplete search
 							try {
-								searchRes = Files
-										.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
+								searchRes = Files.readAllBytes(FileUtils.findBlockAppData(foundBlock, blockName).toPath());
 							} catch (Exception ex) {
 								Utilities.log(this, "Received request for block we do not yet have", true);
 							}

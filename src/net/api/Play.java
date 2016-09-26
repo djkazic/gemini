@@ -23,7 +23,7 @@ public class Play extends ServerResource {
 			if (json.length() > 0) {
 				BlockedFile testBf = FileUtils.getBlockedFile(json.getString("query"));
 				if (testBf != null && !testBf.isComplete()) {
-					Thread downloadThread = (new Thread(new Downloader(FileUtils.getBlockedFile(json.getString("query")), false)));
+					Thread downloadThread = (new Thread(new Downloader(FileUtils.getBlockedFile(json.getString("query")))));
 					downloadThread.start();
 					downloadThread.join();
 				}

@@ -12,12 +12,10 @@ public class Downloader implements Runnable {
 	public static ArrayList<Downloader> downloaders = new ArrayList<Downloader>();
 
 	private BlockedFile blockedFile;
-	private boolean stream = false;
 	private boolean download = true;
 
-	public Downloader(BlockedFile blockedFile, boolean stream) {
+	public Downloader(BlockedFile blockedFile) {
 		this.blockedFile = blockedFile;
-		this.stream = stream;
 	}
 
 	public void run() {
@@ -40,9 +38,6 @@ public class Downloader implements Runnable {
 			Utilities.log(this, "Enumerating block data blacklist", true);
 			blockedFile.setBlackList(FileUtils.enumerateIncompleteBlackList(blockedFile));
 
-			// Counter for length of blocks until we reach a quadrant of (~32MB)
-			int quadrantMark = 0;
-
 			String lastBlock = null;
 			String block = null;
 
@@ -55,18 +50,11 @@ public class Downloader implements Runnable {
 					continue;
 				}
 
-				if (stream) {
-					block = blockedFile.nextStreamBlock();
-				} else {
-					block = blockedFile.nextRandomBlock();
-				}
+				block = blockedFile.nextRandomBlock();
 
 				if (block != null && !block.equals(lastBlock)) {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);
-					if (Core.peers.size() == 0) {
-						quadrantMark += Core.blockSize;
-					}
 					NetHandler.requestBlock(blockedFile.getChecksum(), block);
 					Thread.sleep(90 / Core.peers.size());
 				} else if (block != null && block.equals(lastBlock)) {
@@ -79,30 +67,12 @@ public class Downloader implements Runnable {
 					blockedFile.updateProgress();
 					BlockedFile.serializeAll();
 				}
-
-				if (Core.peers.size() >= 3) {
-					// If bytes counter is greater or equal to 32MB
-					if (quadrantMark >= (32000 * 1000)) {
-						Utilities.log(this, "Sleep for 32nd quadrant initiated", true);
-						quadrantMark = 0;
-						long defaultWait = 750;
-						defaultWait *= (0.45D + (blockedFile.getProgressNum() / 100D));
-						Utilities.log(this, "Quadrant sleep: " + defaultWait + "ms", true);
-						Thread.sleep(defaultWait);
-					}
-				}
-
-				if (stream) {
-					FileUtils.unifyBlocksStream(blockedFile);
-				}
 			}
 
+			// Finish condition
 			download = false;
 			if (Core.config.hubMode || blockedFile.getCacheStatus()) {
 				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
-			} else if (!stream) {
-				Utilities.log(this, "Assembling BlockedFile: " + blockedFile.getPointer().getName(), true);
-				FileUtils.unifyBlocks(blockedFile);
 			}
 
 			downloaders.remove(this);
