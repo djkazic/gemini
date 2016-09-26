@@ -80,7 +80,7 @@ public class Utilities {
 				if (Core.config.generatedMAC == null) {
 					Core.config.generatedMAC = randomMACAddress();
 				}
-				return base64(Core.config.generatedMAC).substring(0, 24);
+				return base64(Core.config.generatedMAC);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

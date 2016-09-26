@@ -17,7 +17,6 @@ public class Config {
 	public String generatedMAC = null;
 
 	// GUI
-	public boolean serverDestroyBypass = true;
 	public boolean hubMode = false;
 	public boolean clearBarAfterSearch = true;
 	public boolean notifiedPortForwarding = false;
