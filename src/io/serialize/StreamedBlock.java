@@ -73,7 +73,10 @@ public class StreamedBlock {
 						RandomAccessFile raf = new RandomAccessFile(bufferFile, "rw");
 						int position = bf.getBlockList().indexOf(blockDest);
 						raf.seek(position * Core.blockSize);
+						Utilities.log(this, "Wrote position " + position + " to RAF", false);
 						raf.write(decrypted);
+						raf.close();
+						bf.logBlock(blockDest);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

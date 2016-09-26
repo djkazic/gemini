@@ -133,7 +133,7 @@ public class FileWatcher implements Runnable {
 							continue;
 						}
 						if (FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
-							Utilities.log(this, "Created BlockedFile: " + relevantsearchSploitFileName, true);
+							Utilities.log(this, "Created BlockedFile: " + relevantsearchSploitFileName, false);
 							new BlockedFile(bfs, true);
 						}
 
@@ -167,7 +167,7 @@ public class FileWatcher implements Runnable {
 		final String relevantsearchSploitFileName = we;
 		final File bfs = new File(FileUtils.getWorkspaceDir() + "/" + relevantsearchSploitFileName);
 
-		if (bfs.isFile() || !bfs.exists()) {
+		if (bfs.isFile() || !bfs.exists() && !FileUtils.getExtension(bfs.getName()).equals("tmp")) {
 			if (!Core.config.hubMode) {
 				Utilities.log(this, "Deletion detected in workspace: " + we, false);
 			}

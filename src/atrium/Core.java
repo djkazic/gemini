@@ -49,7 +49,7 @@ public class Core {
 	public static ArrayList<BlockedFile> blockDex;
 	public static HashMap<ArrayList<String>, ArrayList<String>> index;
 
-	public static int blockSize = 256000;
+	public static int blockSize = 128000;
 	public static Config config;
 	public static String mutex;
 
