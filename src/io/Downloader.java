@@ -1,5 +1,6 @@
 package io;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import atrium.Core;
@@ -70,6 +71,16 @@ public class Downloader implements Runnable {
 			}
 
 			// Finish condition
+			try {
+				File bufferFile = new File(blockedFile.getBufferFile());
+				if (bufferFile.exists()) {
+					Utilities.log(this, "Finalizing buffer file", false);
+					bufferFile.renameTo(new File(FileUtils.getWorkspaceDir() + "/" + blockedFile.getPointer().getName()));
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
 			download = false;
 			if (Core.config.hubMode || blockedFile.getCacheStatus()) {
 				Utilities.log(this, "Successful BlockedFile cache: " + blockedFile.getPointer().getName(), true);
