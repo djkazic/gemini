@@ -261,10 +261,10 @@ public class DualListener extends Listener {
 						public void run() {
 							String pubkeyData = (String) data.getPayload();
 							if (foundPeer.setPubkey(pubkeyData)) {
-								Utilities.log(this, "Set pubkey data for " + foundPeer, false);
+								Utilities.log(this, "Set pubkey " + pubkeyData + " for " + foundPeer, false);
 								foundPeer.getPubkeyLatch().countDown();
 							} else {
-								Utilities.log(this, "Could not set pubkey data for " + foundPeer, false);
+								Utilities.log(this, "Could not set pubkey " + pubkeyData + " for " + foundPeer, false);
 							}
 						}
 					});
