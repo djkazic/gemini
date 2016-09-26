@@ -74,13 +74,13 @@ public class Utilities {
 				}
 			}
 			if (!sb.toString().isEmpty() && firstInterfaceFound == null) {
-				return base64(sb.toString());
+				return base64(sb.toString()).substring(0, 86);
 			} else {
 				log("atrium.Utilities", "Interfaces are null, falling back to config mutex", false);
 				if (Core.config.generatedMAC == null) {
 					Core.config.generatedMAC = randomMACAddress();
 				}
-				return base64(Core.config.generatedMAC);
+				return base64(Core.config.generatedMAC).substring(0, 86);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
