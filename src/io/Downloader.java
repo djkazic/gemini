@@ -57,7 +57,7 @@ public class Downloader implements Runnable {
 					lastBlock = block;
 					Utilities.log(this, "Requesting block " + block, true);
 					NetHandler.requestBlock(blockedFile.getChecksum(), block);
-					Thread.sleep(90 / Core.peers.size());
+					Thread.sleep(120 / Core.peers.size());
 				} else if (block != null && block.equals(lastBlock)) {
 					Utilities.log(this, "Bad randomness, continue loop", true);
 					Thread.sleep(25);
