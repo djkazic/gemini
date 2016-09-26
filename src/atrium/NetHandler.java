@@ -198,7 +198,8 @@ public class NetHandler {
 
 	private void checkDestroyServer() {
 		// TODO: remove short-circuit for production
-		if (!Core.config.hubMode && !extVisible || false) {
+		//!Core.config.hubMode && !extVisible
+		if (false) {
 			destroyServerListeners();
 		}
 	}
