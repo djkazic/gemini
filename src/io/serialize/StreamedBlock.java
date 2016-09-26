@@ -2,6 +2,7 @@ package io.serialize;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 
 import atrium.Core;
 import atrium.Utilities;
@@ -63,38 +64,16 @@ public class StreamedBlock {
 				if (bf.isComplete()) {
 					Utilities.log(this, "Discarding block, BlockedFile is done", true);
 				} else {
-					File folder = new File(bf.getBlocksFolder());
-					File dest = new File(bf.getBlocksFolder() + "/" + blockDest);
-
 					try {
-						if (!folder.exists()) {
-							Utilities.log(this, "Creating directory: " + folder, true);
-							folder.mkdirs();
+						String bufferFileStr = bf.getBufferFile();
+						File bufferFile = new File(bufferFileStr);
+						if (!bufferFile.exists()) {
+							bufferFile.createNewFile();
 						}
-						if (!dest.exists()) {
-							// Utilities.log(this, "Writing block to " + dest);
-							FileOutputStream fos = new FileOutputStream(dest);
-							fos.write(decrypted);
-							fos.close();
-							if (FileUtils.generateChecksum(dest).equals(blockDest)) {
-								Utilities.log(this, "Logging block into blacklist", true);
-								bf.logBlock(blockDest);
-								if (Core.config.hubMode) {
-									// TODO: test hubmode block acceptance
-									Utilities.log(this, "Hub mode: encrypting received block", true);
-									dest.delete();
-									FileOutputStream sfos = new FileOutputStream(dest);
-									sfos.write(Core.aes.encrypt(decrypted));
-									sfos.close();
-								}
-							} else {
-								Utilities.log(this, "Checksum error for block " + blockDest, false);
-								dest.delete();
-							}
-						} else {
-							// TODO: remove debugging
-							Utilities.log(this, "Race condition: already have this block", true);
-						}
+						RandomAccessFile raf = new RandomAccessFile(bufferFile, "rw");
+						int position = bf.getBlockList().indexOf(blockDest);
+						raf.seek(position * Core.blockSize);
+						raf.write(decrypted);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

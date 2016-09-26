@@ -168,6 +168,10 @@ public class BlockedFile {
 		return FileUtils.getAppDataDir() + "/" + checksum;
 	}
 
+	public String getBufferFile() {
+		return FileUtils.getWorkspaceDir() + "/" + checksum + ".tmp";
+	}
+
 	/**
 	 * Returns pre-calculated checksum
 	 * 
