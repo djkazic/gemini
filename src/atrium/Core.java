@@ -116,10 +116,7 @@ public class Core {
 
 		// Initialize crypto RSA
 		Utilities.log("Core", "Initializing RSA", false);
-		if (Core.config.rsaPub != null && Core.config.rsaPriv != null)
-			rsa = new RSA(Core.config.rsaPub, Core.config.rsaPriv);
-		else
-			rsa = new RSA();
+		rsa = new RSA();
 		if (printPubKey) {
 			Utilities.log("Core", "Pubkey dump: " + RSA.pubKey, false);
 		}
