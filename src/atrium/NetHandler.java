@@ -145,7 +145,9 @@ public class NetHandler {
 							Utilities.log(this, "External visibility: " + (extVisible ? "PASS" : "FAIL"), false);
 							if (!Core.config.hubMode) {
 								if (!extVisible && !Core.config.notifiedPortForwarding) {
-									displayPortForwardWarning();
+									try {
+										displayPortForwardWarning();
+									} catch (Exception ex) {}
 								}
 							}
 						}
@@ -309,7 +311,7 @@ public class NetHandler {
 
 			// foundHosts.add(InetAddress.getByName("136.167.66.138"));
 			// foundHosts.add(InetAddress.getByName("192.3.165.112"));
-			foundHosts.add(InetAddress.getByName("192.168.1.116"));
+			foundHosts.add(InetAddress.getByName("192.168.1.51"));
 			// foundHosts.add(InetAddress.getByName("136.167.252.240"));
 
 			filterHosts();

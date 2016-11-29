@@ -20,7 +20,7 @@ public class FilterUtils {
 
 	private static ArrayList<String> badFilter; // internal res, stored as hex
 	private static ArrayList<String> adultFilter; // adultfilter.dat
-	private static ArrayList<String> extensionFilter; // extfilter.dat
+	private static ArrayList<String> extensionFilter; // extfilter.dat: mp3, wav, ogg, aiff, flac, tmp, avi, wmv, mov, mp4
 
 	public static void init() {
 		try {
