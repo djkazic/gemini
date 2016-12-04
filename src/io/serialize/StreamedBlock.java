@@ -3,6 +3,8 @@ package io.serialize;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 import atrium.Core;
 import atrium.Utilities;
@@ -71,10 +73,15 @@ public class StreamedBlock {
 							bufferFile.createNewFile();
 						}
 						RandomAccessFile raf = new RandomAccessFile(bufferFile, "rw");
+						FileChannel fc = raf.getChannel();
 						int position = bf.getBlockList().indexOf(blockDest);
-						raf.seek(position * Core.blockSize);
+						ByteBuffer bb = fc.map(FileChannel.MapMode.READ_WRITE, position * Core.blockSize, Core.blockSize);
+						//raf.seek(position * Core.blockSize);
 						Utilities.log(this, "Wrote position " + position + " to RAF", false);
-						raf.write(decrypted);
+						//raf.write(decrypted);
+						//raf.close();
+						bb.put(decrypted);
+						fc.close();
 						raf.close();
 						bf.logBlock(blockDest);
 					} catch (Exception ex) {
