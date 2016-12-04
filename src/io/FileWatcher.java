@@ -133,7 +133,7 @@ public class FileWatcher implements Runnable {
 							continue;
 						}
 						Utilities.log(this, "Detected a released handle on file", false);
-						if (bfs.getName().endsWith(".tmp") && FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
+						if (!bfs.getName().endsWith(".tmp") && FileUtils.getBlockedFile(FileUtils.generateChecksum(bfs)) == null) {
 							Utilities.log(this, "Created BlockedFile: " + relevantsearchSploitFileName, false);
 							new BlockedFile(bfs, true);
 						} else {
