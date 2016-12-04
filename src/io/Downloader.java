@@ -74,7 +74,13 @@ public class Downloader implements Runnable {
 			try {
 				File bufferFile = new File(blockedFile.getBufferFile());
 				if (bufferFile.exists()) {
-					Utilities.log(this, "Finalizing buffer file: " + bufferFile.renameTo(new File(FileUtils.getWorkspaceDir() + "/" + blockedFile.getPointer().getName())), false);
+					File newFile = new File(FileUtils.getWorkspaceDir() + "/" + blockedFile.getPointer().getName());
+					boolean rename = false;
+					while (!rename) {
+						rename = bufferFile.renameTo(newFile);
+						Utilities.log(this, "Finalizing buffer file: " + rename, false);
+						Thread.sleep(25);
+					}
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
