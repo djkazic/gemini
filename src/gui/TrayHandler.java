@@ -1,5 +1,8 @@
 package gui;
 
+import atrium.Core;
+import atrium.Utilities;
+
 import java.awt.AWTException;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -15,7 +18,8 @@ public class TrayHandler {
 	public static void init() {
 		// Check the SystemTray is supported
 		if (!SystemTray.isSupported()) {
-		    System.out.println("SystemTray is not supported");
+		    Utilities.log("TrayHandler", "SystemTray is not supported", false);
+			Core.config.hubMode = true;
 		    return;
 		}
 		
