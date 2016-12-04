@@ -28,7 +28,8 @@ public class Utilities {
 	 *            debug message
 	 */
 	public static void log(Object someClass, String msg, boolean debug) {
-		String output = "[" + someClass.getClass().getSimpleName() + "]: " + msg;
+		String classStr = someClass.getClass().getSimpleName();
+		String output = "[" + classStr + "]" + generateSpaces(12 - classStr.length()) + ": " + msg;
 		if (debug) {
 			Log.debug(output);
 		} else {
@@ -45,12 +46,20 @@ public class Utilities {
 	 *            debug message
 	 */
 	public static void log(String someClass, String msg, boolean debug) {
-		String output = "[" + someClass + "]: " + msg;
+		String output = "[" + someClass + "]" + generateSpaces(12 - someClass.length()) + ": " + msg;
 		if (debug) {
 			Log.debug(output);
 		} else {
 			Log.info(output);
 		}
+	}
+
+	private static String generateSpaces(int num) {
+		StringBuffer sb = new StringBuffer();
+		for (int i=0; i < num; i++) {
+			sb.append(" ");
+		}
+		return sb.toString();
 	}
 
 	/**
