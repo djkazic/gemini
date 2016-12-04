@@ -1,9 +1,8 @@
 package io.serialize;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import atrium.Core;
@@ -11,6 +10,8 @@ import atrium.Utilities;
 import crypto.AES;
 import io.FileUtils;
 import io.block.BlockedFile;
+import sun.misc.Cleaner;
+import sun.nio.ch.DirectBuffer;
 
 public class StreamedBlock {
 
@@ -67,22 +68,18 @@ public class StreamedBlock {
 					Utilities.log(this, "Discarding block, BlockedFile is done", true);
 				} else {
 					try {
-						String bufferFileStr = bf.getBufferFile();
-						File bufferFile = new File(bufferFileStr);
-						if (!bufferFile.exists()) {
-							bufferFile.createNewFile();
-						}
-						RandomAccessFile raf = new RandomAccessFile(bufferFile, "rw");
-						FileChannel fc = raf.getChannel();
 						int position = bf.getBlockList().indexOf(blockDest);
-						ByteBuffer bb = fc.map(FileChannel.MapMode.READ_WRITE, position * Core.blockSize, Core.blockSize);
-						//raf.seek(position * Core.blockSize);
-						Utilities.log(this, "Wrote position " + position + " to RAF", false);
-						//raf.write(decrypted);
-						//raf.close();
+						FileChannel fc = bf.getBufferFileChannel();
+						MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_WRITE, position * Core.blockSize, Core.blockSize);
 						bb.put(decrypted);
-						fc.close();
-						raf.close();
+						//bb.force();
+
+						Cleaner cleaner = ((DirectBuffer) bb).cleaner();
+						if (cleaner != null) {
+							cleaner.clean();
+						}
+						Utilities.log(this, "Wrote position " + position + " to RAF", false);
+
 						bf.logBlock(blockDest);
 					} catch (Exception ex) {
 						ex.printStackTrace();
