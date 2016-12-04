@@ -472,6 +472,7 @@ public class FileUtils {
 
 			// Delete file after physical blocking if running in hubMode
 			if (Core.config.hubMode) {
+				Utilities.log("FileUtils", "Removing base import file", false);
 				FileUtils.deleteRecursive(bf.getPointer());
 				FileUtils.removeFileAndParentsIfEmpty(bf.getPointer().toPath());
 			}
