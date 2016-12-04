@@ -175,7 +175,7 @@ public class BlockedFile {
 
 	/**
 	 * Returns pre-calculated checksum
-	 * 
+	 *
 	 * @return string pre-calculated checksum
 	 */
 	public String getChecksum() {
