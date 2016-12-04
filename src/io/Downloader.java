@@ -65,6 +65,7 @@ public class Downloader implements Runnable {
 				} else if (block == null) {
 					Utilities.log(this, "BlockedFile " + blockedFile.getPointer().getName() + " is complete", false);
 					blockedFile.setComplete(true);
+					blockedFile.getBufferFileChannel().close();
 					blockedFile.updateProgress();
 					BlockedFile.serializeAll();
 				}
@@ -72,7 +73,7 @@ public class Downloader implements Runnable {
 
 			// Finish condition
 			try {
-				File bufferFile = new File(blockedFile.getBufferFile());
+				File bufferFile = blockedFile.getBufferFile();
 				if (bufferFile.exists()) {
 					File newFile = new File(FileUtils.getWorkspaceDir() + "/" + blockedFile.getPointer().getName());
 					boolean rename = false;

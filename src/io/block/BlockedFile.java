@@ -2,11 +2,14 @@ package io.block;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
@@ -32,6 +35,8 @@ public class BlockedFile {
 	private float blockRate;
 	private long lastChecked;
 	private boolean cacheStatus;
+	private RandomAccessFile raf;
+	private FileChannel chan;
 
 	/**
 	 * Constructor for brand new BlockedFiles in the work directory or empty pointers
@@ -168,10 +173,6 @@ public class BlockedFile {
 		return FileUtils.getAppDataDir() + "/" + checksum;
 	}
 
-	public String getBufferFile() {
-		return FileUtils.getWorkspaceDir() + "/" + checksum + ".tmp";
-	}
-
 	/**
 	 * Returns pre-calculated checksum
 	 * 
@@ -181,13 +182,36 @@ public class BlockedFile {
 		return checksum;
 	}
 
-	public void setChecksum(String in) {
-		checksum = in;
+	public File getBufferFile() {
+		File bufferFile = new File(FileUtils.getWorkspaceDir() + "/" + checksum + ".tmp");
+		if (!bufferFile.exists()) {
+			try {
+				bufferFile.createNewFile();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return bufferFile;
+	}
+
+	public FileChannel getBufferFileChannel() {
+		if (chan == null || (chan != null && !chan.isOpen())) {
+			try {
+				File bufferFile = getBufferFile();
+				if (raf == null) {
+					raf = new RandomAccessFile(bufferFile, "rw");
+				}
+				chan = raf.getChannel();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return chan;
 	}
 
 	/**
 	 * Returns ArrayList<String> list of blocks
-	 * 
+	 *
 	 * @return ArrayList<String> list of blocks
 	 */
 	public ArrayList<String> getBlockList() {
@@ -438,6 +462,8 @@ public class BlockedFile {
 		progress = "";
 		blockRate = 0;
 		lastChecked = 0;
+		raf = null;
+		chan = null;
 		complete = false;
 	}
 
